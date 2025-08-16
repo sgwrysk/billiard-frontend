@@ -440,127 +440,222 @@ const GameBoard: React.FC<GameBoardProps> = ({
       {game.type === GameType.BOWLARD && (
         <Card sx={{ mb: 2 }}>
           <CardContent>
-            {/* ボーリングスコアシート（モバイル対応） */}
+            {/* ボーリングスコアシート（モバイル2段対応） */}
             <Box sx={{ mb: 2 }}>
-              {/* フレーム番号ヘッダー */}
-              <Box sx={{ 
-                display: 'flex', 
-                border: '2px solid #333',
-                borderBottom: '1px solid #333'
-              }}>
-                {Array.from({ length: 10 }, (_, i) => (
-                  <Box 
-                    key={`frame-${i}`}
-                    sx={{
-                      flex: i === 9 ? 1.5 : 1,
-                      border: '1px solid #333',
-                      borderTop: 'none',
-                      borderBottom: 'none',
-                      borderLeft: i === 0 ? 'none' : '1px solid #333',
-                      borderRight: 'none',
-                      p: { xs: 0.5, sm: 1 },
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      fontSize: { xs: '0.75rem', sm: '1rem' }
-                    }}
-                  >
-                    {i + 1}
-                  </Box>
-                ))}
-              </Box>
-              
-              {/* 投球結果行 */}
-              <Box sx={{ 
-                display: 'flex',
-                border: '2px solid #333',
-                borderTop: 'none',
-                borderBottom: '1px solid #333'
-              }}>
-                {Array.from({ length: 10 }, (_, frameIndex) => {
-                  const frame = currentPlayer.bowlingFrames?.[frameIndex];
-                  const isFrame10 = frameIndex === 9;
-                  
-                  return (
+              {/* デスクトップ表示（1行） */}
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <Box sx={{ 
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1.5fr',
+                  border: '2px solid #333'
+                }}>
+                  {/* フレーム番号ヘッダー */}
+                  {Array.from({ length: 10 }, (_, i) => (
                     <Box 
-                      key={`rolls-${frameIndex}`}
+                      key={`frame-${i}`}
                       sx={{
-                        flex: isFrame10 ? 1.5 : 1,
-                        border: '1px solid #333',
-                        borderTop: 'none',
-                        borderBottom: 'none',
-                        borderLeft: frameIndex === 0 ? 'none' : '1px solid #333',
-                        borderRight: 'none',
-                        bgcolor: frame?.isComplete ? '#e8f5e8' : 'white',
-                        minHeight: { xs: 32, sm: 40 },
-                        display: 'flex'
+                        borderRight: i === 9 ? 'none' : '1px solid #333',
+                        borderBottom: '1px solid #333',
+                        p: 1,
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        fontSize: '1rem'
                       }}
                     >
-                      {isFrame10 ? (
-                        // 10フレーム（3つのボックス）
-                        <>
-                          {Array.from({ length: 3 }, (_, rollIndex) => (
+                      {i + 1}
+                    </Box>
+                  ))}
+                  
+                  {/* 投球結果行 */}
+                  {Array.from({ length: 10 }, (_, frameIndex) => {
+                    const frame = currentPlayer.bowlingFrames?.[frameIndex];
+                    const isFrame10 = frameIndex === 9;
+                    
+                    return (
+                      <Box 
+                        key={`rolls-${frameIndex}`}
+                        sx={{
+                          borderRight: isFrame10 ? 'none' : '1px solid #333',
+                          borderBottom: '1px solid #333',
+                          bgcolor: frame?.isComplete ? '#e8f5e8' : 'white',
+                          minHeight: 40,
+                          display: 'flex'
+                        }}
+                      >
+                        {isFrame10 ? (
+                          // 10フレーム（3つのボックス）
+                          <>
+                            {Array.from({ length: 3 }, (_, rollIndex) => (
+                              <Box 
+                                key={rollIndex}
+                                sx={{
+                                  flex: 1,
+                                  borderLeft: rollIndex > 0 ? '1px solid #333' : 'none',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '0.875rem',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {(() => {
+                                  if (frame?.rolls[rollIndex] === undefined) return '';
+                                  
+                                  const roll = frame.rolls[rollIndex];
+                                  
+                                  // 1投目
+                                  if (rollIndex === 0) {
+                                    return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                  }
+                                  
+                                  // 2投目
+                                  if (rollIndex === 1) {
+                                    // 1投目がストライクの場合
+                                    if (frame.rolls[0] === 10) {
+                                      return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                    }
+                                    // スペアの場合
+                                    else if (frame.rolls[0] + roll === 10) {
+                                      return '/';
+                                    }
+                                    // 通常
+                                    else {
+                                      return roll === 0 ? '-' : roll;
+                                    }
+                                  }
+                                  
+                                  // 3投目
+                                  if (rollIndex === 2) {
+                                    return roll === 10 ? 'X' : roll === 0 ? '-' : roll;
+                                  }
+                                  
+                                  return roll;
+                                })()}
+                              </Box>
+                            ))}
+                          </>
+                        ) : (
+                          // 1-9フレーム（2つのボックス）
+                          <>
                             <Box 
-                              key={rollIndex}
                               sx={{
-                                flex: 1,
-                                borderLeft: rollIndex > 0 ? '1px solid #333' : 'none',
+                                width: '50%',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                fontSize: '0.875rem',
+                                fontWeight: 'bold',
+                                borderRight: '1px solid #333'
+                              }}
+                            >
+                              {frame?.rolls[0] !== undefined ? (
+                                frame.isStrike ? 'X' : 
+                                frame.rolls[0] === 0 ? 'G' : frame.rolls[0]
+                              ) : ''}
+                            </Box>
+                            <Box 
+                              sx={{
+                                width: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.875rem',
                                 fontWeight: 'bold'
                               }}
                             >
-                              {(() => {
-                                if (frame?.rolls[rollIndex] === undefined) return '';
-                                
-                                const roll = frame.rolls[rollIndex];
-                                
-                                // 1投目
-                                if (rollIndex === 0) {
-                                  return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
-                                }
-                                
-                                // 2投目
-                                if (rollIndex === 1) {
-                                  // 1投目がストライクの場合
-                                  if (frame.rolls[0] === 10) {
-                                    return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
-                                  }
-                                  // スペアの場合
-                                  else if (frame.rolls[0] + roll === 10) {
-                                    return '/';
-                                  }
-                                  // 通常
-                                  else {
-                                    return roll === 0 ? '-' : roll;
-                                  }
-                                }
-                                
-                                // 3投目
-                                if (rollIndex === 2) {
-                                  return roll === 10 ? 'X' : roll === 0 ? '-' : roll;
-                                }
-                                
-                                return roll;
-                              })()}
+                              {!frame?.isStrike && frame?.rolls[1] !== undefined ? (
+                                frame.isSpare ? '/' :
+                                frame.rolls[1] === 0 ? '-' : frame.rolls[1]
+                              ) : ''}
                             </Box>
-                          ))}
-                        </>
-                      ) : (
-                        // 1-9フレーム（2つのボックス）
-                        <>
+                          </>
+                        )}
+                      </Box>
+                    );
+                  })}
+                  
+                  {/* 累積スコア行 */}
+                  {Array.from({ length: 10 }, (_, i) => {
+                    const frame = currentPlayer.bowlingFrames?.[i];
+                    
+                    return (
+                      <Box 
+                        key={`score-${i}`}
+                        sx={{
+                          borderRight: i === 9 ? 'none' : '1px solid #333',
+                          p: 1,
+                          textAlign: 'center',
+                          fontSize: '1.125rem',
+                          fontWeight: 'bold',
+                          bgcolor: '#f5f5f5',
+                          minHeight: 40,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Box>
+
+              {/* モバイル表示（2段） */}
+              <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                {/* 1-5フレーム */}
+                <Box sx={{ mb: 2 }}>
+                  <Box sx={{ 
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+                    border: '2px solid #333'
+                  }}>
+                    {/* フレーム番号ヘッダー（1-5） */}
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Box 
+                        key={`frame-${i}`}
+                        sx={{
+                          borderRight: i === 4 ? 'none' : '1px solid #333',
+                          borderBottom: '1px solid #333',
+                          p: 0.5,
+                          bgcolor: 'primary.main',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          textAlign: 'center',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        {i + 1}
+                      </Box>
+                    ))}
+                    
+                    {/* 投球結果行（1-5） */}
+                    {Array.from({ length: 5 }, (_, frameIndex) => {
+                      const frame = currentPlayer.bowlingFrames?.[frameIndex];
+                      
+                      return (
+                        <Box 
+                          key={`rolls-${frameIndex}`}
+                          sx={{
+                            borderRight: frameIndex === 4 ? 'none' : '1px solid #333',
+                            borderBottom: '1px solid #333',
+                            bgcolor: frame?.isComplete ? '#e8f5e8' : 'white',
+                            minHeight: 40,
+                            display: 'flex'
+                          }}
+                        >
+                          {/* 1-5フレーム（2つのボックス） */}
                           <Box 
                             sx={{
                               width: '50%',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                              fontSize: '0.75rem',
                               fontWeight: 'bold',
-                              borderRight: '2px solid #333'
+                              borderRight: '1px solid #333'
                             }}
                           >
                             {frame?.rolls[0] !== undefined ? (
@@ -574,7 +669,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                              fontSize: '0.75rem',
                               fontWeight: 'bold'
                             }}
                           >
@@ -583,47 +678,199 @@ const GameBoard: React.FC<GameBoardProps> = ({
                               frame.rolls[1] === 0 ? '-' : frame.rolls[1]
                             ) : ''}
                           </Box>
-                        </>
-                      )}
-                    </Box>
-                  );
-                })}
-              </Box>
-              
-              {/* 累積スコア行 */}
-              <Box sx={{ 
-                display: 'flex',
-                border: '2px solid #333',
-                borderTop: 'none'
-              }}>
-                {Array.from({ length: 10 }, (_, i) => {
-                  const frame = currentPlayer.bowlingFrames?.[i];
-                  
-                  return (
-                    <Box 
-                      key={`score-${i}`}
-                      sx={{
-                        flex: i === 9 ? 1.5 : 1,
-                        border: '1px solid #333',
-                        borderTop: 'none',
-                        borderBottom: 'none',
-                        borderLeft: i === 0 ? 'none' : '1px solid #333',
-                        borderRight: 'none',
-                        p: { xs: 0.5, sm: 1 },
-                        textAlign: 'center',
-                        fontSize: { xs: '0.875rem', sm: '1.125rem' },
-                        fontWeight: 'bold',
-                        bgcolor: '#f5f5f5',
-                        minHeight: { xs: 32, sm: 40 },
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
-                    </Box>
-                  );
-                })}
+                        </Box>
+                      );
+                    })}
+                    
+                    {/* 累積スコア行（1-5） */}
+                    {Array.from({ length: 5 }, (_, i) => {
+                      const frame = currentPlayer.bowlingFrames?.[i];
+                      
+                      return (
+                        <Box 
+                          key={`score-${i}`}
+                          sx={{
+                            borderRight: i === 4 ? 'none' : '1px solid #333',
+                            p: 0.5,
+                            textAlign: 'center',
+                            fontSize: '1rem',
+                            fontWeight: 'bold',
+                            bgcolor: '#f5f5f5',
+                            minHeight: 36,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+
+                {/* 6-10フレーム */}
+                <Box>
+                  <Box sx={{ 
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr 1fr 1fr 1.5fr',
+                    border: '2px solid #333'
+                  }}>
+                    {/* フレーム番号ヘッダー（6-10） */}
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Box 
+                        key={`frame-${i + 5}`}
+                        sx={{
+                          borderRight: i === 4 ? 'none' : '1px solid #333',
+                          borderBottom: '1px solid #333',
+                          p: 0.5,
+                          bgcolor: 'primary.main',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          textAlign: 'center',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        {i + 6}
+                      </Box>
+                    ))}
+                    
+                    {/* 投球結果行（6-10） */}
+                    {Array.from({ length: 5 }, (_, frameIndex) => {
+                      const actualFrameIndex = frameIndex + 5;
+                      const frame = currentPlayer.bowlingFrames?.[actualFrameIndex];
+                      const isFrame10 = actualFrameIndex === 9;
+                      
+                      return (
+                        <Box 
+                          key={`rolls-${actualFrameIndex}`}
+                          sx={{
+                            borderRight: isFrame10 ? 'none' : '1px solid #333',
+                            borderBottom: '1px solid #333',
+                            bgcolor: frame?.isComplete ? '#e8f5e8' : 'white',
+                            minHeight: 40,
+                            display: 'flex'
+                          }}
+                        >
+                          {isFrame10 ? (
+                            // 10フレーム（3つのボックス）
+                            <>
+                              {Array.from({ length: 3 }, (_, rollIndex) => (
+                                <Box 
+                                  key={rollIndex}
+                                  sx={{
+                                    flex: 1,
+                                    borderLeft: rollIndex > 0 ? '1px solid #333' : 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.7rem',
+                                    fontWeight: 'bold'
+                                  }}
+                                >
+                                  {(() => {
+                                    if (frame?.rolls[rollIndex] === undefined) return '';
+                                    
+                                    const roll = frame.rolls[rollIndex];
+                                    
+                                    // 1投目
+                                    if (rollIndex === 0) {
+                                      return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                    }
+                                    
+                                    // 2投目
+                                    if (rollIndex === 1) {
+                                      // 1投目がストライクの場合
+                                      if (frame.rolls[0] === 10) {
+                                        return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                      }
+                                      // スペアの場合
+                                      else if (frame.rolls[0] + roll === 10) {
+                                        return '/';
+                                      }
+                                      // 通常
+                                      else {
+                                        return roll === 0 ? '-' : roll;
+                                      }
+                                    }
+                                    
+                                    // 3投目
+                                    if (rollIndex === 2) {
+                                      return roll === 10 ? 'X' : roll === 0 ? '-' : roll;
+                                    }
+                                    
+                                    return roll;
+                                  })()}
+                                </Box>
+                              ))}
+                            </>
+                          ) : (
+                            // 6-9フレーム（2つのボックス）
+                            <>
+                              <Box 
+                                sx={{
+                                  width: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 'bold',
+                                  borderRight: '1px solid #333'
+                                }}
+                              >
+                                {frame?.rolls[0] !== undefined ? (
+                                  frame.isStrike ? 'X' : 
+                                  frame.rolls[0] === 0 ? 'G' : frame.rolls[0]
+                                ) : ''}
+                              </Box>
+                              <Box 
+                                sx={{
+                                  width: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {!frame?.isStrike && frame?.rolls[1] !== undefined ? (
+                                  frame.isSpare ? '/' :
+                                  frame.rolls[1] === 0 ? '-' : frame.rolls[1]
+                                ) : ''}
+                              </Box>
+                            </>
+                          )}
+                        </Box>
+                      );
+                    })}
+                    
+                    {/* 累積スコア行（6-10） */}
+                    {Array.from({ length: 5 }, (_, i) => {
+                      const actualFrameIndex = i + 5;
+                      const frame = currentPlayer.bowlingFrames?.[actualFrameIndex];
+                      
+                      return (
+                        <Box 
+                          key={`score-${actualFrameIndex}`}
+                          sx={{
+                            borderRight: actualFrameIndex === 9 ? 'none' : '1px solid #333',
+                            p: 0.5,
+                            textAlign: 'center',
+                            fontSize: '1rem',
+                            fontWeight: 'bold',
+                            bgcolor: '#f5f5f5',
+                            minHeight: 36,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
               </Box>
             </Box>
 

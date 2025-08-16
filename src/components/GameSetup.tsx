@@ -107,16 +107,10 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
 
 
           {/* 2名固定のプレイヤー設定 */}
-          <Typography variant="h6" gutterBottom>
-            {t('setup.players')}
-          </Typography>
           <Grid container spacing={2}>
             {players.map((player, index) => (
               <Grid item xs={12} md={6} key={index}>
                 <Card variant="outlined" sx={{ p: 2 }}>
-                  <Typography variant="subtitle1" gutterBottom color="primary">
-                    {t('setup.player')} {index + 1}
-                  </Typography>
                   
                   <TextField
                     fullWidth

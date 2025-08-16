@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Box,
   Card,
@@ -10,7 +10,8 @@ import {
   Chip,
   IconButton,
   Paper,
-} from '@mui/material';
+    Slide,
+  } from '@mui/material';
 import { Home, Undo } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Game } from '../types/index';
@@ -43,6 +44,22 @@ const GameBoard: React.FC<GameBoardProps> = ({
 }) => {
   const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
+  const ballSectionRef = useRef<HTMLDivElement>(null);
+
+  // Scroll monitoring for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      if (ballSectionRef.current) {
+        const rect = ballSectionRef.current.getBoundingClientRect();
+        // Show sticky header when ball section is scrolled off-screen
+        setShowStickyHeader(rect.top < 100);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
 
   const getBallNumbers = () => {
@@ -170,6 +187,54 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <Box sx={{ maxWidth: 1000, mx: 'auto', p: 2 }}>
+      {/* Sticky header for current player */}
+      <Slide direction="down" in={showStickyHeader} mountOnEnter unmountOnExit>
+        <Paper
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            bgcolor: 'white',
+            color: 'text.primary',
+            py: 1,
+            px: 2,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            borderBottom: '2px solid',
+            borderColor: 'primary.main',
+          }}
+        >
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: 2,
+            maxWidth: 1000,
+            mx: 'auto'
+          }}>
+            <Avatar 
+              sx={{ 
+                width: 32, 
+                height: 32, 
+                bgcolor: 'primary.main',
+                color: 'white',
+                fontSize: '1rem'
+              }}
+            >
+              {currentPlayer.name.charAt(0)}
+            </Avatar>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              {currentPlayer.name}
+            </Typography>
+            {game.type === GameType.ROTATION && currentPlayer.targetScore && (
+              <Typography variant="body1">
+                {currentPlayer.score}/{currentPlayer.targetScore} ({t('game.remaining')}: {Math.max(0, currentPlayer.targetScore - currentPlayer.score)})
+              </Typography>
+            )}
+          </Box>
+        </Paper>
+      </Slide>
       {/* ヘッダー */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
@@ -213,18 +278,42 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <Grid item xs={12} md={6} key={player.id}>
             <Card 
               sx={{ 
-                border: player.isActive ? 2 : 1,
-                borderColor: player.isActive ? 'primary.main' : 'grey.300',
-                bgcolor: player.isActive ? 'primary.50' : 'white',
+                // セットマッチでは全プレイヤー統一、ローテーションではアクティブ表示
+                border: game.type === GameType.SET_MATCH ? 1 : (player.isActive ? 3 : 1),
+                borderColor: game.type === GameType.SET_MATCH ? 'grey.300' : (player.isActive ? 'primary.main' : 'grey.300'),
+                bgcolor: 'white',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'all 0.3s ease-in-out',
+                boxShadow: game.type === GameType.SET_MATCH 
+                  ? '0 2px 8px rgba(0,0,0,0.1)'
+                  : (player.isActive 
+                    ? '0 8px 25px rgba(25, 118, 210, 0.3)' 
+                    : '0 2px 8px rgba(0,0,0,0.1)'),
+                transform: game.type === GameType.SET_MATCH ? 'scale(1)' : (player.isActive ? 'scale(1.02)' : 'scale(1)'),
+                position: 'relative',
+                '&::before': (player.isActive && game.type === GameType.ROTATION) ? {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  borderRadius: 1,
+                  background: 'linear-gradient(45deg, rgba(25, 118, 210, 0.1), rgba(25, 118, 210, 0.05))',
+                  pointerEvents: 'none',
+                  zIndex: 0,
+                } : {},
                 '&:hover': {
                   bgcolor: game.type === GameType.SET_MATCH 
-                    ? (player.isActive ? 'success.100' : 'success.50')
+                    ? 'success.50'
                     : (player.isActive ? 'primary.100' : 'grey.50'),
-                  transform: 'translateY(-2px)',
-                  boxShadow: game.type === GameType.SET_MATCH ? 4 : 2,
-                  borderColor: game.type === GameType.SET_MATCH ? 'success.main' : undefined,
+                  transform: game.type === GameType.SET_MATCH 
+                    ? 'translateY(-2px)'
+                    : (player.isActive ? 'scale(1.03) translateY(-2px)' : 'translateY(-2px)'),
+                  boxShadow: game.type === GameType.SET_MATCH 
+                    ? '0 8px 20px rgba(76, 175, 80, 0.3)' 
+                    : (player.isActive ? '0 8px 25px rgba(25, 118, 210, 0.4)' : '0 4px 12px rgba(0,0,0,0.2)'),
+                  borderColor: game.type === GameType.SET_MATCH ? 'success.main' : 'primary.main',
                 },
               }}
               onClick={() => {
@@ -240,7 +329,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 }
               }}
             >
-              <CardContent>
+              <CardContent sx={{ position: 'relative', zIndex: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Avatar 
                     sx={{ 
@@ -323,7 +412,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
                         bgcolor: getBallColor(ball),
                         color: getBallTextColor(ball),
                         fontWeight: 'bold',
-                        border: ball > 8 ? '1px dashed white' : 'none',
                       }}
                     />
                   ))}
@@ -342,11 +430,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
       {/* ボール選択エリア（セットマッチ以外） */}
       {game.type !== GameType.SET_MATCH && (
-        <Card sx={{ mb: 2 }}>
+        <Card ref={ballSectionRef} sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
               {t('game.ballSelect')}
-
             </Typography>
           <Grid container spacing={1}>
             {getBallNumbers().map(ballNumber => (
@@ -356,12 +443,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   disabled={isBallPocketed(ballNumber)}
                   onClick={() => handlePocketBall(ballNumber)}
                   sx={{
-                    width: 52,
-                    height: 52,
-                    minWidth: 52,
+                    width: { xs: 60, sm: 52 },
+                    height: { xs: 60, sm: 52 },
+                    minWidth: { xs: 60, sm: 52 },
                     borderRadius: '50%',
                     fontWeight: 'bold',
-                    fontSize: '1.1rem',
+                    fontSize: { xs: '1.2rem', sm: '1.1rem' },
                     position: 'relative',
                     overflow: 'hidden',
                     border: 'none',
@@ -393,8 +480,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
                       top: '50%',
                       left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      width: '28px',
-                      height: '28px',
+                      width: { xs: '32px', sm: '28px' },
+                      height: { xs: '32px', sm: '28px' },
                       backgroundColor: isBallPocketed(ballNumber) ? '#ddd' : 'white',
                       borderRadius: '50%',
                       boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)',
@@ -514,7 +601,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 <Button
                   fullWidth
                   variant="contained"
-                  color="secondary"
+                  color="primary"
                   onClick={onSwitchPlayer}
                   size="large"
                 >

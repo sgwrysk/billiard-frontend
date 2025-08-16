@@ -67,6 +67,7 @@ const translations: Translations = {
     'game.complete': '完了',
     'game.switchPlayer': 'プレイヤー交代',
     'game.backToHome': 'ホームに戻る',
+    'game.unsupportedGameType': 'サポートされていないゲームタイプ',
     'game.pocketedBalls': 'ポケットしたボール',
     'game.setMatchActions': 'セット勝利',
     'game.winSet': 'セット勝利',
@@ -80,6 +81,7 @@ const translations: Translations = {
     'bowlard.total': '合計',
     'bowlard.enterPins': 'ピン数を入力',
     'bowlard.frameComplete': 'フレーム完了',
+    'bowlard.scoreSheet': 'スコアシート',
 
 
     // Victory screen

@@ -7,6 +7,7 @@ export interface Player {
   isActive: boolean;
   targetScore?: number; // Target score for Rotation game (handicap feature)
   targetSets?: number; // Target sets for Set Match game (handicap feature)
+  setsWon?: number; // Sets won in Set Match game
   bowlingFrames?: BowlingFrame[]; // Bowling frames for Bowlard game
 }
 
@@ -41,6 +42,7 @@ export const GameStatus = {
   NOT_STARTED: 'NOT_STARTED',
   IN_PROGRESS: 'IN_PROGRESS',
   FINISHED: 'FINISHED',
+  COMPLETED: 'COMPLETED',
 } as const;
 
 export type GameStatus = typeof GameStatus[keyof typeof GameStatus];

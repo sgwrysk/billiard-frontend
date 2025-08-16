@@ -278,12 +278,12 @@ describe('useGame', () => {
 
       expect(result.current.checkAllBallsPocketed()).toBe(false);
 
-      // Pocket all 9 balls
-      act(() => {
-        for (let i = 1; i <= 9; i++) {
+      // Pocket all 9 balls one by one
+      for (let i = 1; i <= 9; i++) {
+        act(() => {
           result.current.pocketBall(i);
-        }
-      });
+        });
+      }
 
       expect(result.current.checkAllBallsPocketed()).toBe(true);
     });
@@ -492,8 +492,10 @@ describe('useGame', () => {
       const originalGameType = result.current.currentGame?.type;
       const originalPlayers = result.current.currentGame?.players;
 
+      const finishedGame = result.current.currentGame!;
+      
       act(() => {
-        result.current.startRematch();
+        result.current.startRematch(finishedGame);
       });
 
       expect(result.current.currentGame?.type).toBe(originalGameType);

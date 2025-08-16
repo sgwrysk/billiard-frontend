@@ -41,7 +41,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onUndoLastShot,
   onWinSet,
 }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];
 
 

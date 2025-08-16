@@ -112,11 +112,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     return ballColors[ballNumber] || '#CCCCCC';
   };
 
-  const getBallTextColor = (ballNumber: number) => {
-    // Dark balls use white text, bright balls use black text
-    const darkBalls = [2, 3, 4, 7, 8];
-    return darkBalls.includes(ballNumber) ? 'white' : 'black';
-  };
+
 
   const generateChartData = () => {
     if (!game.scoreHistory || game.scoreHistory.length === 0) {

@@ -16,6 +16,7 @@ import { Home, Undo } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Game } from '../types/index';
 import { GameType } from '../types/index';
+import { getBallColor, getBallTextColor } from '../utils/ballUtils';
 
 interface GameBoardProps {
   game: Game;
@@ -77,32 +78,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   };
 
-  const getBallColor = (ballNumber: number) => {
-    const ballColors: { [key: number]: string } = {
-      1: '#FFD700', // Yellow (solid) - matched to 9 ball
-      2: '#6495ED', // Blue (solid) - matched to 10 ball
-      3: '#FF6B6B', // Red (solid) - matched to 11 ball
-      4: '#DDA0DD', // Purple (solid) - matched to 12 ball
-      5: '#FFDAB9', // Orange (solid) - matched to 13 ball
-      6: '#90EE90', // Green (solid) - matched to 14 ball
-      7: '#CD853F', // Maroon (solid) - matched to 15 ball
-      8: '#000000', // Black
-      9: '#FFD700', // Yellow stripe
-      10: '#6495ED', // Blue stripe
-      11: '#FF6B6B', // Red stripe
-      12: '#DDA0DD', // Purple stripe
-      13: '#FFDAB9', // Orange stripe
-      14: '#90EE90', // Green stripe
-      15: '#CD853F', // Maroon stripe
-    };
-    return ballColors[ballNumber] || '#CCCCCC';
-  };
-
-  const getBallTextColor = (ballNumber: number) => {
-    // Dark balls use white text, bright balls use black text
-    const darkBalls = [2, 3, 4, 7, 8];
-    return darkBalls.includes(ballNumber) ? 'white' : 'black';
-  };
 
   const isBallPocketed = (ballNumber: number) => {
     return game.players.some(player => 

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { storage } from '../utils/storageUtils';
 
 export type Language = 'ja' | 'en';
 
@@ -231,15 +232,15 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
 
   // Load saved language from localStorage
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('billiard-language') as Language;
-    if (savedLanguage && (savedLanguage === 'ja' || savedLanguage === 'en')) {
+    const savedLanguage = storage.getString('billiard-language', 'ja') as Language;
+    if (savedLanguage === 'ja' || savedLanguage === 'en') {
       setLanguage(savedLanguage);
     }
   }, []);
 
   // Save language to localStorage when changed
   useEffect(() => {
-    localStorage.setItem('billiard-language', language);
+    storage.setString('billiard-language', language);
   }, [language]);
 
   const t = (key: string, params?: Record<string, string>): string => {

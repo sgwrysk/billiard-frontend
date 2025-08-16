@@ -453,7 +453,7 @@ describe('useGame', () => {
       const { result } = renderHook(() => useGame());
       
       expect(result.current.playerStats).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to load player stats:', expect.any(Error));
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to load billiardPlayerStats from localStorage:', expect.any(Error));
       
       consoleSpy.mockRestore();
     });

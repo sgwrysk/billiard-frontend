@@ -1,6 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Game, Player, Shot, PlayerStats, ScoreHistory, BowlingFrame } from '../types/index';
+import type { Game, Player, Shot, PlayerStats, ScoreHistory } from '../types/index';
 import { GameType, GameStatus } from '../types/index';
+import { getBallScore } from '../utils/ballUtils';
+import { initializeBowlingFrames, calculateBowlingScores } from '../utils/bowlingUtils';
+import { storage } from '../utils/storageUtils';
 
 export const useGame = () => {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
@@ -9,20 +12,14 @@ export const useGame = () => {
 
   // Load player statistics from localStorage
   useEffect(() => {
-    const savedStats = localStorage.getItem('billiardPlayerStats');
-    if (savedStats) {
-      try {
-        setPlayerStats(JSON.parse(savedStats));
-      } catch (error) {
-        console.error('Failed to load player stats:', error);
-      }
-    }
+    const savedStats = storage.get<PlayerStats[]>('billiardPlayerStats', []);
+    setPlayerStats(savedStats);
   }, []);
 
   // Save player statistics to localStorage
   const savePlayerStats = useCallback((stats: PlayerStats[]) => {
     setPlayerStats(stats);
-    localStorage.setItem('billiardPlayerStats', JSON.stringify(stats));
+    storage.set('billiardPlayerStats', stats);
   }, []);
 
   // Update player statistics
@@ -50,17 +47,6 @@ export const useGame = () => {
     savePlayerStats(updatedStats);
   }, [playerStats, savePlayerStats]);
 
-  // Initialize bowling frames for a player
-  const initializeBowlingFrames = (): BowlingFrame[] => {
-    return Array.from({ length: 10 }, (_, index) => ({
-      frameNumber: index + 1,
-      rolls: [],
-      score: undefined,
-      isStrike: false,
-      isSpare: false,
-      isComplete: false,
-    }));
-  };
 
   // Start a new game
   const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType) => {
@@ -450,93 +436,6 @@ export const useGame = () => {
     });
   }, [currentGame]);
 
-  // Calculate bowling scores with proper strike/spare logic
-  const calculateBowlingScores = (frames: BowlingFrame[]): BowlingFrame[] => {
-    const calculatedFrames = [...frames];
-    
-    for (let i = 0; i < 10; i++) {
-      const frame = calculatedFrames[i];
-      
-      // Frame 10 special calculation
-      if (i === 9) {
-        // For frame 10, just sum all rolls (no bonus calculation needed)
-        const frameScore = frame.rolls.reduce((sum, roll) => sum + roll, 0);
-        const previousScore = i > 0 ? (calculatedFrames[i - 1].score || 0) : 0;
-        calculatedFrames[i] = {
-          ...frame,
-          score: previousScore + frameScore,
-        };
-      } else {
-        // Frames 1-9
-        let frameScore = frame.rolls.reduce((sum, roll) => sum + roll, 0);
-        
-        // Strike bonus (frames 1-9)
-        if (frame.isStrike) {
-          // Add next two rolls
-          if (i + 1 === 9) {
-            // Next frame is frame 10
-            const frame10 = calculatedFrames[9];
-            if (frame10.rolls.length >= 1) {
-              frameScore += frame10.rolls[0];
-            }
-            if (frame10.rolls.length >= 2) {
-              frameScore += frame10.rolls[1];
-            }
-          } else if (i + 1 < 9) {
-            // Next frame is frames 1-8
-            const nextFrame = calculatedFrames[i + 1];
-            if (nextFrame.rolls.length >= 1) {
-              frameScore += nextFrame.rolls[0];
-            }
-            if (nextFrame.rolls.length >= 2) {
-              frameScore += nextFrame.rolls[1];
-            } else if (nextFrame.isStrike && i + 2 < 10) {
-              // Next frame is also strike
-              if (i + 2 === 9) {
-                // Frame after next is frame 10
-                const frame10 = calculatedFrames[9];
-                if (frame10.rolls.length >= 1) {
-                  frameScore += frame10.rolls[0];
-                }
-              } else {
-                // Frame after next is frames 1-8
-                const frameAfterNext = calculatedFrames[i + 2];
-                if (frameAfterNext.rolls.length >= 1) {
-                  frameScore += frameAfterNext.rolls[0];
-                }
-              }
-            }
-          }
-        }
-        // Spare bonus (frames 1-9)
-        else if (frame.isSpare) {
-          // Add next one roll
-          if (i + 1 === 9) {
-            // Next frame is frame 10
-            const frame10 = calculatedFrames[9];
-            if (frame10.rolls.length >= 1) {
-              frameScore += frame10.rolls[0];
-            }
-          } else if (i + 1 < 9) {
-            // Next frame is frames 1-8
-            const nextFrame = calculatedFrames[i + 1];
-            if (nextFrame.rolls.length >= 1) {
-              frameScore += nextFrame.rolls[0];
-            }
-          }
-        }
-        
-        // Set cumulative score
-        const previousScore = i > 0 ? (calculatedFrames[i - 1].score || 0) : 0;
-        calculatedFrames[i] = {
-          ...frame,
-          score: previousScore + frameScore,
-        };
-      }
-    }
-    
-    return calculatedFrames;
-  };
 
   // Undo bowling pin input
   const undoBowlingRoll = useCallback(() => {
@@ -661,14 +560,3 @@ export const useGame = () => {
   };
 };
 
-// Function to calculate ball score
-const getBallScore = (ballNumber: number, gameType: GameType): number => {
-  switch (gameType) {
-    case GameType.SET_MATCH:
-      return ballNumber === 9 ? 10 : 1; // 9-ball is 10 points, others are 1 point
-    case GameType.ROTATION:
-      return ballNumber; // Rotation: ball number equals points
-    default:
-      return 1;
-  }
-};

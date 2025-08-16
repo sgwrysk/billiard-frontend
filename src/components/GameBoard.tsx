@@ -346,11 +346,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <CardContent>
             <Typography variant="h6" gutterBottom>
               {t('game.ballSelect')}
-              {game.type === GameType.ROTATION && (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                  {language === 'en' ? 'Ball numbers equal points when pocketed' : 'どのボールを落としてもボール番号がそのままポイントになります'}
-                </Typography>
-              )}
+
             </Typography>
           <Grid container spacing={1}>
             {getBallNumbers().map(ballNumber => (

@@ -93,13 +93,13 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
   const getBallColor = (ballNumber: number) => {
     const ballColors: { [key: number]: string } = {
-      1: '#FFFF00', // Yellow (solid)
-      2: '#0000FF', // Blue (solid)
-      3: '#FF0000', // Red (solid)
-      4: '#800080', // Purple (solid)
-      5: '#FFA500', // Orange (solid)
-      6: '#008000', // Green (solid)
-      7: '#8B0000', // Maroon (solid)
+      1: '#FFD700', // Yellow (solid) - matched to 9 ball
+      2: '#6495ED', // Blue (solid) - matched to 10 ball
+      3: '#FF6B6B', // Red (solid) - matched to 11 ball
+      4: '#DDA0DD', // Purple (solid) - matched to 12 ball
+      5: '#FFDAB9', // Orange (solid) - matched to 13 ball
+      6: '#90EE90', // Green (solid) - matched to 14 ball
+      7: '#CD853F', // Maroon (solid) - matched to 15 ball
       8: '#000000', // Black
       9: '#FFD700', // Yellow stripe
       10: '#6495ED', // Blue stripe
@@ -408,19 +408,54 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                         key={ball}
                         label={ball}
                         sx={{
-                          bgcolor: getBallColor(ball),
-                          background: `linear-gradient(145deg, ${getBallColor(ball)}, ${getBallColor(ball)}dd)`,
-                          color: getBallTextColor(ball),
-                          fontWeight: 'bold',
-                          border: ball > 8 ? '2px dashed white' : 'none',
+                          width: 36,
+                          height: 36,
                           borderRadius: '50%',
-                          width: 32,
-                          height: 32,
-                          boxShadow: '2px 2px 6px rgba(0,0,0,0.2)',
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          border: 'none',
+                          
+                          // Base background for all balls
+                          background: ball > 8 
+                            ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ball)} 20%, ${getBallColor(ball)} 80%, white 80%, white 100%)`
+                            : `radial-gradient(circle at 30% 30%, ${getBallColor(ball)}dd, ${getBallColor(ball)} 70%)`,
+                          
+                          boxShadow: '0 3px 8px rgba(0,0,0,0.3), inset -1px -1px 2px rgba(0,0,0,0.1), inset 1px 1px 2px rgba(255,255,255,0.3)',
+                          
+                          // White circle background for number
+                          '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
+                            zIndex: 1,
+                          },
+                          
                           '& .MuiChip-label': {
                             padding: 0,
-                            fontSize: '0.8rem',
+                            fontSize: '0.9rem',
                             fontWeight: 'bold',
+                            position: 'relative',
+                            zIndex: 2,
+                            color: '#000',
+                          },
+                          
+                          // Prevent hover color changes - keep original background
+                          '&:hover': {
+                            background: ball > 8 
+                              ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ball)} 20%, ${getBallColor(ball)} 80%, white 80%, white 100%) !important`
+                              : `radial-gradient(circle at 30% 30%, ${getBallColor(ball)}dd, ${getBallColor(ball)} 70%) !important`,
+                            '& .MuiChip-label': {
+                              color: '#000 !important',
+                            }
                           },
                         }}
                       />

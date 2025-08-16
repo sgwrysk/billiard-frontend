@@ -58,13 +58,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   const getBallColor = (ballNumber: number) => {
     const ballColors: { [key: number]: string } = {
-      1: '#FFFF00', // Yellow (solid)
-      2: '#0000FF', // Blue (solid)
-      3: '#FF0000', // Red (solid)
-      4: '#800080', // Purple (solid)
-      5: '#FFA500', // Orange (solid)
-      6: '#008000', // Green (solid)
-      7: '#8B0000', // Maroon (solid)
+      1: '#FFD700', // Yellow (solid) - matched to 9 ball
+      2: '#6495ED', // Blue (solid) - matched to 10 ball
+      3: '#FF6B6B', // Red (solid) - matched to 11 ball
+      4: '#DDA0DD', // Purple (solid) - matched to 12 ball
+      5: '#FFDAB9', // Orange (solid) - matched to 13 ball
+      6: '#90EE90', // Green (solid) - matched to 14 ball
+      7: '#CD853F', // Maroon (solid) - matched to 15 ball
       8: '#000000', // Black
       9: '#FFD700', // Yellow stripe
       10: '#6495ED', // Blue stripe
@@ -356,30 +356,104 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   disabled={isBallPocketed(ballNumber)}
                   onClick={() => handlePocketBall(ballNumber)}
                   sx={{
-                    bgcolor: isBallPocketed(ballNumber) ? 'grey.300' : getBallColor(ballNumber),
-                    color: isBallPocketed(ballNumber) ? 'white' : getBallTextColor(ballNumber),
+                    width: 52,
+                    height: 52,
+                    minWidth: 52,
+                    borderRadius: '50%',
                     fontWeight: 'bold',
-                    minWidth: 48,
-                    height: 48,
-                    border: ballNumber > 8 ? '2px dashed white' : 'none', // ストライプボールには点線枠
-                    borderRadius: '50%', // 球形に見せるため円形に
-                    background: isBallPocketed(ballNumber) ? 'linear-gradient(145deg, #e6e6e6, #cccccc)' : `linear-gradient(145deg, ${getBallColor(ballNumber)}, ${getBallColor(ballNumber)}dd)`,
-                    boxShadow: isBallPocketed(ballNumber) ? 'inset 2px 2px 4px rgba(0,0,0,0.2)' : '2px 2px 8px rgba(0,0,0,0.3)',
+                    fontSize: '1.1rem',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: 'none',
+                    padding: 0,
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    
+                    // Base background for all balls
+                    ...(isBallPocketed(ballNumber) 
+                      ? {
+                          background: 'linear-gradient(145deg, #e6e6e6, #cccccc)',
+                        }
+                      : ballNumber > 8 
+                        ? {
+                            background: `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ballNumber)} 20%, ${getBallColor(ballNumber)} 80%, white 80%, white 100%)`,
+                          }
+                        : {
+                            background: `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%)`,
+                          }
+                    ),
+                    
+                    boxShadow: isBallPocketed(ballNumber) 
+                      ? 'inset 2px 2px 4px rgba(0,0,0,0.2)' 
+                      : '0 4px 12px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.3)',
+                    
+                    // White circle background for number
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: '28px',
+                      height: '28px',
+                      backgroundColor: isBallPocketed(ballNumber) ? '#ddd' : 'white',
+                      borderRadius: '50%',
+                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)',
+                      zIndex: 1,
+                    },
+                    
+                    // Number styling
+                    color: isBallPocketed(ballNumber) ? '#999' : '#000',
+                    
                     '&:hover': {
-                      bgcolor: isBallPocketed(ballNumber) ? 'grey.300' : getBallColor(ballNumber),
-                      background: isBallPocketed(ballNumber) ? 'linear-gradient(145deg, #e6e6e6, #cccccc)' : `linear-gradient(145deg, ${getBallColor(ballNumber)}, ${getBallColor(ballNumber)}dd)`,
-                      opacity: 0.9,
-                      transform: 'scale(1.05)',
+                      transform: 'scale(1.08)',
+                      boxShadow: isBallPocketed(ballNumber) 
+                        ? 'inset 2px 2px 4px rgba(0,0,0,0.2)' 
+                        : '0 6px 16px rgba(0,0,0,0.4), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.4)',
+                      // Keep original background
+                      ...(isBallPocketed(ballNumber) 
+                        ? {
+                            background: 'linear-gradient(145deg, #e6e6e6, #cccccc) !important',
+                          }
+                        : ballNumber > 8 
+                          ? {
+                              background: `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ballNumber)} 20%, ${getBallColor(ballNumber)} 80%, white 80%, white 100%) !important`,
+                            }
+                          : {
+                              background: `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%) !important`,
+                            }
+                      ),
+                      '& span': {
+                        transform: 'scale(1.15)',
+                        color: isBallPocketed(ballNumber) ? '#999 !important' : '#000 !important',
+                      }
                     },
+                    
                     '&.Mui-disabled': {
-                      bgcolor: 'grey.300',
                       background: 'linear-gradient(145deg, #e6e6e6, #cccccc)',
-                      color: '#666',
+                      '&::before': {
+                        backgroundColor: '#ddd',
+                      }
                     },
-                    transition: 'all 0.2s ease',
+                    
+                    // Make sure text is always on top
+                    '& .MuiButton-root': {
+                      position: 'relative',
+                      zIndex: 5,
+                    },
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  {ballNumber}
+                  <span style={{ 
+                    position: 'relative', 
+                    zIndex: 10, 
+                    fontWeight: 'bold',
+                    color: isBallPocketed(ballNumber) ? '#999' : '#000',
+                    transition: 'transform 0.2s ease'
+                  }}>
+                    {ballNumber}
+                  </span>
                 </Button>
               </Grid>
             ))}

@@ -10,7 +10,8 @@ A modern billiard score management application built with React + TypeScript + M
 
 ### Game Types
 - **Set Match**: Simple set counting game (first to reach target sets wins)
-- **Rotation**: Ball numbers equal points, target specific score to win (120, 180, 240 points)
+- **Rotation**: Ball numbers equal points, target specific score to win (120, 180, 240 points)  
+- **Bowlard**: Bowling-style game played with billiard balls (10 frames, strikes and spares)
 
 ### Core Features
 - 👥 **2-Player Games**: All games support exactly 2 players
@@ -34,6 +35,13 @@ A modern billiard score management application built with React + TypeScript + M
 - Player-specific target scores for handicaps
 - Re-racking when all 15 balls are pocketed
 - Score progression graph on victory screen
+
+### Bowlard Game
+- Bowling-style scoring system with billiard ball aesthetics
+- 10 frames per game with strikes and spares
+- Pin input interface with bowling terminology
+- Frame-by-frame scoring display with cumulative totals
+- Perfect mobile-responsive design with CSS Grid layout
 
 ## 🛠️ Tech Stack
 
@@ -90,13 +98,19 @@ npm run preview
 3. Use "Undo" button to correct ball entries
 4. Game ends when a player reaches target score
 
-### 4. Victory Screen
+### 4. Bowlard Gameplay
+1. Enter number of pins knocked down for each roll
+2. Game automatically calculates strikes and spares
+3. Play 10 frames with up to 2 rolls per frame (3 for frame 10)
+4. Game ends after completing all 10 frames
+
+### 5. Victory Screen
 - Displays game statistics and winner
 - Shows score progression graph (Rotation) or set history table (Set Match)
 - Offers rematch with same settings
 - Tracks cumulative wins per player
 
-### 5. Language Support
+### 6. Language Support
 - Switch between Japanese/English on home screen
 - All UI text and player names are translated
 

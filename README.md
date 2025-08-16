@@ -1,95 +1,171 @@
-# 🎱 ビリヤードスコアアプリ
+# 🎱 Billiard Score App
 
-React + TypeScript + Material-UIで作成されたモダンなビリヤードスコア管理アプリケーションです。
+A modern billiard score management application built with React + TypeScript + Material-UI.
 
-## 🚀 機能
+## 🌐 Live Demo
 
-### ゲームタイプ
-- **ナインボール**: 1番から9番まで順番にポケット、9番ボールを最初に入れたプレイヤーの勝利
-- **エイトボール**: ソリッド（1-7番）またはストライプ（9-15番）を全て入れてから8番ボールを入れたプレイヤーの勝利
-- **ストレートプール**: 指定した得点に最初に到達したプレイヤーの勝利
+🚀 **[Try it now!](https://billiard-score-app.onrender.com)**
 
-### 主要機能
-- 👥 **プレイヤー管理**: 2人以上のプレイヤーでゲーム可能
-- 🎯 **スコア記録**: リアルタイムでスコアを更新
-- 🔄 **プレイヤー交代**: 手動でのプレイヤー切り替え
-- ⚠️ **ファウル記録**: ファウル時の処理
-- 📊 **ゲーム履歴**: 過去のゲーム結果を保存・閲覧
-- 🏆 **勝敗判定**: 各ゲームタイプに応じた自動勝敗判定
+## 🚀 Features
 
-## 🛠️ 技術スタック
+### Game Types
+- **Set Match**: Simple set counting game (first to reach target sets wins)
+- **Rotation**: Ball numbers equal points, target specific score to win (120, 180, 240 points)
+
+### Core Features
+- 👥 **2-Player Games**: All games support exactly 2 players
+- 🎯 **Real-time Scoring**: Live score updates during gameplay
+- 🔄 **Undo Function**: Correct mistakenly entered scores
+- 🏆 **Victory Screen**: Celebrate wins with game statistics
+- 📊 **Game History**: View past game results
+- 🌍 **Internationalization**: Japanese/English language support
+- 📱 **Responsive Design**: Works on mobile, tablet, and desktop
+- 🎨 **Authentic Ball Design**: Realistic billiard ball colors and styling
+
+### Set Match Game
+- Simple set counting (e.g., first to 5 sets wins)
+- Player-specific handicaps (e.g., Player 1 needs 5 sets, Player 2 needs 4 sets)
+- Large scoreboard-style display
+- Set history table showing which player won each set
+
+### Rotation Game
+- Ball numbers equal points (1 ball = 1 point, 15 ball = 15 points)
+- Target specific scores (120, 180, 240 points)
+- Player-specific target scores for handicaps
+- Re-racking when all 15 balls are pocketed
+- Score progression graph on victory screen
+
+## 🛠️ Tech Stack
 
 - **Frontend**: React 18 + TypeScript
-- **UI Library**: Material-UI (MUI)
+- **UI Library**: Material-UI (MUI) with Deep Blue theme
 - **Build Tool**: Vite
-- **State Management**: React Hooks (useState, useCallback)
+- **State Management**: React Hooks + Context API
+- **Charts**: Chart.js + react-chartjs-2
+- **Internationalization**: Custom i18n context
+- **Deployment**: Render (Static Site)
 
-## 📦 インストール & 起動
+## 📦 Installation & Setup
 
-### 前提条件
-- Node.js (v18以上)
+### Prerequisites
+- Node.js (v18 or higher)
 - npm
 
-### セットアップ
+### Local Development
 ```bash
-# 依存関係をインストール
+# Clone the repository
+git clone https://github.com/sgwrysk/billiard-score-app.git
+cd billiard-score-app
+
+# Install dependencies
 npm install
 
-# 開発サーバーを起動
+# Start development server
 npm run dev
 
-# ビルド（本番用）
+# Build for production
 npm run build
 
-# プレビュー（ビルド後の確認）
+# Preview production build
 npm run preview
 ```
 
-## 🎮 使い方
+## 🎮 How to Use
 
-### 1. ゲーム開始
-1. プレイヤー名を入力（デフォルトでPlayer 1, Player 2が設定済み）
-2. ゲームタイプを選択（ナインボール/エイトボール/ストレートプール）
-3. 「ゲーム開始」ボタンをクリック
+### 1. Game Setup
+1. Select game type (Set Match or Rotation)
+2. Enter player names (default: Player 1, Player 2)
+3. Set target (sets for Set Match, points for Rotation)
+4. Use preset buttons for common targets
+5. Click "Start Game"
 
-### 2. ゲームプレイ
-1. 現在のプレイヤーがポケットしたボールの番号をクリック
-2. 必要に応じて「プレイヤー交代」「ファウル」ボタンを使用
-3. 勝利条件を満たしたら「勝利宣言」またはシステムが自動判定
+### 2. Set Match Gameplay
+1. Click on player info to add a set
+2. Use "Undo" button to correct mistakes
+3. Game ends when a player reaches target sets
 
-### 3. ゲーム履歴
-- ヘッダーの「履歴」ボタンから過去のゲーム結果を確認可能
+### 3. Rotation Gameplay
+1. Click pocketed ball numbers to add points
+2. Game automatically re-racks after all 15 balls
+3. Use "Undo" button to correct ball entries
+4. Game ends when a player reaches target score
 
-## 📱 レスポンシブデザイン
+### 4. Victory Screen
+- Displays game statistics and winner
+- Shows score progression graph (Rotation) or set history table (Set Match)
+- Offers rematch with same settings
+- Tracks cumulative wins per player
 
-モバイル、タブレット、デスクトップに対応したレスポンシブデザインを採用。どのデバイスでも快適にプレイできます。
+### 5. Language Support
+- Switch between Japanese/English on home screen
+- All UI text and player names are translated
 
-## 🎨 UI/UX特徴
+## 🎨 Design Features
 
-- **ビリヤードテーブル風カラー**: グリーンを基調とした親しみやすいデザイン
-- **直感的操作**: ボタンの色分けやアイコンで操作を視覚的に分かりやすく
-- **リアルタイム更新**: スコアやゲーム状況がリアルタイムで更新
-- **アクセシビリティ**: Material-UIによる高いアクセシビリティ
+### Authentic Billiard Balls
+- **Perfect Circles**: All balls are perfectly round
+- **Realistic Colors**: Standard billiard ball color scheme
+- **Stripe Design**: Balls 9-15 feature authentic stripe patterns
+- **White Number Background**: Numbers displayed on white circles for visibility
+- **Hover Effects**: Subtle scaling without color changes
 
-## 🔧 カスタマイズ
+### Color Pairs
+- 1 & 9: Gold Yellow
+- 2 & 10: Cornflower Blue  
+- 3 & 11: Light Red
+- 4 & 12: Plum Purple
+- 5 & 13: Peach Orange
+- 6 & 14: Light Green
+- 7 & 15: Peru Brown
+- 8: Black
 
-### ゲームルールの追加
-`src/types/index.ts`にゲームタイプを追加し、各コンポーネントでルールを実装
+### UI Theme
+- **Deep Blue Theme**: Professional sports-oriented design
+- **Outfit Font**: Modern, clean typography
+- **Responsive Layout**: Optimized for all screen sizes
+- **Intuitive Navigation**: Clear visual hierarchy and user flow
 
-### UI テーマのカスタマイズ
-`src/App.tsx`のMaterial-UIテーマ設定を変更
+## 🔧 Customization
 
-### スコア計算ロジック
-`src/hooks/useGame.ts`の`getBallScore`関数を修正
+### Adding Game Types
+Extend `src/types/index.ts` and implement logic in `src/hooks/useGame.ts`
 
-## 📄 ライセンス
+### UI Theme Customization
+Modify Material-UI theme in `src/App.tsx`
+
+### Internationalization
+Add translations in `src/contexts/LanguageContext.tsx`
+
+### Ball Design
+Customize ball colors and styling in `getBallColor()` functions
+
+## 🌐 Deployment
+
+This app is deployed as a static site on Render with automatic deployments from the main branch.
+
+### Deployment Configuration
+- **Platform**: Render Static Site
+- **Build Command**: `npm ci && npm run build`
+- **Publish Directory**: `dist`
+- **Auto Deploy**: Enabled
+- **SPA Routing**: Configured with `_redirects` file
+
+## 📄 License
 
 MIT License
 
-## 🤝 コントリビューション
+## 🤝 Contributing
 
-バグ報告や機能要望は、GitHubのIssuesまでお願いします。
+Bug reports and feature requests are welcome! Please use GitHub Issues.
+
+## 🎯 Future Enhancements
+
+- Database integration for persistent game history
+- Additional game modes
+- Tournament bracket support
+- Advanced statistics and analytics
+- Social features and player profiles
 
 ---
 
-🎱 ビリヤードを楽しもう！
+🎱 **Enjoy playing billiards!**

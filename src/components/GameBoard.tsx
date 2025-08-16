@@ -52,8 +52,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     const handleScroll = () => {
       if (ballSectionRef.current) {
         const rect = ballSectionRef.current.getBoundingClientRect();
-        // Show sticky header when ball section is scrolled off-screen
-        setShowStickyHeader(rect.top < 100);
+        // Show sticky header when ball section starts to scroll up
+        setShowStickyHeader(rect.top < 300);
       }
     };
 

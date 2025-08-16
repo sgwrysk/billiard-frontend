@@ -74,6 +74,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         return t('setup.gameType.setmatch');
       case GameType.ROTATION:
         return t('setup.gameType.rotation');
+      case GameType.BOWLARD:
+        return t('setup.gameType.bowlard');
       default:
         return type;
     }
@@ -115,6 +117,10 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
 
   const generateChartData = () => {
+    if (game.type === GameType.BOWLARD) {
+      return generateBowlardChartData();
+    }
+
     if (!game.scoreHistory || game.scoreHistory.length === 0) {
       return null;
     }
@@ -142,6 +148,37 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     return {
       labels,
       datasets,
+    };
+  };
+
+  // Generate chart data for Bowlard game
+  const generateBowlardChartData = () => {
+    const player = game.players[0];
+    if (!player?.bowlingFrames) {
+      return null;
+    }
+
+    const completedFrames = player.bowlingFrames.filter(frame => frame.isComplete);
+    if (completedFrames.length === 0) {
+      return null;
+    }
+
+    // Create data points for completed frames
+    const labels = completedFrames.map(frame => `${frame.frameNumber}`);
+    const scores = completedFrames.map(frame => frame.score || 0);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: player.name,
+          data: scores,
+          borderColor: '#2196F3',
+          backgroundColor: '#2196F320',
+          tension: 0.1,
+          fill: true,
+        },
+      ],
     };
   };
 
@@ -210,6 +247,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     plugins: {
       legend: {
         position: 'top' as const,
+        display: game.type !== GameType.BOWLARD, // Hide legend for single-player Bowlard
       },
       title: {
         display: true,
@@ -227,7 +265,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       x: {
         title: {
           display: true,
-          text: 'ショット数',
+          text: game.type === GameType.BOWLARD ? 'フレーム' : 'ショット数',
         },
       },
     },
@@ -235,53 +273,227 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
-      {/* 勝利アナウンス */}
-      <Card sx={{ mb: 3, bgcolor: 'success.50', border: '2px solid', borderColor: 'success.main' }}>
-        <CardContent sx={{ textAlign: 'center', py: 4 }}>
-          <EmojiEvents sx={{ fontSize: 80, color: 'gold', mb: 2 }} />
-          <Typography variant="h3" component="h1" gutterBottom color="success.dark">
-            🎉 勝利！ 🎉
-          </Typography>
-          {winner && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Avatar 
-                sx={{ 
-                  bgcolor: 'success.main',
-                  width: 64,
-                  height: 64,
-                  fontSize: '2rem'
-                }}
-              >
-                {winner.name.charAt(0)}
-              </Avatar>
-              <Box>
-                <Typography variant="h4" component="h2">
-                  {winner.name}
-                </Typography>
-                <Typography variant="h5" color="success.main">
-                  {winner.score}点
-                </Typography>
-                {getPlayerStats(winner.name) && (
-                  <Box sx={{ display: 'flex', gap: 1, mt: 1, justifyContent: 'center' }}>
-                    <Chip 
-                      icon={<Star />}
-                      label={`通算 ${getPlayerStats(winner.name)?.totalWins}勝`}
-                      color="warning"
-                      variant="filled"
-                    />
-                    <Chip 
-                      icon={<SportsEsports />}
-                      label={`${getPlayerStats(winner.name)?.totalGames}戦`}
-                      color="info"
-                      variant="outlined"
-                    />
-                  </Box>
-                )}
+      {/* 勝利アナウンス（ボーラード以外のみ） */}
+      {game.type !== GameType.BOWLARD && (
+        <Card sx={{ mb: 3, bgcolor: 'success.50', border: '2px solid', borderColor: 'success.main' }}>
+          <CardContent sx={{ textAlign: 'center', py: 4 }}>
+            <EmojiEvents sx={{ fontSize: 80, color: 'gold', mb: 2 }} />
+            <Typography variant="h3" component="h1" gutterBottom color="success.dark">
+              🎉 勝利！ 🎉
+            </Typography>
+            {winner && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 3 }}>
+                <Avatar 
+                  sx={{ 
+                    bgcolor: 'success.main',
+                    width: 64,
+                    height: 64,
+                    fontSize: '2rem'
+                  }}
+                >
+                  {winner.name.charAt(0)}
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" component="h2">
+                    {winner.name}
+                  </Typography>
+                  <Typography variant="h5" color="success.main">
+                    {winner.score}点
+                  </Typography>
+                  {getPlayerStats(winner.name) && (
+                    <Box sx={{ display: 'flex', gap: 1, mt: 1, justifyContent: 'center' }}>
+                      <Chip 
+                        icon={<Star />}
+                        label={`通算 ${getPlayerStats(winner.name)?.totalWins}勝`}
+                        color="warning"
+                        variant="filled"
+                      />
+                      <Chip 
+                        icon={<SportsEsports />}
+                        label={`${getPlayerStats(winner.name)?.totalGames}戦`}
+                        color="info"
+                        variant="outlined"
+                      />
+                    </Box>
+                  )}
+                </Box>
               </Box>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ボーラード用のボーリングスコア詳細（ゲーム詳細の上に移動） */}
+      {game.type === GameType.BOWLARD && (
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              {t('setup.gameType.bowlard')} - {t('victory.finalScore')}: {game.players[0]?.score || 0}
+            </Typography>
+            
+            {/* ボーリングスコアシート（表形式） */}
+            <Box sx={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse', border: '2px solid #333' }}>
+                <thead>
+                  <tr>
+                    {/* フレーム番号ヘッダー */}
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <th 
+                        key={`frame-${i}`}
+                        style={{
+                          border: '1px solid #333',
+                          padding: '8px',
+                          backgroundColor: '#1976d2',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          textAlign: 'center',
+                          width: i === 9 ? '120px' : '80px'
+                        }}
+                      >
+                        {i + 1}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* 投球結果行 */}
+                  <tr style={{ height: '40px' }}>
+                    {Array.from({ length: 10 }, (_, i) => {
+                      const frame = game.players[0]?.bowlingFrames?.[i];
+                      const isFrame10 = i === 9;
+                      
+                      return (
+                        <td 
+                          key={`rolls-${i}`}
+                          style={{
+                            border: '1px solid #333',
+                            padding: '0',
+                            textAlign: 'center',
+                            position: 'relative',
+                            backgroundColor: frame?.isComplete ? '#e8f5e8' : 'white'
+                          }}
+                        >
+                          {isFrame10 ? (
+                            // 10フレーム（3つのボックス）
+                            <div style={{ display: 'flex', height: '100%' }}>
+                              {Array.from({ length: 3 }, (_, rollIndex) => (
+                                <div 
+                                  key={rollIndex}
+                                  style={{
+                                    flex: 1,
+                                    borderLeft: rollIndex > 0 ? '1px solid #333' : 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '14px',
+                                    fontWeight: 'bold'
+                                  }}
+                                >
+                                  {(() => {
+                                    if (frame?.rolls[rollIndex] === undefined) return '';
+                                    
+                                    const roll = frame.rolls[rollIndex];
+                                    
+                                    // 1投目
+                                    if (rollIndex === 0) {
+                                      return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                    }
+                                    
+                                    // 2投目
+                                    if (rollIndex === 1) {
+                                      // 1投目がストライクの場合
+                                      if (frame.rolls[0] === 10) {
+                                        return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                      }
+                                      // スペアの場合
+                                      else if (frame.rolls[0] + roll === 10) {
+                                        return '/';
+                                      }
+                                      // 通常
+                                      else {
+                                        return roll === 0 ? '-' : roll;
+                                      }
+                                    }
+                                    
+                                    // 3投目
+                                    if (rollIndex === 2) {
+                                      return roll === 10 ? 'X' : roll === 0 ? '-' : roll;
+                                    }
+                                    
+                                    return roll;
+                                  })()}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            // 1-9フレーム（2つのボックス）
+                            <div style={{ display: 'flex', height: '100%' }}>
+                              <div 
+                                style={{
+                                  width: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '14px',
+                                  fontWeight: 'bold',
+                                  borderRight: '2px solid #333'
+                                }}
+                              >
+                                {frame?.rolls[0] !== undefined ? (
+                                  frame.isStrike ? 'X' : 
+                                  frame.rolls[0] === 0 ? 'G' : frame.rolls[0]
+                                ) : ''}
+                              </div>
+                              <div 
+                                style={{
+                                  width: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '14px',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {!frame?.isStrike && frame?.rolls[1] !== undefined ? (
+                                  frame.isSpare ? '/' :
+                                  frame.rolls[1] === 0 ? '-' : frame.rolls[1]
+                                ) : ''}
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  
+                  {/* 累積スコア行 */}
+                  <tr style={{ height: '40px' }}>
+                    {Array.from({ length: 10 }, (_, i) => {
+                      const frame = game.players[0]?.bowlingFrames?.[i];
+                      
+                      return (
+                        <td 
+                          key={`score-${i}`}
+                          style={{
+                            border: '1px solid #333',
+                            padding: '8px',
+                            textAlign: 'center',
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            backgroundColor: '#f5f5f5'
+                          }}
+                        >
+                          {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tbody>
+              </table>
             </Box>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ゲーム詳細情報 */}
       <Card sx={{ mb: 3 }}>
@@ -291,7 +503,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
           </Typography>
           
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={game.type === GameType.BOWLARD ? 12 : 6}>
               <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                 <Typography variant="h6" gutterBottom>
                   ゲーム情報
@@ -312,49 +524,52 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                <Typography variant="h6" gutterBottom>
-                  最終スコア
-                </Typography>
-                <Stack spacing={2}>
-                  {game.players.map(player => {
-                    const stats = getPlayerStats(player.name);
-                    return (
-                      <Box 
-                        key={player.id}
-                        sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          p: 1,
-                          borderRadius: 1,
-                          bgcolor: player.id === game.winner ? 'success.100' : 'white',
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="h6">
-                            {player.name}
-                            {player.id === game.winner && ' 👑'}
+            {/* 最終スコア枠（ボーラード以外のみ） */}
+            {game.type !== GameType.BOWLARD && (
+              <Grid item xs={12} md={6}>
+                <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                  <Typography variant="h6" gutterBottom>
+                    最終スコア
+                  </Typography>
+                  <Stack spacing={2}>
+                    {game.players.map(player => {
+                      const stats = getPlayerStats(player.name);
+                      return (
+                        <Box 
+                          key={player.id}
+                          sx={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            p: 1,
+                            borderRadius: 1,
+                            bgcolor: player.id === game.winner ? 'success.100' : 'white',
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="h6">
+                              {player.name}
+                              {player.id === game.winner && ' 👑'}
+                            </Typography>
+                            {stats && (
+                              <Chip 
+                                label={`${stats.totalWins}勝`}
+                                size="small"
+                                color="primary"
+                                variant="outlined"
+                              />
+                            )}
+                          </Box>
+                          <Typography variant="h6" color="primary">
+                            {player.score}点
                           </Typography>
-                          {stats && (
-                            <Chip 
-                              label={`${stats.totalWins}勝`}
-                              size="small"
-                              color="primary"
-                              variant="outlined"
-                            />
-                          )}
                         </Box>
-                        <Typography variant="h6" color="primary">
-                          {player.score}点
-                        </Typography>
-                      </Box>
-                    );
-                  })}
-                </Stack>
-              </Paper>
-            </Grid>
+                      );
+                    })}
+                  </Stack>
+                </Paper>
+              </Grid>
+            )}
           </Grid>
         </CardContent>
       </Card>
@@ -385,8 +600,10 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         </Card>
       )}
 
-      {/* ポケットしたボール詳細（セットマッチ以外） */}
-      {game.type !== GameType.SET_MATCH && (
+
+
+      {/* ポケットしたボール詳細（セットマッチ・ボーラード以外） */}
+      {game.type !== GameType.SET_MATCH && game.type !== GameType.BOWLARD && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>

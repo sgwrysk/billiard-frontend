@@ -7,6 +7,17 @@ export interface Player {
   isActive: boolean;
   targetScore?: number; // Target score for Rotation game (handicap feature)
   targetSets?: number; // Target sets for Set Match game (handicap feature)
+  bowlingFrames?: BowlingFrame[]; // Bowling frames for Bowlard game
+}
+
+// Bowling frame type definition for Bowlard game
+export interface BowlingFrame {
+  frameNumber: number;
+  rolls: number[]; // Array of pin counts for each roll (max 2 for frames 1-9, max 3 for frame 10)
+  score?: number; // Cumulative score up to this frame
+  isStrike: boolean;
+  isSpare: boolean;
+  isComplete: boolean;
 }
 
 // Player statistics type definition
@@ -20,6 +31,7 @@ export interface PlayerStats {
 export const GameType = {
   SET_MATCH: 'SET_MATCH',
   ROTATION: 'ROTATION',
+  BOWLARD: 'BOWLARD',
 } as const;
 
 export type GameType = typeof GameType[keyof typeof GameType];

@@ -101,15 +101,16 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
             >
               <MenuItem value={GameType.SET_MATCH}>{t('setup.gameType.setmatch')}</MenuItem>
               <MenuItem value={GameType.ROTATION}>{t('setup.gameType.rotation')}</MenuItem>
+              <MenuItem value={GameType.BOWLARD}>{t('setup.gameType.bowlard')}</MenuItem>
             </Select>
           </FormControl>
 
 
 
-          {/* 2名固定のプレイヤー設定 */}
+          {/* プレイヤー設定 */}
           <Grid container spacing={2}>
-            {players.map((player, index) => (
-              <Grid item xs={12} md={6} key={index}>
+            {(gameType === GameType.BOWLARD ? players.slice(0, 1) : players).map((player, index) => (
+              <Grid item xs={12} md={gameType === GameType.BOWLARD ? 12 : 6} key={index}>
                 <Card variant="outlined" sx={{ p: 2 }}>
                   
                   <TextField

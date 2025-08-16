@@ -32,6 +32,7 @@ const translations: Translations = {
     'setup.gameType': 'ゲームタイプ',
     'setup.gameType.setmatch': 'セットマッチ',
     'setup.gameType.rotation': 'ローテーション',
+    'setup.gameType.bowlard': 'ボーラード',
 
     'setup.players': 'プレイヤー',
     'setup.player': 'プレイヤー',
@@ -62,11 +63,22 @@ const translations: Translations = {
     'game.clickToSelect': 'クリックして選択',
     'game.nextRack': '🎉 次のラックへ 🎉',
     'game.undo': '取り消し',
+    'game.complete': '完了',
     'game.switchPlayer': 'プレイヤー交代',
     'game.backToHome': 'ホームに戻る',
     'game.pocketedBalls': 'ポケットしたボール',
     'game.setMatchActions': 'セット勝利',
     'game.winSet': 'セット勝利',
+    
+    // Bowlard game
+    'bowlard.frame': 'フレーム',
+    'bowlard.roll': '投球',
+    'bowlard.pins': 'ピン',
+    'bowlard.strike': 'ストライク',
+    'bowlard.spare': 'スペア',
+    'bowlard.total': '合計',
+    'bowlard.enterPins': 'ピン数を入力',
+    'bowlard.frameComplete': 'フレーム完了',
 
 
     // Victory screen
@@ -120,6 +132,7 @@ const translations: Translations = {
     'setup.gameType': 'Game Type',
     'setup.gameType.setmatch': 'Set Match',
     'setup.gameType.rotation': 'Rotation',
+    'setup.gameType.bowlard': 'Bowlard',
 
     'setup.players': 'Players',
     'setup.player': 'Player',
@@ -150,11 +163,22 @@ const translations: Translations = {
     'game.clickToSelect': 'Click to Select',
     'game.nextRack': '🎉 Next Rack 🎉',
     'game.undo': 'Undo',
+    'game.complete': 'Complete',
     'game.switchPlayer': 'Switch Player',
     'game.backToHome': 'Back to Home',
     'game.pocketedBalls': 'Pocketed Balls',
     'game.setMatchActions': 'Set Victory',
     'game.winSet': 'Win Set',
+    
+    // Bowlard game
+    'bowlard.frame': 'Frame',
+    'bowlard.roll': 'Roll',
+    'bowlard.pins': 'Pins',
+    'bowlard.strike': 'Strike',
+    'bowlard.spare': 'Spare',
+    'bowlard.total': 'Total',
+    'bowlard.enterPins': 'Enter Pins',
+    'bowlard.frameComplete': 'Frame Complete',
 
 
     // Victory screen

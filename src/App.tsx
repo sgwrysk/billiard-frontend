@@ -130,6 +130,8 @@ const AppContent: React.FC = () => {
     checkAllBallsPocketed,
     undoLastShot,
     winSet,
+    addPins,
+    undoBowlingRoll,
   } = useGame();
   
   const [finishedGame, setFinishedGame] = useState<any>(null);
@@ -249,6 +251,8 @@ const AppContent: React.FC = () => {
             checkAllBallsPocketed={checkAllBallsPocketed}
             onUndoLastShot={undoLastShot}
             onWinSet={winSet}
+            onAddPins={addPins}
+            onUndoBowlingRoll={undoBowlingRoll}
           />
         )}
         

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Game, Player, Shot, PlayerStats, ScoreHistory } from '../types/index';
+import type { Game, Player, Shot, PlayerStats, ScoreHistory, BowlingFrame } from '../types/index';
 import { GameType, GameStatus } from '../types/index';
 
 export const useGame = () => {
@@ -50,6 +50,18 @@ export const useGame = () => {
     savePlayerStats(updatedStats);
   }, [playerStats, savePlayerStats]);
 
+  // Initialize bowling frames for a player
+  const initializeBowlingFrames = (): BowlingFrame[] => {
+    return Array.from({ length: 10 }, (_, index) => ({
+      frameNumber: index + 1,
+      rolls: [],
+      score: undefined,
+      isStrike: false,
+      isSpare: false,
+      isComplete: false,
+    }));
+  };
+
   // Start a new game
   const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType) => {
     const players: Player[] = playerSetups.map((setup, index) => ({
@@ -60,6 +72,8 @@ export const useGame = () => {
       isActive: index === 0, // First player is active
       targetScore: setup.targetScore,
       targetSets: setup.targetSets,
+      // Initialize bowling frames for BOWLARD game
+      bowlingFrames: gameType === GameType.BOWLARD ? initializeBowlingFrames() : undefined,
     }));
 
     const newGame: Game = {
@@ -337,6 +351,291 @@ export const useGame = () => {
     });
   }, [currentGame]);
 
+  // Add pins to bowling frame
+  const addPins = useCallback((pins: number) => {
+    if (!currentGame || currentGame.type !== GameType.BOWLARD) return;
+
+    setCurrentGame(prev => {
+      if (!prev) return prev;
+
+      const activePlayer = prev.players[prev.currentPlayerIndex];
+      const frames = activePlayer.bowlingFrames || [];
+      
+      // Find current frame
+      const currentFrameIndex = frames.findIndex(frame => !frame.isComplete);
+      if (currentFrameIndex === -1) return prev; // All frames complete
+
+      const currentFrame = frames[currentFrameIndex];
+      const updatedFrames = [...frames];
+      const updatedFrame = { ...currentFrame };
+
+      // Add pins to current roll
+      updatedFrame.rolls.push(pins);
+
+      // Check for strike (frame 1-9)
+      if (currentFrameIndex < 9 && updatedFrame.rolls.length === 1 && pins === 10) {
+        updatedFrame.isStrike = true;
+        updatedFrame.isComplete = true;
+      }
+      // Check for spare (frame 1-9)
+      else if (currentFrameIndex < 9 && updatedFrame.rolls.length === 2) {
+        const total = updatedFrame.rolls.reduce((sum, roll) => sum + roll, 0);
+        updatedFrame.isSpare = total === 10;
+        updatedFrame.isComplete = true;
+      }
+      // Frame 10 special rules
+      else if (currentFrameIndex === 9) {
+        // Check for first roll strike
+        if (updatedFrame.rolls.length === 1 && pins === 10) {
+          updatedFrame.isStrike = true;
+        }
+        // Check for spare (only if first roll wasn't a strike)
+        else if (updatedFrame.rolls.length === 2 && updatedFrame.rolls[0] !== 10) {
+          const total = updatedFrame.rolls[0] + updatedFrame.rolls[1];
+          if (total === 10) {
+            updatedFrame.isSpare = true;
+          }
+        }
+        
+        // Frame 10 completion rules
+        if (updatedFrame.rolls.length === 3) {
+          // Always complete with 3 rolls
+          updatedFrame.isComplete = true;
+        } else if (updatedFrame.rolls.length === 2) {
+          // Complete with 2 rolls only if no strike and no spare
+          const firstRoll = updatedFrame.rolls[0];
+          const secondRoll = updatedFrame.rolls[1];
+          
+          // If first roll is strike, need 3rd roll
+          if (firstRoll === 10) {
+            updatedFrame.isComplete = false;
+          }
+          // If spare, need 3rd roll
+          else if (firstRoll + secondRoll === 10) {
+            updatedFrame.isComplete = false;
+          }
+          // No strike, no spare - complete
+          else {
+            updatedFrame.isComplete = true;
+          }
+        }
+      }
+
+      updatedFrames[currentFrameIndex] = updatedFrame;
+
+      // Calculate scores
+      const calculatedFrames = calculateBowlingScores(updatedFrames);
+      const totalScore = calculatedFrames[calculatedFrames.length - 1]?.score || 0;
+
+      const updatedPlayer = {
+        ...activePlayer,
+        bowlingFrames: calculatedFrames,
+        score: totalScore,
+      };
+
+      const updatedPlayers = prev.players.map(player => 
+        player.id === activePlayer.id ? updatedPlayer : player
+      );
+
+      // Check if game is complete (all 10 frames done)
+      const gameComplete = calculatedFrames[9]?.isComplete || false;
+
+      return {
+        ...prev,
+        players: updatedPlayers,
+        status: gameComplete ? GameStatus.FINISHED : prev.status,
+        winner: gameComplete ? activePlayer.id : prev.winner,
+        endTime: gameComplete ? new Date() : prev.endTime,
+      };
+    });
+  }, [currentGame]);
+
+  // Calculate bowling scores with proper strike/spare logic
+  const calculateBowlingScores = (frames: BowlingFrame[]): BowlingFrame[] => {
+    const calculatedFrames = [...frames];
+    
+    for (let i = 0; i < 10; i++) {
+      const frame = calculatedFrames[i];
+      
+      // Frame 10 special calculation
+      if (i === 9) {
+        // For frame 10, just sum all rolls (no bonus calculation needed)
+        const frameScore = frame.rolls.reduce((sum, roll) => sum + roll, 0);
+        const previousScore = i > 0 ? (calculatedFrames[i - 1].score || 0) : 0;
+        calculatedFrames[i] = {
+          ...frame,
+          score: previousScore + frameScore,
+        };
+      } else {
+        // Frames 1-9
+        let frameScore = frame.rolls.reduce((sum, roll) => sum + roll, 0);
+        
+        // Strike bonus (frames 1-9)
+        if (frame.isStrike) {
+          // Add next two rolls
+          if (i + 1 === 9) {
+            // Next frame is frame 10
+            const frame10 = calculatedFrames[9];
+            if (frame10.rolls.length >= 1) {
+              frameScore += frame10.rolls[0];
+            }
+            if (frame10.rolls.length >= 2) {
+              frameScore += frame10.rolls[1];
+            }
+          } else if (i + 1 < 9) {
+            // Next frame is frames 1-8
+            const nextFrame = calculatedFrames[i + 1];
+            if (nextFrame.rolls.length >= 1) {
+              frameScore += nextFrame.rolls[0];
+            }
+            if (nextFrame.rolls.length >= 2) {
+              frameScore += nextFrame.rolls[1];
+            } else if (nextFrame.isStrike && i + 2 < 10) {
+              // Next frame is also strike
+              if (i + 2 === 9) {
+                // Frame after next is frame 10
+                const frame10 = calculatedFrames[9];
+                if (frame10.rolls.length >= 1) {
+                  frameScore += frame10.rolls[0];
+                }
+              } else {
+                // Frame after next is frames 1-8
+                const frameAfterNext = calculatedFrames[i + 2];
+                if (frameAfterNext.rolls.length >= 1) {
+                  frameScore += frameAfterNext.rolls[0];
+                }
+              }
+            }
+          }
+        }
+        // Spare bonus (frames 1-9)
+        else if (frame.isSpare) {
+          // Add next one roll
+          if (i + 1 === 9) {
+            // Next frame is frame 10
+            const frame10 = calculatedFrames[9];
+            if (frame10.rolls.length >= 1) {
+              frameScore += frame10.rolls[0];
+            }
+          } else if (i + 1 < 9) {
+            // Next frame is frames 1-8
+            const nextFrame = calculatedFrames[i + 1];
+            if (nextFrame.rolls.length >= 1) {
+              frameScore += nextFrame.rolls[0];
+            }
+          }
+        }
+        
+        // Set cumulative score
+        const previousScore = i > 0 ? (calculatedFrames[i - 1].score || 0) : 0;
+        calculatedFrames[i] = {
+          ...frame,
+          score: previousScore + frameScore,
+        };
+      }
+    }
+    
+    return calculatedFrames;
+  };
+
+  // Undo bowling pin input
+  const undoBowlingRoll = useCallback(() => {
+    if (!currentGame || currentGame.type !== GameType.BOWLARD) return;
+
+    setCurrentGame(prev => {
+      if (!prev) return prev;
+
+      const activePlayer = prev.players[prev.currentPlayerIndex];
+      const frames = activePlayer.bowlingFrames || [];
+      
+      // Find current frame or last frame with rolls
+      let targetFrameIndex = -1;
+      for (let i = frames.length - 1; i >= 0; i--) {
+        if (frames[i].rolls.length > 0) {
+          targetFrameIndex = i;
+          break;
+        }
+      }
+      
+      if (targetFrameIndex === -1) return prev; // No rolls to undo
+
+      const updatedFrames = [...frames];
+      const targetFrame = { ...updatedFrames[targetFrameIndex] };
+      
+      // Remove last roll
+      targetFrame.rolls = targetFrame.rolls.slice(0, -1);
+      
+      // Reset frame state
+      targetFrame.isStrike = false;
+      targetFrame.isSpare = false;
+      targetFrame.isComplete = false;
+      
+      // Recalculate frame state based on remaining rolls
+      if (targetFrameIndex < 9) {
+        // Frames 1-9
+        if (targetFrame.rolls.length === 1 && targetFrame.rolls[0] === 10) {
+          targetFrame.isStrike = true;
+          targetFrame.isComplete = true;
+        } else if (targetFrame.rolls.length === 2) {
+          const total = targetFrame.rolls.reduce((sum, roll) => sum + roll, 0);
+          targetFrame.isSpare = total === 10;
+          targetFrame.isComplete = true;
+        }
+      } else {
+        // Frame 10
+        if (targetFrame.rolls.length === 1 && targetFrame.rolls[0] === 10) {
+          targetFrame.isStrike = true;
+        } else if (targetFrame.rolls.length === 2 && targetFrame.rolls[0] !== 10) {
+          const total = targetFrame.rolls[0] + targetFrame.rolls[1];
+          if (total === 10) {
+            targetFrame.isSpare = true;
+          }
+        }
+        
+        // Frame 10 completion rules
+        if (targetFrame.rolls.length === 3) {
+          targetFrame.isComplete = true;
+        } else if (targetFrame.rolls.length === 2) {
+          const firstRoll = targetFrame.rolls[0];
+          const secondRoll = targetFrame.rolls[1];
+          
+          if (firstRoll === 10 || firstRoll + secondRoll === 10) {
+            targetFrame.isComplete = false;
+          } else {
+            targetFrame.isComplete = true;
+          }
+        }
+      }
+      
+      updatedFrames[targetFrameIndex] = targetFrame;
+      
+      // Recalculate scores
+      const calculatedFrames = calculateBowlingScores(updatedFrames);
+      const totalScore = calculatedFrames[calculatedFrames.length - 1]?.score || 0;
+
+      const updatedPlayer = {
+        ...activePlayer,
+        bowlingFrames: calculatedFrames,
+        score: totalScore,
+      };
+
+      const updatedPlayers = prev.players.map(player => 
+        player.id === activePlayer.id ? updatedPlayer : player
+      );
+
+      // Check if game is still complete
+      const gameComplete = calculatedFrames[9]?.isComplete || false;
+
+      return {
+        ...prev,
+        players: updatedPlayers,
+        status: gameComplete ? GameStatus.FINISHED : GameStatus.IN_PROGRESS,
+        winner: gameComplete ? activePlayer.id : undefined,
+        endTime: gameComplete ? new Date() : undefined,
+      };
+    });
+  }, [currentGame]);
+
   // Reset game
   const resetGame = useCallback(() => {
     setCurrentGame(null);
@@ -357,6 +656,8 @@ export const useGame = () => {
     checkAllBallsPocketed,
     undoLastShot,
     winSet,
+    addPins,
+    undoBowlingRoll,
   };
 };
 

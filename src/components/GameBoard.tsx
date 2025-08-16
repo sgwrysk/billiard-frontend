@@ -28,6 +28,8 @@ interface GameBoardProps {
   checkAllBallsPocketed: () => boolean;
   onUndoLastShot: () => void;
   onWinSet: (playerId: string) => void;
+  onAddPins?: (pins: number) => void;
+  onUndoBowlingRoll?: () => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -41,6 +43,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
   checkAllBallsPocketed,
   onUndoLastShot,
   onWinSet,
+  onAddPins,
+  onUndoBowlingRoll,
 }) => {
   const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];
@@ -112,6 +116,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
         return t('setup.gameType.setmatch');
       case GameType.ROTATION:
         return t('setup.gameType.rotation');
+      case GameType.BOWLARD:
+        return t('setup.gameType.bowlard');
       default:
         return type;
     }
@@ -272,8 +278,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
 
 
-      {/* プレイヤー情報 */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      {/* プレイヤー情報（ボーラード以外） */}
+      {game.type !== GameType.BOWLARD && (
+        <Grid container spacing={2} sx={{ mb: 3 }}>
         {game.players.map((player) => (
           <Grid item xs={12} md={6} key={player.id}>
             <Card 
@@ -420,7 +427,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
             </Card>
           </Grid>
         ))}
-      </Grid>
+        </Grid>
+      )}
 
 
 
@@ -428,8 +436,268 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
 
 
-      {/* ボール選択エリア（セットマッチ以外） */}
-      {game.type !== GameType.SET_MATCH && (
+      {/* ボーラード用のボーリングスコアシート */}
+      {game.type === GameType.BOWLARD && (
+        <Card sx={{ mb: 2 }}>
+          <CardContent>
+            {/* ボーリングスコアシート（表形式） */}
+            <Box sx={{ overflowX: 'auto', mb: 2 }}>
+              <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse', border: '2px solid #333' }}>
+                <thead>
+                  <tr>
+                    {/* フレーム番号ヘッダー */}
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <th 
+                        key={`frame-${i}`}
+                        style={{
+                          border: '1px solid #333',
+                          padding: '8px',
+                          backgroundColor: '#1976d2',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          textAlign: 'center',
+                          width: i === 9 ? '120px' : '80px'
+                        }}
+                      >
+                        {i + 1}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* 投球結果行 */}
+                  <tr style={{ height: '40px' }}>
+                    {Array.from({ length: 10 }, (_, frameIndex) => {
+                      const frame = currentPlayer.bowlingFrames?.[frameIndex];
+                      const isFrame10 = frameIndex === 9;
+                      
+                      return (
+                        <td 
+                          key={`rolls-${frameIndex}`}
+                          style={{
+                            border: '1px solid #333',
+                            padding: '0',
+                            textAlign: 'center',
+                            position: 'relative',
+                            backgroundColor: frame?.isComplete ? '#e8f5e8' : 'white'
+                          }}
+                        >
+                          {isFrame10 ? (
+                            // 10フレーム（3つのボックス）
+                            <div style={{ display: 'flex', height: '100%' }}>
+                              {Array.from({ length: 3 }, (_, rollIndex) => {
+                                return (
+                                  <div 
+                                    key={rollIndex}
+                                    style={{
+                                      flex: 1,
+                                      borderLeft: rollIndex > 0 ? '1px solid #333' : 'none',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontSize: '14px',
+                                      fontWeight: 'bold'
+                                    }}
+                                  >
+                                    {(() => {
+                                      if (frame?.rolls[rollIndex] === undefined) return '';
+                                      
+                                      const roll = frame.rolls[rollIndex];
+                                      
+                                      // 1投目
+                                      if (rollIndex === 0) {
+                                        return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                      }
+                                      
+                                      // 2投目
+                                      if (rollIndex === 1) {
+                                        // 1投目がストライクの場合
+                                        if (frame.rolls[0] === 10) {
+                                          return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
+                                        }
+                                        // スペアの場合
+                                        else if (frame.rolls[0] + roll === 10) {
+                                          return '/';
+                                        }
+                                        // 通常
+                                        else {
+                                          return roll === 0 ? '-' : roll;
+                                        }
+                                      }
+                                      
+                                      // 3投目
+                                      if (rollIndex === 2) {
+                                        return roll === 10 ? 'X' : roll === 0 ? '-' : roll;
+                                      }
+                                      
+                                      return roll;
+                                    })()}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            // 1-9フレーム（2つのボックス）
+                            <div style={{ display: 'flex', height: '100%' }}>
+                              <div 
+                                style={{
+                                  width: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '14px',
+                                  fontWeight: 'bold',
+                                  borderRight: '2px solid #333'
+                                }}
+                              >
+                                {frame?.rolls[0] !== undefined ? (
+                                  frame.isStrike ? 'X' : 
+                                  frame.rolls[0] === 0 ? 'G' : frame.rolls[0]
+                                ) : ''}
+                              </div>
+                              <div 
+                                style={{
+                                  width: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '14px',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {!frame?.isStrike && frame?.rolls[1] !== undefined ? (
+                                  frame.isSpare ? '/' :
+                                  frame.rolls[1] === 0 ? '-' : frame.rolls[1]
+                                ) : ''}
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  
+                  {/* 累積スコア行 */}
+                  <tr style={{ height: '40px' }}>
+                    {Array.from({ length: 10 }, (_, i) => {
+                      const frame = currentPlayer.bowlingFrames?.[i];
+                      
+                      return (
+                        <td 
+                          key={`score-${i}`}
+                          style={{
+                            border: '1px solid #333',
+                            padding: '8px',
+                            textAlign: 'center',
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            backgroundColor: '#f5f5f5'
+                          }}
+                        >
+                          {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tbody>
+              </table>
+            </Box>
+
+            {/* 現在のフレーム情報と入力 */}
+            {(() => {
+              const frames = currentPlayer.bowlingFrames || [];
+              const currentFrameIndex = frames.findIndex(frame => !frame.isComplete);
+              const currentFrame = frames[currentFrameIndex];
+              
+              if (currentFrameIndex === -1) {
+                return (
+                  <Typography variant="h6" sx={{ textAlign: 'center', color: 'success.main' }}>
+                    🎉 {t('bowlard.frameComplete')} 🎉
+                  </Typography>
+                );
+              }
+
+              return (
+                <Box>
+                  {/* ピン数入力ボタン */}
+                  <Grid container spacing={1}>
+                    {Array.from({ length: 11 }, (_, i) => {
+                      let maxPins = 10;
+                      let disabled = false;
+                      
+                      // 10フレーム目の特殊制限
+                      if (currentFrameIndex === 9) {
+                        const rollsLength = currentFrame?.rolls.length || 0;
+                        
+                        if (rollsLength === 0) {
+                          // 1投目: 0-10まで全て可能
+                          maxPins = 10;
+                        } else if (rollsLength === 1) {
+                          // 2投目
+                          const firstRoll = currentFrame.rolls[0];
+                          if (firstRoll === 10) {
+                            // 1投目がストライクなら2投目も0-10まで全て可能
+                            maxPins = 10;
+                          } else {
+                            // 1投目がストライクでなければ残りピン数まで
+                            maxPins = 10 - firstRoll;
+                          }
+                        } else if (rollsLength === 2) {
+                          // 3投目
+                          const firstRoll = currentFrame.rolls[0];
+                          const secondRoll = currentFrame.rolls[1];
+                          
+                          if (firstRoll === 10 || firstRoll + secondRoll === 10) {
+                            // 1投目がストライクまたはスペアなら3投目は0-10まで全て可能
+                            maxPins = 10;
+                          } else {
+                            // それ以外なら3投目はない（この状況は発生しないはず）
+                            maxPins = 0;
+                          }
+                        }
+                      } else {
+                        // 1-9フレーム目の通常制限
+                        if (currentFrame?.rolls.length === 1) {
+                          maxPins = 10 - (currentFrame.rolls[0] || 0);
+                        } else {
+                          maxPins = 10;
+                        }
+                      }
+                      
+                      disabled = i > maxPins;
+                      
+                      return (
+                        <Grid item key={i}>
+                          <Button
+                            variant="contained"
+                            disabled={disabled}
+                            onClick={() => onAddPins?.(i)}
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              fontSize: '1.1rem',
+                              fontWeight: 'bold',
+                              bgcolor: disabled ? 'grey.300' : 'primary.main',
+                              '&:hover': {
+                                bgcolor: disabled ? 'grey.300' : 'primary.dark',
+                              }
+                            }}
+                          >
+                            {i}
+                          </Button>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                </Box>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ボール選択エリア（セットマッチとボーラード以外） */}
+      {game.type !== GameType.SET_MATCH && game.type !== GameType.BOWLARD && (
         <Card ref={ballSectionRef} sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -581,8 +849,48 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 {t('game.undo')}
               </Button>
             </Grid>
+          ) : game.type === GameType.BOWLARD ? (
+            // ボーラード用のボタン
+            (() => {
+              const frames = currentPlayer.bowlingFrames || [];
+              const gameComplete = frames[9]?.isComplete || false;
+              const hasRolls = frames.some(frame => frame.rolls.length > 0);
+              
+              return (
+                <>
+                  <Grid item xs={gameComplete ? 6 : 12}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="warning"
+                      onClick={onUndoBowlingRoll}
+                      size="large"
+                      startIcon={<Undo />}
+                      disabled={!hasRolls}
+                    >
+                      {t('game.undo')}
+                    </Button>
+                  </Grid>
+                  
+                  {/* 完了ボタン（ゲーム終了時のみ表示） */}
+                  {gameComplete && (
+                    <Grid item xs={6}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="success"
+                        onClick={() => onEndGame(currentPlayer.id)}
+                        size="large"
+                      >
+                        {t('game.complete')}
+                      </Button>
+                    </Grid>
+                  )}
+                </>
+              );
+            })()
           ) : (
-            // 通常時のボタン（ローテーション等）
+            // 通常時のボタン（ローテーション）
             <>
               <Grid item xs={12} sm={6}>
                 <Button
@@ -597,6 +905,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   {t('game.undo')}
                 </Button>
               </Grid>
+              {/* プレイヤー交代ボタン */}
               <Grid item xs={12} sm={6}>
                 <Button
                   fullWidth

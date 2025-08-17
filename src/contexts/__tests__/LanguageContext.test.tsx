@@ -135,4 +135,63 @@ describe('LanguageContext', () => {
     expect(screen.getByTestId('current-language')).toHaveTextContent('ja');
     expect(screen.getByTestId('translated-text')).toHaveTextContent('ビリヤードスコア');
   });
+
+  describe('Menu translations', () => {
+    const MenuTestComponent: React.FC = () => {
+      const { language, setLanguage, t } = useLanguage();
+      
+      return (
+        <div>
+          <span data-testid="current-language">{language}</span>
+          <span data-testid="buy-me-coffee-text">{t('menu.buyMeCoffee')}</span>
+          <span data-testid="score-input-text">{t('menu.scoreInput')}</span>
+          <button onClick={() => setLanguage('en')}>Switch to English</button>
+          <button onClick={() => setLanguage('ja')}>Switch to Japanese</button>
+        </div>
+      );
+    };
+
+    it('should translate Buy Me Coffee correctly in Japanese', () => {
+      render(
+        <LanguageProvider>
+          <MenuTestComponent />
+        </LanguageProvider>
+      );
+
+      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('開発者にコーヒーをおごる');
+      expect(screen.getByTestId('score-input-text')).toHaveTextContent('スコア入力');
+    });
+
+    it('should translate Buy Me Coffee correctly in English', () => {
+      render(
+        <LanguageProvider>
+          <MenuTestComponent />
+        </LanguageProvider>
+      );
+
+      fireEvent.click(screen.getByText('Switch to English'));
+
+      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('Buy Coffee for Developer');
+      expect(screen.getByTestId('score-input-text')).toHaveTextContent('Score Input');
+    });
+
+    it('should switch Buy Me Coffee text when language changes', () => {
+      render(
+        <LanguageProvider>
+          <MenuTestComponent />
+        </LanguageProvider>
+      );
+
+      // Start with Japanese
+      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('開発者にコーヒーをおごる');
+
+      // Switch to English
+      fireEvent.click(screen.getByText('Switch to English'));
+      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('Buy Coffee for Developer');
+
+      // Switch back to Japanese
+      fireEvent.click(screen.getByText('Switch to Japanese'));
+      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('開発者にコーヒーをおごる');
+    });
+  });
 });

@@ -13,9 +13,10 @@ import {
   IconButton,
   Menu,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Divider
 } from '@mui/material';
-import { Menu as MenuIcon, Home as HomeIcon } from '@mui/icons-material';
+import { Menu as MenuIcon, Home as HomeIcon, LocalCafe as CoffeeIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
 import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
@@ -240,6 +241,11 @@ const AppContent: React.FC = () => {
     handleMenuClose();
   };
 
+  const handleBuyMeCoffeeClick = () => {
+    window.open('https://buymeacoffee.com/latteemielr', '_blank', 'noopener,noreferrer');
+    handleMenuClose();
+  };
+
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'grey.50' }}>
       {/* App bar */}
@@ -307,6 +313,13 @@ const AppContent: React.FC = () => {
             <HomeIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary={t('menu.scoreInput')} />
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleBuyMeCoffeeClick}>
+          <ListItemIcon>
+            <CoffeeIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t('menu.buyMeCoffee')} />
         </MenuItem>
       </Menu>
 

@@ -62,8 +62,8 @@ A modern billiard score management application built with React + TypeScript + M
 ### Local Development
 ```bash
 # Clone the repository
-git clone https://github.com/sgwrysk/billiard_frontend.git
-cd billiard_frontend
+git clone https://github.com/sgwrysk/billiard-frontend.git
+cd billiard-frontend
 
 # Install dependencies
 npm install

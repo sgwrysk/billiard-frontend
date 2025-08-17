@@ -118,9 +118,19 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                     label={t('setup.playerName')}
                     value={player.name}
                     onChange={(e) => handleUpdatePlayerName(index, e.target.value)}
+                    onFocus={(e) => e.target.select()}
                     variant="outlined"
                     size="small"
-                    sx={{ mb: 2 }}
+                    sx={{ 
+                      mb: 2,
+                      '& .MuiOutlinedInput-root': {
+                        minHeight: 44
+                      }
+                    }}
+                    inputProps={{
+                      autoComplete: 'off',
+                      autoCapitalize: 'words'
+                    }}
                   />
                 
                 {/* ローテーション用の目標得点設定 */}
@@ -129,7 +139,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                     <Typography variant="body2" gutterBottom>
                       {t('setup.targetScore')}:
                     </Typography>
-                    <Grid container spacing={1} alignItems="center">
+                    <Grid container spacing={1.5} alignItems="center">
                       {presetScores.map(score => (
                         <Grid item key={score}>
                           <Chip
@@ -137,7 +147,14 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                             onClick={() => handleUpdatePlayerTargetScore(index, score)}
                             color={player.targetScore === score ? 'primary' : 'default'}
                             variant={player.targetScore === score ? 'filled' : 'outlined'}
-                            size="small"
+                            size="medium"
+                            sx={{ 
+                              minHeight: 36, 
+                              fontSize: '0.875rem',
+                              '& .MuiChip-label': { 
+                                padding: '0 12px' 
+                              }
+                            }}
                           />
                         </Grid>
                       ))}
@@ -146,9 +163,18 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                           type="number"
                           value={player.targetScore || presetScores[0]}
                           onChange={(e) => handleUpdatePlayerTargetScore(index, Number(e.target.value))}
+                          onFocus={(e) => e.target.select()}
                           size="small"
-                          sx={{ width: 80 }}
-                          inputProps={{ min: 1, max: 999 }}
+                          sx={{ width: 90, minHeight: 40 }}
+                          inputProps={{ 
+                            min: 1, 
+                            max: 999,
+                            inputMode: 'numeric',
+                            pattern: '[0-9]*'
+                          }}
+                          InputProps={{
+                            sx: { fontSize: '0.875rem' }
+                          }}
                         />
                       </Grid>
                     </Grid>
@@ -161,7 +187,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                     <Typography variant="body2" gutterBottom>
                       {t('setup.sets')}:
                     </Typography>
-                    <Grid container spacing={1} alignItems="center">
+                    <Grid container spacing={1.5} alignItems="center">
                       {presetSets.map(sets => (
                         <Grid item key={sets}>
                           <Chip
@@ -169,7 +195,14 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                             onClick={() => handleUpdatePlayerTargetSets(index, sets)}
                             color={player.targetSets === sets ? 'primary' : 'default'}
                             variant={player.targetSets === sets ? 'filled' : 'outlined'}
-                            size="small"
+                            size="medium"
+                            sx={{ 
+                              minHeight: 36, 
+                              fontSize: '0.875rem',
+                              '& .MuiChip-label': { 
+                                padding: '0 12px' 
+                              }
+                            }}
                           />
                         </Grid>
                       ))}
@@ -178,9 +211,18 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                           type="number"
                           value={player.targetSets || presetSets[1]}
                           onChange={(e) => handleUpdatePlayerTargetSets(index, Number(e.target.value))}
+                          onFocus={(e) => e.target.select()}
                           size="small"
-                          sx={{ width: 80 }}
-                          inputProps={{ min: 1, max: 21 }}
+                          sx={{ width: 90, minHeight: 40 }}
+                          inputProps={{ 
+                            min: 1, 
+                            max: 21,
+                            inputMode: 'numeric',
+                            pattern: '[0-9]*'
+                          }}
+                          InputProps={{
+                            sx: { fontSize: '0.875rem' }
+                          }}
                         />
                       </Grid>
                     </Grid>

@@ -26,10 +26,7 @@ describe('useGame', () => {
       expect(result.current.currentGame).toBeNull();
     });
 
-    it('should initialize empty game history', () => {
-      const { result } = renderHook(() => useGame());
-      expect(result.current.gameHistory).toEqual([]);
-    });
+
 
     it('should start a SET_MATCH game correctly', () => {
       const { result } = renderHook(() => useGame());
@@ -211,15 +208,11 @@ describe('useGame', () => {
         );
       });
 
-      const winnerId = result.current.currentGame!.players[0].id;
-      
       act(() => {
-        result.current.endGame(winnerId);
+        result.current.endGame();
       });
 
       expect(result.current.currentGame).toBeNull();
-      expect(result.current.gameHistory).toHaveLength(1);
-      expect(result.current.gameHistory[0].winner).toBe(winnerId);
     });
 
     it('should reset rack in ROTATION game', () => {
@@ -535,8 +528,6 @@ describe('useGame', () => {
 
       expect(result.current.currentGame?.players[0].setsWon).toBe(2);
       expect(result.current.currentGame?.status).toBe(GameStatus.COMPLETED);
-      expect(result.current.gameHistory).toHaveLength(1);
-      expect(result.current.gameHistory[0].winner).toBe(player1Id);
     });
 
     it('should not end SET_MATCH game when target sets are not reached', () => {
@@ -566,43 +557,9 @@ describe('useGame', () => {
       expect(result.current.currentGame?.players[0].setsWon).toBe(2);
       expect(result.current.currentGame?.players[1].setsWon).toBe(1);
       expect(result.current.currentGame?.status).toBe(GameStatus.IN_PROGRESS);
-      expect(result.current.gameHistory).toHaveLength(0);
     });
 
-    it('should update game history and player stats when SET_MATCH game ends', () => {
-      const { result } = renderHook(() => useGame());
-      
-      act(() => {
-        result.current.startGame(
-          [{ name: 'Winner Player', targetSets: 1 }, { name: 'Loser Player', targetSets: 1 }],
-          GameType.SET_MATCH
-        );
-      });
 
-      const winnerId = result.current.currentGame!.players[0].id;
-      
-      // Win the required set
-      act(() => {
-        result.current.winSet(winnerId);
-      });
-
-      // Check game is completed and added to history
-      expect(result.current.currentGame?.status).toBe(GameStatus.COMPLETED);
-      expect(result.current.gameHistory).toHaveLength(1);
-      expect(result.current.gameHistory[0].winner).toBe(winnerId);
-      expect(result.current.gameHistory[0].type).toBe(GameType.SET_MATCH);
-      expect(result.current.gameHistory[0].endTime).toBeInstanceOf(Date);
-
-      // Check player stats are updated
-      expect(result.current.playerStats).toHaveLength(2);
-      const winnerStats = result.current.playerStats.find(stat => stat.name === 'Winner Player');
-      const loserStats = result.current.playerStats.find(stat => stat.name === 'Loser Player');
-      
-      expect(winnerStats?.totalGames).toBe(1);
-      expect(winnerStats?.totalWins).toBe(1);
-      expect(loserStats?.totalGames).toBe(1);
-      expect(loserStats?.totalWins).toBe(0);
-    });
   });
 
   describe('Bowling (BOWLARD) specific functions', () => {
@@ -703,38 +660,7 @@ describe('useGame', () => {
     });
   });
 
-  describe('Player statistics', () => {
-    it('should load player stats from localStorage', () => {
-      const mockStats = [{ name: 'Player 1', totalWins: 5, totalGames: 10 }];
-      localStorageMock.getItem.mockReturnValue(JSON.stringify(mockStats));
 
-      const { result } = renderHook(() => useGame());
-      
-      expect(result.current.playerStats).toEqual(mockStats);
-    });
-
-    it('should update player stats when game ends', () => {
-      const { result } = renderHook(() => useGame());
-      
-      act(() => {
-        result.current.startGame(
-          [{ name: 'Player 1' }, { name: 'Player 2' }],
-          GameType.SET_MATCH
-        );
-      });
-
-      const winnerId = result.current.currentGame!.players[0].id;
-      
-      act(() => {
-        result.current.endGame(winnerId);
-      });
-
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'billiardPlayerStats',
-        expect.stringContaining('Player 1')
-      );
-    });
-  });
 
   describe('Error handling', () => {
     it('should handle invalid player index in switchToPlayer', () => {
@@ -772,18 +698,7 @@ describe('useGame', () => {
       }).not.toThrow();
     });
 
-    it('should handle corrupted localStorage data', () => {
-      localStorageMock.getItem.mockReturnValue('invalid json');
-      
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
-      const { result } = renderHook(() => useGame());
-      
-      expect(result.current.playerStats).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to load billiardPlayerStats from localStorage:', expect.any(Error));
-      
-      consoleSpy.mockRestore();
-    });
+
   });
 
   describe('Game flow', () => {

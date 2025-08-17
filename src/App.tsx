@@ -13,16 +13,14 @@ import {
   IconButton,
   Menu,
   ListItemIcon,
-  ListItemText,
-  Divider
+  ListItemText
 } from '@mui/material';
-import { Menu as MenuIcon, Home as HomeIcon, Settings as SettingsIcon } from '@mui/icons-material';
+import { Menu as MenuIcon, Home as HomeIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
 import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
 import GameSetup from './components/GameSetup';
 import GameBoard from './components/GameBoard';
-import GameHistory from './components/GameHistory';
 import VictoryScreen from './components/VictoryScreen';
 import { GameType, GameStatus } from './types/index';
 
@@ -126,7 +124,6 @@ const AppScreen = {
   SETUP: 'SETUP',
   GAME: 'GAME',
   VICTORY: 'VICTORY',
-  HISTORY: 'HISTORY',
 } as const;
 
 const AppContent: React.FC = () => {
@@ -136,8 +133,6 @@ const AppContent: React.FC = () => {
   const open = Boolean(anchorEl);
   const {
     currentGame,
-    gameHistory,
-    playerStats,
     startGame,
 
     pocketBall,
@@ -191,7 +186,7 @@ const AppContent: React.FC = () => {
         endTime: new Date(),
       };
       setFinishedGame(gameWithWinner);
-      endGame(winnerId);
+      endGame();
       setCurrentScreen(AppScreen.VICTORY);
     }
   };
@@ -203,9 +198,7 @@ const AppContent: React.FC = () => {
 
 
 
-  const handleBackToSetup = () => {
-    setCurrentScreen(AppScreen.SETUP);
-  };
+
 
   const handleRematch = () => {
     if (!finishedGame) return;
@@ -315,13 +308,6 @@ const AppContent: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t('menu.scoreInput')} />
         </MenuItem>
-        <Divider />
-        <MenuItem onClick={() => handleMenuItemClick(AppScreen.HISTORY)}>
-          <ListItemIcon>
-            <SettingsIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={t('home.gameHistory')} />
-        </MenuItem>
       </Menu>
 
       {/* Main content */}
@@ -353,16 +339,8 @@ const AppContent: React.FC = () => {
         {currentScreen === AppScreen.VICTORY && finishedGame && (
           <VictoryScreen
             game={finishedGame}
-            playerStats={playerStats}
             onRematch={handleRematch}
             onBackToMenu={handleBackToMenu}
-          />
-        )}
-        
-        {currentScreen === AppScreen.HISTORY && (
-          <GameHistory
-            gameHistory={gameHistory}
-            onBack={handleBackToSetup}
           />
         )}
       </Container>

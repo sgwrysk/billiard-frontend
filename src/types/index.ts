@@ -21,12 +21,7 @@ export interface BowlingFrame {
   isComplete: boolean;
 }
 
-// Player statistics type definition
-export interface PlayerStats {
-  name: string;
-  totalWins: number;
-  totalGames: number;
-}
+
 
 // Game type enumeration
 export const GameType = {
@@ -81,8 +76,4 @@ export interface ScoreHistory {
   ballNumber?: number;
 }
 
-// Game history type definition
-export interface GameHistory {
-  game: Game;
-  shots: Shot[];
-}
+

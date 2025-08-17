@@ -23,7 +23,6 @@ const translations: Translations = {
     // Home screen
     'app.title': 'ビリヤードスコア',
     'home.newGame': '新しいゲーム',
-    'home.gameHistory': 'ゲーム履歴',
     'language.japanese': '日本語',
     'language.english': 'English',
     'language.select': '言語選択',
@@ -109,13 +108,7 @@ const translations: Translations = {
     'victory.gameEnd': 'ゲーム終了',
     'victory.unknown': '不明',
 
-    // Game history
-    'history.title': 'ゲーム履歴',
-    'history.noGames': 'ゲーム履歴がありません',
-    'history.playedOn': 'プレイ日時',
-    'history.winner': '勝者',
-    'history.players': 'プレイヤー',
-    'history.duration': '時間',
+
 
     // Common
     'common.back': '戻る',
@@ -136,7 +129,6 @@ const translations: Translations = {
     // Home screen
     'app.title': 'Billiard Score',
     'home.newGame': 'New Game',
-    'home.gameHistory': 'Game History',
     'language.japanese': '日本語',
     'language.english': 'English',
     'language.select': 'Language Selection',
@@ -220,13 +212,7 @@ const translations: Translations = {
     'victory.gameEnd': 'Game End',
     'victory.unknown': 'Unknown',
 
-    // Game history
-    'history.title': 'Game History',
-    'history.noGames': 'No game history',
-    'history.playedOn': 'Played on',
-    'history.winner': 'Winner',
-    'history.players': 'Players',
-    'history.duration': 'Duration',
+
 
     // Common
     'common.back': 'Back',

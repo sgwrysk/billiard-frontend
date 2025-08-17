@@ -22,9 +22,8 @@ import {
   EmojiEvents, 
   Refresh, 
   Home, 
-  Star,
   AccessTime,
-  SportsEsports 
+  SportsEsports
 } from '@mui/icons-material';
 import {
   Chart as ChartJS,
@@ -38,10 +37,10 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useLanguage } from '../contexts/LanguageContext';
-import type { Game, PlayerStats } from '../types/index';
+import type { Game } from '../types/index';
 import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
-import { UIColors, AppColors } from '../constants/colors';
+import { UIColors, BowlardColors } from '../constants/colors';
 
 ChartJS.register(
   CategoryScale,
@@ -55,14 +54,12 @@ ChartJS.register(
 
 interface VictoryScreenProps {
   game: Game;
-  playerStats: PlayerStats[];
   onRematch: () => void;
   onBackToMenu: () => void;
 }
 
 const VictoryScreen: React.FC<VictoryScreenProps> = ({
   game,
-  playerStats,
   onRematch,
   onBackToMenu,
 }) => {
@@ -91,9 +88,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     return language === 'en' ? `${minutes}m ${seconds}s` : `${minutes}分${seconds}秒`;
   };
 
-  const getPlayerStats = (playerName: string) => {
-    return playerStats.find(stats => stats.name === playerName);
-  };
+
 
   // Generate complete pocketed balls data from scoreHistory for ROTATION games, organized by rack
   const getCompletePocketedBallsByRack = () => {
@@ -327,6 +322,18 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     };
   };
 
+  // Calculate actual sets won for a player from scoreHistory
+  const calculateActualSetsWon = (playerId: string) => {
+    if (game.type !== GameType.SET_MATCH || !game.scoreHistory || game.scoreHistory.length === 0) {
+      return game.players.find(p => p.id === playerId)?.setsWon || 0;
+    }
+    
+    // Count set wins from scoreHistory for this player
+    return game.scoreHistory
+      .filter(entry => entry.score === 1 && entry.playerId === playerId)
+      .length;
+  };
+
   // Generate set history table for Set Match
   const generateSetHistoryTable = () => {
     if (game.type !== GameType.SET_MATCH || !game.scoreHistory || game.scoreHistory.length === 0) {
@@ -424,9 +431,6 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         <Card sx={{ mb: 3, bgcolor: 'success.50', border: '2px solid', borderColor: 'success.main' }}>
           <CardContent sx={{ textAlign: 'center', py: 4 }}>
             <EmojiEvents sx={{ fontSize: 80, color: 'gold', mb: 2 }} />
-            <Typography variant="h3" component="h1" gutterBottom color="success.dark">
-              🎉 勝利！ 🎉
-            </Typography>
             {winner && (
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 3 }}>
                 <Avatar 
@@ -443,25 +447,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                   <Typography variant="h4" component="h2">
                     {winner.name}
                   </Typography>
-                  <Typography variant="h5" color="success.main">
-                    {winner.score}点
-                  </Typography>
-                  {getPlayerStats(winner.name) && (
-                    <Box sx={{ display: 'flex', gap: 1, mt: 1, justifyContent: 'center' }}>
-                      <Chip 
-                        icon={<Star />}
-                        label={`通算 ${getPlayerStats(winner.name)?.totalWins}勝`}
-                        color="warning"
-                        variant="filled"
-                      />
-                      <Chip 
-                        icon={<SportsEsports />}
-                        label={`${getPlayerStats(winner.name)?.totalGames}戦`}
-                        color="info"
-                        variant="outlined"
-                      />
-                    </Box>
-                  )}
+
                 </Box>
               </Box>
             )}
@@ -478,164 +464,348 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
             </Typography>
             
             {/* ボーリングスコアシート（表形式） */}
-            <Box sx={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse', border: `2px solid ${UIColors.border.dark}` }}>
-                <thead>
-                  <tr>
-                    {/* フレーム番号ヘッダー */}
-                    {Array.from({ length: 10 }, (_, i) => (
-                      <th 
-                        key={`frame-${i}`}
-                        style={{
-                          border: `1px solid ${UIColors.border.dark}`,
-                          padding: '8px',
-                          backgroundColor: AppColors.theme.primary,
-                          color: 'white',
-                          fontWeight: 'bold',
-                          textAlign: 'center',
-                          width: i === 9 ? '120px' : '80px'
+            {/* Desktop Layout */}
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1.5fr',
+                border: `2px solid ${UIColors.border.dark}`
+              }}>
+                {/* Frame headers */}
+                {Array.from({ length: 10 }, (_, i) => (
+                  <Box 
+                    key={`frame-${i}`}
+                    sx={{ 
+                      borderRight: i === 9 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                      borderBottom: `1px solid ${UIColors.border.dark}`,
+                      padding: '8px',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      backgroundColor: BowlardColors.number.background
+                    }}
+                  >
+                    {i + 1}
+                  </Box>
+                ))}
+                
+                {/* Roll results */}
+                {Array.from({ length: 10 }, (_, frameIndex) => {
+                  const frame = game.players[0]?.bowlingFrames?.[frameIndex];
+                  
+                  const renderRollResult = (frame: any, rollIndex: number) => {
+                    const roll = frame?.rolls[rollIndex];
+                    if (roll === undefined) return '';
+                    
+                    if (frameIndex === 9) {
+                      // 10フレーム目
+                      if (rollIndex === 0) {
+                        return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                      } else if (rollIndex === 1) {
+                        if (frame.rolls[0] === 10) {
+                          return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                        } else {
+                          return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
+                        }
+                      } else {
+                        const firstRoll = frame.rolls[0];
+                        const secondRoll = frame.rolls[1];
+                        
+                        if (firstRoll === 10) {
+                          if (secondRoll === 10) {
+                            return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                          } else {
+                            return (secondRoll + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
+                          }
+                        } else {
+                          return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                        }
+                      }
+                    } else {
+                      // 1-9フレーム
+                      if (rollIndex === 0) {
+                        return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                      } else {
+                        return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
+                      }
+                    }
+                  };
+                  
+                  return (
+                    <Box 
+                      key={`rolls-${frameIndex}`}
+                      sx={{ 
+                        borderRight: frameIndex === 9 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                        display: 'flex',
+                        minHeight: '40px'
+                      }}
+                    >
+                      {frameIndex === 9 ? (
+                        // 10フレーム目 (3投分)
+                        <>
+                          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
+                            {frame ? renderRollResult(frame, 0) : ''}
+                          </Box>
+                          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
+                            {frame ? renderRollResult(frame, 1) : ''}
+                          </Box>
+                          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {frame ? renderRollResult(frame, 2) : ''}
+                          </Box>
+                        </>
+                      ) : (
+                        // 1-9フレーム目 (2投分)
+                        <>
+                          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
+                            {frame ? renderRollResult(frame, 0) : ''}
+                          </Box>
+                          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {frame ? renderRollResult(frame, 1) : ''}
+                          </Box>
+                        </>
+                      )}
+                    </Box>
+                  );
+                })}
+                
+                {/* Cumulative scores */}
+                {Array.from({ length: 10 }, (_, i) => {
+                  const frame = game.players[0]?.bowlingFrames?.[i];
+                  return (
+                    <Box 
+                      key={`score-${i}`}
+                      sx={{ 
+                        borderRight: i === 9 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                        padding: '8px',
+                        textAlign: 'center',
+                        borderTop: `1px solid ${UIColors.border.dark}`,
+                        fontWeight: 'bold',
+                        minHeight: '40px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                    </Box>
+                  );
+                })}
+              </Box>
+            </Box>
+
+            {/* Mobile Layout (2 rows) */}
+            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+              {/* 1-5 frames */}
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+                  border: `2px solid ${UIColors.border.dark}`
+                }}>
+                  {/* Frame headers 1-5 */}
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Box 
+                      key={`frame-${i}`}
+                      sx={{ 
+                        borderRight: i === 4 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                        borderBottom: `1px solid ${UIColors.border.dark}`,
+                        padding: '8px',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        backgroundColor: BowlardColors.number.background
+                      }}
+                    >
+                      {i + 1}
+                    </Box>
+                  ))}
+                  
+                  {/* Roll results 1-5 */}
+                  {Array.from({ length: 5 }, (_, frameIndex) => {
+                    const frame = game.players[0]?.bowlingFrames?.[frameIndex];
+                    
+                    const renderRollResult = (frame: any, rollIndex: number) => {
+                      const roll = frame?.rolls[rollIndex];
+                      if (roll === undefined) return '';
+                      
+                      if (rollIndex === 0) {
+                        return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                      } else {
+                        return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
+                      }
+                    };
+                    
+                    return (
+                      <Box 
+                        key={`rolls-${frameIndex}`}
+                        sx={{ 
+                          borderRight: frameIndex === 4 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                          display: 'flex',
+                          minHeight: '40px'
                         }}
                       >
-                        {i + 1}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* 投球結果行 */}
-                  <tr style={{ height: '40px' }}>
-                    {Array.from({ length: 10 }, (_, i) => {
-                      const frame = game.players[0]?.bowlingFrames?.[i];
-                      const isFrame10 = i === 9;
-                      
-                      return (
-                        <td 
-                          key={`rolls-${i}`}
-                          style={{
-                            border: `1px solid ${UIColors.border.dark}`,
-                            padding: '0',
-                            textAlign: 'center',
-                            position: 'relative',
-                            backgroundColor: frame?.isComplete ? UIColors.background.success : UIColors.background.white
-                          }}
-                        >
-                          {isFrame10 ? (
-                            // 10フレーム（3つのボックス）
-                            <div style={{ display: 'flex', height: '100%' }}>
-                              {Array.from({ length: 3 }, (_, rollIndex) => (
-                                <div 
-                                  key={rollIndex}
-                                  style={{
-                                    flex: 1,
-                                    borderLeft: rollIndex > 0 ? `1px solid ${UIColors.border.dark}` : 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '14px',
-                                    fontWeight: 'bold'
-                                  }}
-                                >
-                                  {(() => {
-                                    if (frame?.rolls[rollIndex] === undefined) return '';
-                                    
-                                    const roll = frame.rolls[rollIndex];
-                                    
-                                    // 1投目
-                                    if (rollIndex === 0) {
-                                      return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
-                                    }
-                                    
-                                    // 2投目
-                                    if (rollIndex === 1) {
-                                      // 1投目がストライクの場合
-                                      if (frame.rolls[0] === 10) {
-                                        return roll === 10 ? 'X' : roll === 0 ? 'G' : roll;
-                                      }
-                                      // スペアの場合
-                                      else if (frame.rolls[0] + roll === 10) {
-                                        return '/';
-                                      }
-                                      // 通常
-                                      else {
-                                        return roll === 0 ? '-' : roll;
-                                      }
-                                    }
-                                    
-                                    // 3投目
-                                    if (rollIndex === 2) {
-                                      return roll === 10 ? 'X' : roll === 0 ? '-' : roll;
-                                    }
-                                    
-                                    return roll;
-                                  })()}
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            // 1-9フレーム（2つのボックス）
-                            <div style={{ display: 'flex', height: '100%' }}>
-                              <div 
-                                style={{
-                                  width: '50%',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontSize: '14px',
-                                  fontWeight: 'bold',
-                                  borderRight: `2px solid ${UIColors.border.dark}`
-                                }}
-                              >
-                                {frame?.rolls[0] !== undefined ? (
-                                  frame.isStrike ? 'X' : 
-                                  frame.rolls[0] === 0 ? 'G' : frame.rolls[0]
-                                ) : ''}
-                              </div>
-                              <div 
-                                style={{
-                                  width: '50%',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontSize: '14px',
-                                  fontWeight: 'bold'
-                                }}
-                              >
-                                {!frame?.isStrike && frame?.rolls[1] !== undefined ? (
-                                  frame.isSpare ? '/' :
-                                  frame.rolls[1] === 0 ? '-' : frame.rolls[1]
-                                ) : ''}
-                              </div>
-                            </div>
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
+                        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
+                          {frame ? renderRollResult(frame, 0) : ''}
+                        </Box>
+                        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {frame ? renderRollResult(frame, 1) : ''}
+                        </Box>
+                      </Box>
+                    );
+                  })}
                   
-                  {/* 累積スコア行 */}
-                  <tr style={{ height: '40px' }}>
-                    {Array.from({ length: 10 }, (_, i) => {
-                      const frame = game.players[0]?.bowlingFrames?.[i];
+                  {/* Cumulative scores 1-5 */}
+                  {Array.from({ length: 5 }, (_, i) => {
+                    const frame = game.players[0]?.bowlingFrames?.[i];
+                    return (
+                      <Box 
+                        key={`score-${i}`}
+                        sx={{ 
+                          borderRight: i === 4 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                          padding: '8px',
+                          textAlign: 'center',
+                          borderTop: `1px solid ${UIColors.border.dark}`,
+                          fontWeight: 'bold',
+                          minHeight: '40px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Box>
+              
+              {/* 6-10 frames */}
+              <Box>
+                <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr 1fr 1fr 1.5fr',
+                  border: `2px solid ${UIColors.border.dark}`
+                }}>
+                  {/* Frame headers 6-10 */}
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Box 
+                      key={`frame-${i + 5}`}
+                      sx={{ 
+                        borderRight: i === 4 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                        borderBottom: `1px solid ${UIColors.border.dark}`,
+                        padding: '8px',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        backgroundColor: BowlardColors.number.background
+                      }}
+                    >
+                      {i + 6}
+                    </Box>
+                  ))}
+                  
+                  {/* Roll results 6-10 */}
+                  {Array.from({ length: 5 }, (_, i) => {
+                    const frameIndex = i + 5;
+                    const frame = game.players[0]?.bowlingFrames?.[frameIndex];
+                    
+                    const renderRollResult = (frame: any, rollIndex: number) => {
+                      const roll = frame?.rolls[rollIndex];
+                      if (roll === undefined) return '';
                       
-                      return (
-                        <td 
-                          key={`score-${i}`}
-                          style={{
-                            border: `1px solid ${UIColors.border.dark}`,
-                            padding: '8px',
-                            textAlign: 'center',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            backgroundColor: UIColors.background.lightGray
-                          }}
-                        >
-                          {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                </tbody>
-              </table>
+                      if (frameIndex === 9) {
+                        // 10フレーム目
+                        if (rollIndex === 0) {
+                          return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                        } else if (rollIndex === 1) {
+                          if (frame.rolls[0] === 10) {
+                            return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                          } else {
+                            return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
+                          }
+                        } else {
+                          const firstRoll = frame.rolls[0];
+                          const secondRoll = frame.rolls[1];
+                          
+                          if (firstRoll === 10) {
+                            if (secondRoll === 10) {
+                              return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                            } else {
+                              return (secondRoll + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
+                            }
+                          } else {
+                            return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                          }
+                        }
+                      } else {
+                        // 6-9フレーム
+                        if (rollIndex === 0) {
+                          return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
+                        } else {
+                          return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
+                        }
+                      }
+                    };
+                    
+                    return (
+                      <Box 
+                        key={`rolls-${frameIndex}`}
+                        sx={{ 
+                          borderRight: i === 4 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                          display: 'flex',
+                          minHeight: '40px'
+                        }}
+                      >
+                        {frameIndex === 9 ? (
+                          // 10フレーム目 (3投分)
+                          <>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
+                              {frame ? renderRollResult(frame, 0) : ''}
+                            </Box>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
+                              {frame ? renderRollResult(frame, 1) : ''}
+                            </Box>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {frame ? renderRollResult(frame, 2) : ''}
+                            </Box>
+                          </>
+                        ) : (
+                          // 6-9フレーム目 (2投分)
+                          <>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
+                              {frame ? renderRollResult(frame, 0) : ''}
+                            </Box>
+                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {frame ? renderRollResult(frame, 1) : ''}
+                            </Box>
+                          </>
+                        )}
+                      </Box>
+                    );
+                  })}
+                  
+                  {/* Cumulative scores 6-10 */}
+                  {Array.from({ length: 5 }, (_, i) => {
+                    const frameIndex = i + 5;
+                    const frame = game.players[0]?.bowlingFrames?.[frameIndex];
+                    return (
+                      <Box 
+                        key={`score-${frameIndex}`}
+                        sx={{ 
+                          borderRight: i === 4 ? 'none' : `1px solid ${UIColors.border.dark}`,
+                          padding: '8px',
+                          textAlign: 'center',
+                          borderTop: `1px solid ${UIColors.border.dark}`,
+                          fontWeight: 'bold',
+                          minHeight: '40px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Box>
             </Box>
           </CardContent>
         </Card>
@@ -678,9 +848,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                     最終スコア
                   </Typography>
                   <Stack spacing={2}>
-                    {game.players.map(player => {
-                      const stats = getPlayerStats(player.name);
-                      return (
+                    {game.players.map(player => (
                         <Box 
                           key={player.id}
                           sx={{ 
@@ -697,21 +865,15 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                               {player.name}
                               {player.id === game.winner && ' 👑'}
                             </Typography>
-                            {stats && (
-                              <Chip 
-                                label={`${stats.totalWins}勝`}
-                                size="small"
-                                color="primary"
-                                variant="outlined"
-                              />
-                            )}
                           </Box>
                           <Typography variant="h6" color="primary">
-                            {player.score}点
+                            {game.type === GameType.SET_MATCH 
+                              ? `${calculateActualSetsWon(player.id)}セット` 
+                              : `${player.score}点`
+                            }
                           </Typography>
                         </Box>
-                      );
-                    })}
+                    ))}
                   </Stack>
                 </Paper>
               </Grid>

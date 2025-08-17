@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import VictoryScreen from '../VictoryScreen';
 import { LanguageProvider } from '../../contexts/LanguageContext';
 import { GameType, GameStatus } from '../../types/index';
-import type { Game, PlayerStats } from '../../types/index';
+import type { Game } from '../../types/index';
 
 // Mock Chart.js
 vi.mock('react-chartjs-2', () => ({
@@ -19,10 +19,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 describe('VictoryScreen', () => {
-  const mockPlayerStats: PlayerStats[] = [
-    { name: 'Player 1', totalWins: 1, totalGames: 1 },
-    { name: 'Player 2', totalWins: 0, totalGames: 1 },
-  ];
+
 
   const mockOnRematch = vi.fn();
   const mockOnBackToMenu = vi.fn();
@@ -88,15 +85,14 @@ describe('VictoryScreen', () => {
       <TestWrapper>
         <VictoryScreen
           game={setMatchGame}
-          playerStats={mockPlayerStats}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
         />
       </TestWrapper>
     );
 
-    // Check if victory announcement is shown
-    expect(screen.getByText(/勝利/)).toBeInTheDocument();
+    // Check if winner display is shown (trophy icon should be present)
+    expect(screen.getByTestId('EmojiEventsIcon')).toBeInTheDocument();
     
     // The set history table should be rendered when there are scoreHistory entries with score: 1
     // This validates that the fix for filtering scoreHistory by score works
@@ -193,7 +189,6 @@ describe('VictoryScreen', () => {
       <TestWrapper>
         <VictoryScreen
           game={rotationGame}
-          playerStats={mockPlayerStats}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
         />
@@ -252,7 +247,6 @@ describe('VictoryScreen', () => {
       <TestWrapper>
         <VictoryScreen
           game={emptySetMatchGame}
-          playerStats={mockPlayerStats}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
         />
@@ -324,7 +318,6 @@ describe('VictoryScreen', () => {
       <TestWrapper>
         <VictoryScreen
           game={mixedScoreHistoryGame}
-          playerStats={mockPlayerStats}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
         />
@@ -438,7 +431,6 @@ describe('VictoryScreen', () => {
       <TestWrapper>
         <VictoryScreen
           game={rotationGameWithShots}
-          playerStats={mockPlayerStats}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
         />
@@ -574,7 +566,6 @@ describe('VictoryScreen', () => {
       <TestWrapper>
         <VictoryScreen
           game={rotationGameWithInnings}
-          playerStats={mockPlayerStats}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
         />
@@ -704,7 +695,6 @@ describe('VictoryScreen', () => {
       <TestWrapper>
         <VictoryScreen
           game={multiRackRotationGame}
-          playerStats={mockPlayerStats}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
         />
@@ -729,5 +719,134 @@ describe('VictoryScreen', () => {
     expect(rack1Section).toBeInTheDocument();
     expect(rack2Section).toBeInTheDocument();
     expect(rack3Section).toBeInTheDocument();
+  });
+
+  it('should calculate and display correct set counts from scoreHistory for SET_MATCH', () => {
+    // Create a SET_MATCH game where scoreHistory and player.setsWon differ
+    // This tests the calculateActualSetsWon function
+    const setMatchGameWithScoreHistory: Game = {
+      id: 'test-setmatch-score-calc',
+      type: GameType.SET_MATCH,
+      status: GameStatus.FINISHED,
+      players: [
+        {
+          id: 'player-1',
+          name: 'Player 1',
+          score: 0, // Not used for SET_MATCH
+          ballsPocketed: [],
+          isActive: false,
+          targetSets: 5,
+          setsWon: 2, // This should be ignored in favor of scoreHistory calculation
+        },
+        {
+          id: 'player-2', 
+          name: 'Player 2',
+          score: 0, // Not used for SET_MATCH
+          ballsPocketed: [],
+          isActive: false,
+          targetSets: 5,
+          setsWon: 1, // This should be ignored in favor of scoreHistory calculation
+        },
+      ],
+      currentPlayerIndex: 0,
+      startTime: new Date('2023-01-01T10:00:00Z'),
+      endTime: new Date('2023-01-01T11:00:00Z'),
+      winner: 'player-1',
+      totalRacks: 1,
+      currentRack: 1,
+      rackInProgress: false,
+      shotHistory: [],
+      // scoreHistory shows Player 1 won 5 sets, Player 2 won 4 sets
+      scoreHistory: [
+        { playerId: 'player-1', score: 1, timestamp: new Date('2023-01-01T10:10:00Z') }, // Set 1
+        { playerId: 'player-1', score: 1, timestamp: new Date('2023-01-01T10:15:00Z') }, // Set 2
+        { playerId: 'player-1', score: 1, timestamp: new Date('2023-01-01T10:20:00Z') }, // Set 3
+        { playerId: 'player-2', score: 1, timestamp: new Date('2023-01-01T10:25:00Z') }, // Set 4
+        { playerId: 'player-2', score: 1, timestamp: new Date('2023-01-01T10:30:00Z') }, // Set 5
+        { playerId: 'player-2', score: 1, timestamp: new Date('2023-01-01T10:35:00Z') }, // Set 6
+        { playerId: 'player-2', score: 1, timestamp: new Date('2023-01-01T10:40:00Z') }, // Set 7
+        { playerId: 'player-1', score: 1, timestamp: new Date('2023-01-01T10:45:00Z') }, // Set 8
+        { playerId: 'player-1', score: 1, timestamp: new Date('2023-01-01T10:50:00Z') }, // Set 9
+      ],
+    };
+
+    render(
+      <TestWrapper>
+        <VictoryScreen
+          game={setMatchGameWithScoreHistory}
+          onRematch={mockOnRematch}
+          onBackToMenu={mockOnBackToMenu}
+        />
+      </TestWrapper>
+    );
+
+    // Check that scoreHistory-calculated set counts are displayed correctly
+    // Player 1 should show 5 sets (from scoreHistory), not 2 (from setsWon)
+    expect(screen.getByText('5セット')).toBeInTheDocument(); // Only in final score section
+    
+    // Player 2 should show 4 sets (from scoreHistory), not 1 (from setsWon)  
+    expect(screen.getByText('4セット')).toBeInTheDocument();
+    
+    // Verify set history table is also displayed
+    expect(screen.getByText('セット獲得履歴')).toBeInTheDocument();
+    
+    // Verify victory announcement shows Player 1 as winner
+    expect(screen.getAllByText('Player 1')).toHaveLength(2); // Winner display and set history table
+    expect(screen.getByTestId('EmojiEventsIcon')).toBeInTheDocument();
+  });
+
+  it('should handle SET_MATCH with no scoreHistory and fall back to setsWon', () => {
+    // Test fallback behavior when scoreHistory is empty
+    const setMatchGameNoHistory: Game = {
+      id: 'test-setmatch-no-history',
+      type: GameType.SET_MATCH,
+      status: GameStatus.FINISHED,
+      players: [
+        {
+          id: 'player-1',
+          name: 'Player 1',
+          score: 0,
+          ballsPocketed: [],
+          isActive: false,
+          targetSets: 3,
+          setsWon: 3, // Should be used when no scoreHistory
+        },
+        {
+          id: 'player-2',
+          name: 'Player 2', 
+          score: 0,
+          ballsPocketed: [],
+          isActive: false,
+          targetSets: 3,
+          setsWon: 1, // Should be used when no scoreHistory
+        },
+      ],
+      currentPlayerIndex: 0,
+      startTime: new Date('2023-01-01T10:00:00Z'),
+      endTime: new Date('2023-01-01T10:30:00Z'),
+      winner: 'player-1',
+      totalRacks: 1,
+      currentRack: 1,
+      rackInProgress: false,
+      shotHistory: [],
+      scoreHistory: [], // Empty scoreHistory
+    };
+
+    render(
+      <TestWrapper>
+        <VictoryScreen
+          game={setMatchGameNoHistory}
+          onRematch={mockOnRematch}
+          onBackToMenu={mockOnBackToMenu}
+        />
+      </TestWrapper>
+    );
+
+    // Should fall back to setsWon values
+    expect(screen.getByText('3セット')).toBeInTheDocument(); // Only in final score section
+    expect(screen.getByText('1セット')).toBeInTheDocument();
+    
+    // No set history table should be displayed
+    expect(screen.queryByText('セット獲得履歴')).not.toBeInTheDocument();
   });
 });

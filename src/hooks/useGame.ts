@@ -1,50 +1,19 @@
-import { useState, useCallback, useEffect } from 'react';
-import type { Game, PlayerStats } from '../types/index';
+import { useState, useCallback } from 'react';
+import type { Game } from '../types/index';
 import { GameType, GameStatus } from '../types/index';
 import { GameEngineFactory } from '../games/GameEngineFactory';
-import { storage } from '../utils/storageUtils';
+
 
 export const useGame = () => {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
-  const [gameHistory, setGameHistory] = useState<Game[]>([]);
-  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
 
-  // Load player statistics from localStorage
-  useEffect(() => {
-    const savedStats = storage.get<PlayerStats[]>('billiardPlayerStats', []);
-    setPlayerStats(savedStats);
-  }, []);
 
-  // Save player statistics to localStorage
-  const savePlayerStats = useCallback((stats: PlayerStats[]) => {
-    setPlayerStats(stats);
-    storage.set('billiardPlayerStats', stats);
-  }, []);
 
-  // Update player statistics
-  const updatePlayerStats = useCallback((gameResult: Game) => {
-    const updatedStats = [...playerStats];
-    
-    gameResult.players.forEach(player => {
-      let playerStat = updatedStats.find(stat => stat.name === player.name);
-      
-      if (!playerStat) {
-        playerStat = {
-          name: player.name,
-          totalWins: 0,
-          totalGames: 0,
-        };
-        updatedStats.push(playerStat);
-      }
-      
-      playerStat.totalGames += 1;
-      if (player.id === gameResult.winner) {
-        playerStat.totalWins += 1;
-      }
-    });
-    
-    savePlayerStats(updatedStats);
-  }, [playerStats, savePlayerStats]);
+
+
+
+
+
 
   // Start a new game
   const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType) => {
@@ -72,9 +41,6 @@ export const useGame = () => {
         endTime: new Date(),
       };
       setCurrentGame(finalGame);
-      // Add to game history and update stats when game is completed
-      setGameHistory(prev => [...prev, finalGame]);
-      updatePlayerStats(finalGame);
     } else {
       // Check if all balls are pocketed (for rack reset in games like Rotation)
       if (engine.hasCustomLogic() && 'checkAllBallsPocketed' in engine) {
@@ -90,7 +56,7 @@ export const useGame = () => {
         setCurrentGame(updatedGame);
       }
     }
-  }, [currentGame, setGameHistory, updatePlayerStats]);
+  }, [currentGame]);
 
   // Switch player
   const switchPlayer = useCallback(() => {
@@ -118,20 +84,11 @@ export const useGame = () => {
   }, [currentGame]);
 
   // End game
-  const endGame = useCallback((winnerId?: string) => {
+  const endGame = useCallback(() => {
     if (!currentGame) return;
 
-    const finalGame: Game = {
-      ...currentGame,
-      status: GameStatus.COMPLETED,
-      winner: winnerId,
-      endTime: new Date(),
-    };
-
-    setGameHistory(prev => [finalGame, ...prev]);
-    updatePlayerStats(finalGame);
     setCurrentGame(null); // ゲーム終了後はnullにする
-  }, [currentGame, updatePlayerStats]);
+  }, [currentGame]);
 
   // Reset game
   const resetGame = useCallback(() => {
@@ -217,21 +174,12 @@ export const useGame = () => {
       
       // ゲームが終了したかチェック
       if (updatedGame.status === GameStatus.COMPLETED) {
-        // 勝者を設定
-        const gameWithWinner = {
-          ...updatedGame,
-          winner: playerId,
-          endTime: new Date(),
-        };
+
         
-        // ゲーム履歴に追加
-        setGameHistory(prev => [...prev, gameWithWinner]);
-        
-        // プレイヤー統計を更新
-        updatePlayerStats(gameWithWinner);
+
       }
     }
-  }, [currentGame, updatePlayerStats]);
+  }, [currentGame]);
 
   // Bowlard-specific methods
   const addPins = useCallback((pins: number) => {
@@ -245,8 +193,6 @@ export const useGame = () => {
   return {
     // State
     currentGame,
-    gameHistory,
-    playerStats,
     
     // Core actions
     startGame,

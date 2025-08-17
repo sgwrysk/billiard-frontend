@@ -1,10 +1,10 @@
-# 🎱 Billiard Score App
+# 🎱 Billiard Frontend
 
 A modern billiard score management application built with React + TypeScript + Material-UI.
 
 ## 🌐 Live Demo
 
-🚀 **[Try it now!](https://billiard-score-app.onrender.com)**
+🚀 **[Try it now!](https://billiard-frontend.onrender.com)**
 
 ## 🚀 Features
 
@@ -62,8 +62,8 @@ A modern billiard score management application built with React + TypeScript + M
 ### Local Development
 ```bash
 # Clone the repository
-git clone https://github.com/sgwrysk/billiard-score-app.git
-cd billiard-score-app
+git clone https://github.com/sgwrysk/billiard_frontend.git
+cd billiard_frontend
 
 # Install dependencies
 npm install

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: billiard-score-app
+    name: billiard_frontend
     env: static
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist

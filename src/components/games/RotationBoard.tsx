@@ -12,12 +12,14 @@ import {
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
 import { getBallColor } from '../../utils/ballUtils';
+import { BallColors, UIColors, GameColors } from '../../constants/colors';
 
 interface RotationBoardProps {
   game: Game;
   onPocketBall: (ballNumber: number) => void;
   onSwitchPlayer: () => void;
   onUndoLastShot: () => void;
+  onSelectPlayer?: (playerId: string) => void;
 }
 
 export const RotationBoard: React.FC<RotationBoardProps> = ({
@@ -25,6 +27,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   onPocketBall,
   onSwitchPlayer,
   onUndoLastShot,
+  onSelectPlayer,
 }) => {
   const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];
@@ -57,6 +60,16 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
     return Math.max(0, player.targetScore - player.score);
   };
 
+  // Get balls pocketed by a player in chronological order
+  const getPlayerBallsInOrder = (playerId: string) => {
+    if (!game.shotHistory) return [];
+    
+    return game.shotHistory
+      .filter(shot => shot.playerId === playerId && shot.isSunk)
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+      .map(shot => shot.ballNumber);
+  };
+
   return (
     <Box>
       {/* Sticky Header for Current Player */}
@@ -69,9 +82,9 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
             right: 0,
             zIndex: 1100,
             p: 2,
-            backgroundColor: 'white',
-            borderBottom: '1px solid #e0e0e0',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            backgroundColor: UIColors.background.white,
+            borderBottom: `1px solid ${UIColors.border.light}`,
+            boxShadow: UIColors.shadow.light,
           }}
         >
           <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>
@@ -91,14 +104,24 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           <Grid item xs={12} sm={6} key={player.id}>
             <Card 
               elevation={player.isActive ? 6 : 2}
+              onClick={() => onSelectPlayer && onSelectPlayer(player.id)}
               sx={{
-                border: player.isActive ? '3px solid #1976d2' : '1px solid #e0e0e0',
-                backgroundColor: 'white',
+                border: player.isActive ? GameColors.playerSelected.border : GameColors.playerUnselected.border,
+                backgroundColor: UIColors.background.white,
                 transform: player.isActive ? 'scale(1.05)' : 'scale(1)',
                 transition: 'all 0.2s ease-in-out',
+                cursor: onSelectPlayer ? 'pointer' : 'default',
                 boxShadow: player.isActive 
                   ? '0 8px 24px rgba(25, 118, 210, 0.15)' 
-                  : '0 2px 8px rgba(0,0,0,0.1)',
+                  : UIColors.shadow.medium,
+                '&:hover': onSelectPlayer ? {
+                  backgroundColor: UIColors.hover.lightBackground,
+                  transform: player.isActive ? 'scale(1.08)' : 'scale(1.03)',
+                  boxShadow: UIColors.hover.shadow,
+                } : {},
+                '&:active': onSelectPlayer ? {
+                  transform: 'scale(0.98)',
+                } : {},
               }}
             >
               <CardContent>
@@ -114,6 +137,69 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                 <Typography variant="body2" color="success.main">
                   {t('game.remaining')}: {getRemainingScore(player)}
                 </Typography>
+                
+                {/* Pocketed Balls Display */}
+                <Box sx={{ mt: 2 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, minHeight: '40px' }}>
+                    {getPlayerBallsInOrder(player.id).length > 0 ? (
+                      getPlayerBallsInOrder(player.id).map((ballNumber, index) => (
+                        <Box
+                          key={`${ballNumber}-${index}`}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.75rem',
+                            fontWeight: 'bold',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            border: 'none',
+                            
+                            // Use same background as the main ball selection
+                            background: ballNumber > 8 
+                              ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ballNumber)} 20%, ${getBallColor(ballNumber)} 80%, white 80%, white 100%)`
+                              : `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%)`,
+                            
+                            // Use same shadow as the main ball selection
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.4)',
+                            
+                            // Add the white circle background for number (smaller size for 32px balls)
+                            '&::before': {
+                              content: '""',
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              width: '18px',
+                              height: '18px',
+                              backgroundColor: 'white',
+                              borderRadius: '50%',
+                              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
+                              zIndex: 1,
+                            },
+                          }}
+                        >
+                          <span style={{ 
+                            position: 'relative', 
+                            zIndex: 2, 
+                            color: UIColors.text.black,
+                            fontSize: '0.75rem',
+                            fontWeight: 'bold'
+                          }}>
+                            {ballNumber}
+                          </span>
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem', py: 1 }}>
+                        なし
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -146,14 +232,14 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                     padding: 0,
                     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                     ...(isBallPocketed(ballNumber)
-                      ? { background: 'linear-gradient(145deg, #e6e6e6, #cccccc)' }
+                      ? { background: BallColors.pocketed.background }
                       : ballNumber > 8
                         ? { background: `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ballNumber)} 20%, ${getBallColor(ballNumber)} 80%, white 80%, white 100%)` }
                         : { background: `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%)` }
                     ),
                     boxShadow: isBallPocketed(ballNumber)
-                      ? 'inset 2px 2px 4px rgba(0,0,0,0.2)'
-                      : '0 4px 12px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.3)',
+                      ? BallColors.pocketed.shadow
+                      : BallColors.shadow.normal,
                     '&::before': {
                       content: '""',
                       position: 'absolute',
@@ -162,20 +248,26 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                       transform: 'translate(-50%, -50%)',
                       width: { xs: '32px', sm: '28px' },
                       height: { xs: '32px', sm: '28px' },
-                      backgroundColor: isBallPocketed(ballNumber) ? '#ddd' : 'white',
+                      backgroundColor: isBallPocketed(ballNumber) ? UIColors.background.mediumGray : UIColors.background.white,
                       borderRadius: '50%',
-                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)',
+                      boxShadow: UIColors.shadow.inset,
                       zIndex: 1,
                     },
-                    color: isBallPocketed(ballNumber) ? '#999' : '#000',
+                    color: isBallPocketed(ballNumber) ? UIColors.text.lightGray : UIColors.text.black,
                     '&:hover': {
                       transform: 'scale(1.08)',
+                      // ホバー時も元の背景色を保持
+                      background: isBallPocketed(ballNumber)
+                        ? `${BallColors.pocketed.background} !important`
+                        : ballNumber > 8
+                          ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ballNumber)} 20%, ${getBallColor(ballNumber)} 80%, white 80%, white 100%) !important`
+                          : `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%) !important`,
                       boxShadow: isBallPocketed(ballNumber)
-                        ? 'inset 2px 2px 4px rgba(0,0,0,0.2)'
+                        ? BallColors.pocketed.shadow
                         : '0 6px 16px rgba(0,0,0,0.4), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.4)',
                       '& span': {
                         transform: 'scale(1.15)',
-                        color: isBallPocketed(ballNumber) ? '#999 !important' : '#000 !important',
+                        color: isBallPocketed(ballNumber) ? `${UIColors.text.lightGray} !important` : `${UIColors.text.black} !important`,
                       }
                     },
                     '& > span': {

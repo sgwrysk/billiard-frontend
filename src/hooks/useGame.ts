@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Game, Player, PlayerStats } from '../types/index';
+import type { Game, PlayerStats } from '../types/index';
 import { GameType, GameStatus } from '../types/index';
 import { GameEngineFactory } from '../games/GameEngineFactory';
 import { storage } from '../utils/storageUtils';
@@ -49,25 +49,7 @@ export const useGame = () => {
   // Start a new game
   const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType) => {
     const engine = GameEngineFactory.getEngine(gameType);
-    const players: Player[] = engine.initializePlayers(playerSetups);
-
-    const newGame: Game = {
-      id: `game-${Date.now()}`,
-      type: gameType,
-      status: GameStatus.IN_PROGRESS,
-      players,
-      currentPlayerIndex: 0,
-      startTime: new Date(),
-      totalRacks: 1,
-      currentRack: 1,
-      rackInProgress: true,
-      shotHistory: [],
-      scoreHistory: players.map(player => ({
-        playerId: player.id,
-        score: 0,
-        timestamp: new Date(),
-      })),
-    };
+    const newGame = engine.initializeGame(playerSetups);
 
     setCurrentGame(newGame);
   }, []);
@@ -90,10 +72,25 @@ export const useGame = () => {
         endTime: new Date(),
       };
       setCurrentGame(finalGame);
+      // Add to game history and update stats when game is completed
+      setGameHistory(prev => [...prev, finalGame]);
+      updatePlayerStats(finalGame);
     } else {
-      setCurrentGame(updatedGame);
+      // Check if all balls are pocketed (for rack reset in games like Rotation)
+      if (engine.hasCustomLogic() && 'checkAllBallsPocketed' in engine) {
+        const allBallsPocketed = (engine as any).checkAllBallsPocketed(updatedGame);
+        if (allBallsPocketed && engine.handleCustomAction) {
+          // Auto-reset rack for next round
+          const resetGame = engine.handleCustomAction(updatedGame, 'RESET_RACK');
+          setCurrentGame(resetGame);
+        } else {
+          setCurrentGame(updatedGame);
+        }
+      } else {
+        setCurrentGame(updatedGame);
+      }
     }
-  }, [currentGame]);
+  }, [currentGame, setGameHistory, updatePlayerStats]);
 
   // Switch player
   const switchPlayer = useCallback(() => {
@@ -171,8 +168,16 @@ export const useGame = () => {
     if (!currentGame) return;
 
     const engine = GameEngineFactory.getEngine(currentGame.type);
-    const updatedGame = engine.handleUndo(currentGame);
-    setCurrentGame(updatedGame);
+    
+    if (engine.hasCustomLogic() && engine.handleCustomAction) {
+      // カスタムアクションとしてアンドゥを処理
+      const updatedGame = engine.handleCustomAction(currentGame, 'UNDO_LAST_SHOT');
+      setCurrentGame(updatedGame);
+    } else {
+      // デフォルトのアンドゥ処理を使用
+      const updatedGame = engine.handleUndo(currentGame);
+      setCurrentGame(updatedGame);
+    }
   }, [currentGame]);
 
   // Game-specific methods
@@ -202,8 +207,31 @@ export const useGame = () => {
   }, [currentGame]);
 
   const winSet = useCallback((playerId: string) => {
-    handleGameAction('WIN_SET', { playerId });
-  }, [handleGameAction]);
+    if (!currentGame) return;
+
+    const engine = GameEngineFactory.getEngine(currentGame.type);
+    
+    if (engine.hasCustomLogic() && engine.handleCustomAction) {
+      const updatedGame = engine.handleCustomAction(currentGame, 'WIN_SET', { playerId });
+      setCurrentGame(updatedGame);
+      
+      // ゲームが終了したかチェック
+      if (updatedGame.status === GameStatus.COMPLETED) {
+        // 勝者を設定
+        const gameWithWinner = {
+          ...updatedGame,
+          winner: playerId,
+          endTime: new Date(),
+        };
+        
+        // ゲーム履歴に追加
+        setGameHistory(prev => [...prev, gameWithWinner]);
+        
+        // プレイヤー統計を更新
+        updatePlayerStats(gameWithWinner);
+      }
+    }
+  }, [currentGame, updatePlayerStats]);
 
   // Bowlard-specific methods
   const addPins = useCallback((pins: number) => {

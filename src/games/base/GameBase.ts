@@ -7,6 +7,9 @@ export interface IGameEngine {
   /** プレイヤーを初期化 */
   initializePlayers(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Player[];
   
+  /** ゲームを初期化 */
+  initializeGame(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Game;
+  
   /** ボールポケット処理 */
   handlePocketBall(game: Game, ballNumber: number): Game;
   
@@ -45,6 +48,28 @@ export abstract class GameBase implements IGameEngine {
     }));
   }
   
+  initializeGame(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Game {
+    const players = this.initializePlayers(playerSetups);
+    
+    return {
+      id: `game-${Date.now()}`,
+      type: this.getGameType(),
+      status: 'IN_PROGRESS' as const,
+      players,
+      currentPlayerIndex: 0,
+      startTime: new Date(),
+      totalRacks: 1,
+      currentRack: 1,
+      rackInProgress: true,
+      shotHistory: [],
+      scoreHistory: players.map(player => ({
+        playerId: player.id,
+        score: 0,
+        timestamp: new Date(),
+      })),
+    };
+  }
+  
   abstract handlePocketBall(game: Game, ballNumber: number): Game;
   abstract handleSwitchPlayer(game: Game): Game;
   abstract checkVictoryCondition(game: Game): { isGameOver: boolean; winnerId?: string };
@@ -62,6 +87,17 @@ export abstract class GameBase implements IGameEngine {
     
     // shotHistoryから最後のエントリを削除
     updatedGame.shotHistory = updatedGame.shotHistory.slice(0, -1);
+    
+    // scoreHistoryから対応するエントリも削除（ROTATIONのグラフ表示のため）
+    const scoreToRemove = this.getBallScore(lastShot.ballNumber);
+    if (updatedGame.scoreHistory.length > 0) {
+      // 最後のスコアエントリを確認して、一致するものを削除
+      const lastScoreIndex = updatedGame.scoreHistory.length - 1;
+      const lastScoreEntry = updatedGame.scoreHistory[lastScoreIndex];
+      if (lastScoreEntry.playerId === lastShot.playerId && lastScoreEntry.score === scoreToRemove) {
+        updatedGame.scoreHistory = updatedGame.scoreHistory.slice(0, -1);
+      }
+    }
     
     // プレイヤーから最後にポケットしたボールを削除
     updatedGame.players = updatedGame.players.map(player => {

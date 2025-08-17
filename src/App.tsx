@@ -1,6 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Container, AppBar, Toolbar, Typography, Box, Select, MenuItem, FormControl } from '@mui/material';
+import { 
+  CssBaseline, 
+  Container, 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Box, 
+  Select, 
+  MenuItem, 
+  FormControl,
+  IconButton,
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  Divider
+} from '@mui/material';
+import { Menu as MenuIcon, Home as HomeIcon, Settings as SettingsIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
 import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
@@ -8,7 +24,7 @@ import GameSetup from './components/GameSetup';
 import GameBoard from './components/GameBoard';
 import GameHistory from './components/GameHistory';
 import VictoryScreen from './components/VictoryScreen';
-import { GameType } from './types/index';
+import { GameType, GameStatus } from './types/index';
 
 // Create Material-UI theme - Deep Blue + Outfit
 const theme = createTheme({
@@ -106,6 +122,7 @@ const theme = createTheme({
 });
 
 const AppScreen = {
+  HOME: 'HOME',
   SETUP: 'SETUP',
   GAME: 'GAME',
   VICTORY: 'VICTORY',
@@ -114,7 +131,9 @@ const AppScreen = {
 
 const AppContent: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
-  const [currentScreen, setCurrentScreen] = useState<string>(AppScreen.SETUP);
+  const [currentScreen, setCurrentScreen] = useState<string>(AppScreen.HOME);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
   const {
     currentGame,
     gameHistory,
@@ -126,7 +145,6 @@ const AppContent: React.FC = () => {
     switchToPlayer,
     endGame,
     resetGame,
-    resetRack,
     checkAllBallsPocketed,
     undoLastShot,
     winSet,
@@ -136,6 +154,28 @@ const AppContent: React.FC = () => {
   
   const [finishedGame, setFinishedGame] = useState<any>(null);
 
+  // ゲーム終了を監視して自動的に勝利画面に遷移
+  useEffect(() => {
+    if (currentGame && currentGame.status === GameStatus.COMPLETED) {
+      // 勝者を見つける
+      let winnerId: string | undefined;
+      for (const player of currentGame.players) {
+        if (currentGame.type === GameType.SET_MATCH) {
+          if (player.targetSets && (player.setsWon || 0) >= player.targetSets) {
+            winnerId = player.id;
+            break;
+          }
+        } else if (currentGame.type === GameType.ROTATION) {
+          if (player.targetScore && player.score >= player.targetScore) {
+            winnerId = player.id;
+            break;
+          }
+        }
+      }
+      
+      handleEndGame(winnerId);
+    }
+  }, [currentGame]);
 
 
   const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType) => {
@@ -187,11 +227,24 @@ const AppContent: React.FC = () => {
 
   const handleBackToMenu = () => {
     setFinishedGame(null);
-    setCurrentScreen(AppScreen.SETUP);
+    setCurrentScreen(AppScreen.HOME);
   };
 
   const handleLanguageChange = (newLanguage: LanguageType) => {
     setLanguage(newLanguage);
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuItemClick = (screen: string) => {
+    setCurrentScreen(screen);
+    handleMenuClose();
   };
 
   return (
@@ -199,8 +252,19 @@ const AppContent: React.FC = () => {
       {/* App bar */}
       <AppBar position="static">
         <Toolbar>
+          {/* Hamburger menu */}
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={handleMenuClick}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            🎱 {t('app.title')}
+            {t('app.title')}
           </Typography>
           
           {/* Language selector */}
@@ -228,13 +292,44 @@ const AppContent: React.FC = () => {
               </MenuItem>
             </Select>
           </FormControl>
-
-
         </Toolbar>
       </AppBar>
 
+      {/* Hamburger menu dropdown */}
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <MenuItem onClick={() => handleMenuItemClick(AppScreen.HOME)}>
+          <ListItemIcon>
+            <HomeIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t('menu.scoreInput')} />
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => handleMenuItemClick(AppScreen.HISTORY)}>
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t('home.gameHistory')} />
+        </MenuItem>
+      </Menu>
+
       {/* Main content */}
       <Container maxWidth="lg" sx={{ py: 3, minHeight: 'calc(100vh - 64px)' }}>
+        {currentScreen === AppScreen.HOME && (
+          <GameSetup onStartGame={handleStartGame} />
+        )}
+        
         {currentScreen === AppScreen.SETUP && (
           <GameSetup onStartGame={handleStartGame} />
         )}
@@ -247,7 +342,6 @@ const AppContent: React.FC = () => {
             onSwitchToPlayer={switchToPlayer}
             onEndGame={handleEndGame}
             onResetGame={handleResetGame}
-            onResetRack={resetRack}
             checkAllBallsPocketed={checkAllBallsPocketed}
             onUndoLastShot={undoLastShot}
             onWinSet={winSet}

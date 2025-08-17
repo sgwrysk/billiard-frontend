@@ -35,12 +35,24 @@ export class RotationEngine extends GameBase {
     });
     
     // ショット履歴を追加
-    const updatedGame = this.addShotToHistory(
+    const gameWithShotHistory = this.addShotToHistory(
       { ...game, players: updatedPlayers },
       activePlayer.id,
       ballNumber,
       true
     );
+    
+    // スコア履歴も追加（グラフ表示のため）
+    const scoreEntry = {
+      playerId: activePlayer.id,
+      score: score, // このボールで獲得したスコア
+      timestamp: new Date(),
+    };
+    
+    const updatedGame = {
+      ...gameWithShotHistory,
+      scoreHistory: [...gameWithShotHistory.scoreHistory, scoreEntry],
+    };
     
     return updatedGame;
   }
@@ -81,6 +93,9 @@ export class RotationEngine extends GameBase {
       case 'CHECK_ALL_BALLS_POCKETED':
         // booleanを返すため、ゲーム状態は変更しない
         return game;
+      case 'UNDO_LAST_SHOT':
+        // ROTATIONではデフォルトのアンドゥ処理を使用
+        return this.handleUndo(game);
       default:
         return game;
     }

@@ -20,6 +20,7 @@ export const calculateBowlingScores = (frames: BowlingFrame[]): BowlingFrame[] =
     // Frame 10 special calculation
     if (i === 9) {
       // For frame 10, just sum all rolls (no bonus calculation needed)
+      // 10フレーム目は投球した分だけが得点になる
       const frameScore = frame.rolls.reduce((sum, roll) => sum + roll, 0);
       const previousScore = i > 0 ? (calculatedFrames[i - 1].score || 0) : 0;
       calculatedFrames[i] = {
@@ -135,9 +136,9 @@ export const updateFrameStatus = (frame: BowlingFrame, frameIndex: number): Bowl
     }
   } else {
     // Frame 10
-    if (updatedFrame.rolls.length === 1 && updatedFrame.rolls[0] === 10) {
+    if (updatedFrame.rolls.length >= 1 && updatedFrame.rolls[0] === 10) {
       updatedFrame.isStrike = true;
-    } else if (updatedFrame.rolls.length === 2 && updatedFrame.rolls[0] !== 10) {
+    } else if (updatedFrame.rolls.length >= 2 && updatedFrame.rolls[0] !== 10) {
       const total = updatedFrame.rolls[0] + updatedFrame.rolls[1];
       if (total === 10) {
         updatedFrame.isSpare = true;

@@ -41,6 +41,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import type { Game, PlayerStats } from '../types/index';
 import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
+import { UIColors, AppColors } from '../constants/colors';
 
 ChartJS.register(
   CategoryScale,
@@ -94,6 +95,68 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     return playerStats.find(stats => stats.name === playerName);
   };
 
+  // Generate complete pocketed balls data from scoreHistory for ROTATION games, organized by rack
+  const getCompletePocketedBallsByRack = () => {
+    if (game.type !== GameType.ROTATION || !game.scoreHistory) {
+      return [{
+        rackNumber: 1,
+        players: game.players.map(player => ({
+          playerId: player.id,
+          playerName: player.name,
+          ballsPocketed: player.ballsPocketed || [],
+        }))
+      }];
+    }
+
+    // Sort score history by timestamp to get chronological order
+    const sortedScoreHistory = [...game.scoreHistory].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    
+    // Group balls by rack - we'll use ball number ranges to determine racks
+    // Rack 1: balls 1-15, Rack 2: balls 1-15 again, etc.
+    const rackData: { [rackNumber: number]: { [playerId: string]: number[] } } = {};
+    let currentRack = 1;
+    const ballsInCurrentRack = new Set<number>();
+    
+    // Initialize first rack
+    rackData[currentRack] = {};
+    game.players.forEach(player => {
+      rackData[currentRack][player.id] = [];
+    });
+
+    sortedScoreHistory.forEach(entry => {
+      const ballNumber = entry.score;
+      if (ballNumber >= 1 && ballNumber <= 15) {
+        // Check if this ball was already pocketed in current rack
+        if (ballsInCurrentRack.has(ballNumber)) {
+          // Start new rack
+          currentRack++;
+          ballsInCurrentRack.clear();
+          rackData[currentRack] = {};
+          game.players.forEach(player => {
+            rackData[currentRack][player.id] = [];
+          });
+        }
+        
+        // Add ball to current rack
+        ballsInCurrentRack.add(ballNumber);
+        if (!rackData[currentRack][entry.playerId]) {
+          rackData[currentRack][entry.playerId] = [];
+        }
+        rackData[currentRack][entry.playerId].push(ballNumber);
+      }
+    });
+
+    // Convert to display format
+    return Object.keys(rackData).map(rackNum => ({
+      rackNumber: parseInt(rackNum),
+      players: game.players.map(player => ({
+        playerId: player.id,
+        playerName: player.name,
+        ballsPocketed: rackData[parseInt(rackNum)][player.id] || [],
+      }))
+    }));
+  };
+
 
 
 
@@ -102,12 +165,16 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       return generateBowlardChartData();
     }
 
+    if (game.type === GameType.ROTATION) {
+      return generateRotationChartData();
+    }
+
     if (!game.scoreHistory || game.scoreHistory.length === 0) {
       return null;
     }
 
-    // Organize score progression for each player
-    const playerColors = ['#2196F3', '#F44336', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4'];
+    // For SET_MATCH games - use scoreHistory
+    const playerColors = UIColors.chart.playerColors;
     const datasets = game.players.map((player, index) => {
       const playerScoreHistory = game.scoreHistory
         .filter(entry => entry.playerId === player.id)
@@ -125,6 +192,103 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     // X-axis labels (shot numbers)
     const maxDataLength = Math.max(...datasets.map(d => d.data.length));
     const labels = Array.from({ length: maxDataLength }, (_, i) => `${i + 1}`);
+
+    return {
+      labels,
+      datasets,
+    };
+  };
+
+  // Generate chart data for Rotation game
+  const generateRotationChartData = () => {
+    // Check if we have score history data (works across all racks)
+    if (!game.scoreHistory || game.scoreHistory.length === 0) {
+      return null;
+    }
+
+    // Sort score entries by timestamp to get chronological order
+    const sortedScoreHistory = [...game.scoreHistory].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    
+    // Group consecutive shots by the same player into innings
+    const innings: { playerId: string; totalScore: number; timestamp: Date }[] = [];
+    let currentInning: { playerId: string; shots: Array<{ playerId: string; score: number; timestamp: Date }>; startTime: Date } | null = null;
+
+    sortedScoreHistory.forEach(entry => {
+      // For rotation, each entry represents a pocketed ball
+      if (!currentInning || currentInning.playerId !== entry.playerId) {
+        // Finalize previous inning if exists
+        if (currentInning && (currentInning as any).shots.length > 0) {
+          const inningTotal = (currentInning as any).shots.reduce((sum: number, shot: { score: number }) => sum + shot.score, 0);
+          innings.push({
+            playerId: (currentInning as any).playerId,
+            totalScore: inningTotal,
+            timestamp: (currentInning as any).startTime,
+          });
+        }
+        
+        // Start new inning
+        currentInning = { 
+          playerId: entry.playerId, 
+          shots: [entry],
+          startTime: entry.timestamp
+        };
+      } else {
+        // Continue current inning
+        currentInning.shots.push(entry);
+      }
+    });
+
+    // Add the last inning if exists
+    if (currentInning && (currentInning as any).shots.length > 0) {
+      const inningTotal = (currentInning as any).shots.reduce((sum: number, shot: { score: number }) => sum + shot.score, 0);
+      innings.push({
+        playerId: (currentInning as any).playerId,
+        totalScore: inningTotal,
+        timestamp: (currentInning as any).startTime,
+      });
+    }
+
+    if (innings.length === 0) {
+      return null;
+    }
+
+    // Calculate cumulative scores for each player by inning
+    const playerColors = UIColors.chart.playerColors;
+    const playerCumulativeScores: { [playerId: string]: number[] } = {};
+    const playerLabels: { [playerId: string]: string } = {};
+    
+    // Initialize scores and labels for all players
+    game.players.forEach(player => {
+      playerCumulativeScores[player.id] = [0]; // Start with 0 score
+      playerLabels[player.id] = player.name;
+    });
+
+    // Calculate scores for each inning
+    innings.forEach((inning) => {
+      game.players.forEach(player => {
+        const lastScore = playerCumulativeScores[player.id][playerCumulativeScores[player.id].length - 1] || 0;
+        
+        if (player.id === inning.playerId) {
+          // This player scored in this inning
+          playerCumulativeScores[player.id].push(lastScore + inning.totalScore);
+        } else {
+          // Other players keep their previous score
+          playerCumulativeScores[player.id].push(lastScore);
+        }
+      });
+    });
+
+    // Create datasets for Chart.js
+    const datasets = game.players.map((player, index) => ({
+      label: playerLabels[player.id],
+      data: playerCumulativeScores[player.id],
+      borderColor: playerColors[index % playerColors.length],
+      backgroundColor: playerColors[index % playerColors.length] + '20',
+      tension: 0.1,
+    }));
+
+    // Create labels (inning numbers)
+    const labels = ['Start', ...Array.from({ length: innings.length }, (_, i) => `イニング${i + 1}`)];
 
     return {
       labels,
@@ -154,8 +318,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         {
           label: player.name,
           data: scores,
-          borderColor: '#2196F3',
-          backgroundColor: '#2196F320',
+          borderColor: UIColors.chart.primary,
+          backgroundColor: UIColors.chart.primaryBackground,
           tension: 0.1,
           fill: true,
         },
@@ -170,8 +334,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     }
 
     // Get all set wins in chronological order
+    // Set match entries are those with score: 1 (indicating a set win)
     const setWins = game.scoreHistory
-      .filter(entry => entry.ballNumber === 0) // Set match entries have ballNumber 0
+      .filter(entry => entry.score === 1) // Set match entries have score: 1
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
     const totalSetsPlayed = setWins.length; // Total number of sets played
@@ -246,7 +411,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       x: {
         title: {
           display: true,
-          text: game.type === GameType.BOWLARD ? 'フレーム' : 'ショット数',
+          text: game.type === GameType.BOWLARD ? 'フレーム' : game.type === GameType.ROTATION ? 'イニング' : 'ショット数',
         },
       },
     },
@@ -314,7 +479,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
             
             {/* ボーリングスコアシート（表形式） */}
             <Box sx={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse', border: '2px solid #333' }}>
+              <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse', border: `2px solid ${UIColors.border.dark}` }}>
                 <thead>
                   <tr>
                     {/* フレーム番号ヘッダー */}
@@ -322,9 +487,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                       <th 
                         key={`frame-${i}`}
                         style={{
-                          border: '1px solid #333',
+                          border: `1px solid ${UIColors.border.dark}`,
                           padding: '8px',
-                          backgroundColor: '#1976d2',
+                          backgroundColor: AppColors.theme.primary,
                           color: 'white',
                           fontWeight: 'bold',
                           textAlign: 'center',
@@ -347,11 +512,11 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                         <td 
                           key={`rolls-${i}`}
                           style={{
-                            border: '1px solid #333',
+                            border: `1px solid ${UIColors.border.dark}`,
                             padding: '0',
                             textAlign: 'center',
                             position: 'relative',
-                            backgroundColor: frame?.isComplete ? '#e8f5e8' : 'white'
+                            backgroundColor: frame?.isComplete ? UIColors.background.success : UIColors.background.white
                           }}
                         >
                           {isFrame10 ? (
@@ -362,7 +527,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                                   key={rollIndex}
                                   style={{
                                     flex: 1,
-                                    borderLeft: rollIndex > 0 ? '1px solid #333' : 'none',
+                                    borderLeft: rollIndex > 0 ? `1px solid ${UIColors.border.dark}` : 'none',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -417,7 +582,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                                   justifyContent: 'center',
                                   fontSize: '14px',
                                   fontWeight: 'bold',
-                                  borderRight: '2px solid #333'
+                                  borderRight: `2px solid ${UIColors.border.dark}`
                                 }}
                               >
                                 {frame?.rolls[0] !== undefined ? (
@@ -456,12 +621,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                         <td 
                           key={`score-${i}`}
                           style={{
-                            border: '1px solid #333',
+                            border: `1px solid ${UIColors.border.dark}`,
                             padding: '8px',
                             textAlign: 'center',
                             fontSize: '18px',
                             fontWeight: 'bold',
-                            backgroundColor: '#f5f5f5'
+                            backgroundColor: UIColors.background.lightGray
                           }}
                         >
                           {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
@@ -584,26 +749,33 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
 
       {/* ポケットしたボール詳細（セットマッチ・ボーラード以外） */}
-      {game.type !== GameType.SET_MATCH && game.type !== GameType.BOWLARD && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              ポケットしたボール
-            </Typography>
-            {game.players.map(player => (
-              <Box key={player.id} sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  {player.name} ({player.ballsPocketed.length}個)
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {player.ballsPocketed.length > 0 ? (
-                    player.ballsPocketed.map(ball => (
-                      <Chip
-                        key={ball}
-                        label={ball}
-                        sx={{
-                          width: 36,
-                          height: 36,
+      {game.type !== GameType.SET_MATCH && game.type !== GameType.BOWLARD && (() => {
+        const rackData = getCompletePocketedBallsByRack();
+        return (
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                ポケットしたボール
+              </Typography>
+              {rackData.map(rack => (
+                <Box key={rack.rackNumber} sx={{ mb: 4 }}>
+                  <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+                    ラック {rack.rackNumber}
+                  </Typography>
+                  {rack.players.map(playerData => (
+                    <Box key={playerData.playerId} sx={{ mb: 2, ml: 2 }}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        {playerData.playerName} ({playerData.ballsPocketed.length}個)
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, ml: 1 }}>
+                        {playerData.ballsPocketed.length > 0 ? (
+                          playerData.ballsPocketed.map(ball => (
+                            <Chip
+                              key={ball}
+                              label={ball}
+                              sx={{
+                                width: 36,
+                                height: 36,
                           borderRadius: '50%',
                           fontWeight: 'bold',
                           fontSize: '0.9rem',
@@ -639,7 +811,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                             fontWeight: 'bold',
                             position: 'relative',
                             zIndex: 2,
-                            color: '#000',
+                            color: UIColors.text.black,
                           },
                           
                           // Prevent hover color changes - keep original background
@@ -648,7 +820,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                               ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ball)} 20%, ${getBallColor(ball)} 80%, white 80%, white 100%) !important`
                               : `radial-gradient(circle at 30% 30%, ${getBallColor(ball)}dd, ${getBallColor(ball)} 70%) !important`,
                             '& .MuiChip-label': {
-                              color: '#000 !important',
+                              color: `${UIColors.text.black} !important`,
                             }
                           },
                         }}
@@ -659,13 +831,16 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                       ポケットしたボールなし
                     </Typography>
                   )}
+                                        </Box>
+                      </Box>
+                    ))}
+                  {rack !== rackData[rackData.length - 1] && <Divider sx={{ mt: 3 }} />}
                 </Box>
-                {player !== game.players[game.players.length - 1] && <Divider sx={{ mt: 2 }} />}
-              </Box>
-            ))}
+              ))}
           </CardContent>
         </Card>
-      )}
+        );
+      })()}
 
       {/* アクションボタン */}
       <Paper sx={{ p: 3 }}>

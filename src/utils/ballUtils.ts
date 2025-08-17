@@ -1,30 +1,14 @@
 import { GameType } from '../types/index';
+import { BallColors } from '../constants/colors';
 
 export const getBallColor = (ballNumber: number): string => {
-  const ballColors: { [key: number]: string } = {
-    1: '#FFD700', // Yellow (solid) - matched to 9 ball
-    2: '#6495ED', // Blue (solid) - matched to 10 ball
-    3: '#FF6B6B', // Red (solid) - matched to 11 ball
-    4: '#9370DB', // Purple (solid) - matched to 12 ball
-    5: '#FF8C00', // Orange (solid) - matched to 13 ball
-    6: '#32CD32', // Green (solid) - matched to 14 ball
-    7: '#8B4513', // Maroon (solid) - matched to 15 ball
-    8: '#000000', // Black (solid)
-    9: '#FFFF00', // Yellow stripe
-    10: '#0000FF', // Blue stripe
-    11: '#FF0000', // Red stripe
-    12: '#800080', // Purple stripe
-    13: '#FFA500', // Orange stripe
-    14: '#90EE90', // Green stripe
-    15: '#CD853F', // Maroon stripe
-  };
-  return ballColors[ballNumber] || '#CCCCCC';
+  return BallColors.colors[ballNumber as keyof typeof BallColors.colors] || BallColors.default;
 };
 
 export const getBallTextColor = (ballNumber: number): string => {
   // Dark balls use white text, bright balls use black text
   const darkBalls = [2, 3, 4, 7, 8];
-  return darkBalls.includes(ballNumber) ? 'white' : 'black';
+  return darkBalls.includes(ballNumber) ? BallColors.text.dark : BallColors.text.light;
 };
 
 export const getBallScore = (ballNumber: number, gameType: GameType): number => {
@@ -43,7 +27,7 @@ export const getBallStyle = (ballNumber: number) => {
     width: 40,
     height: 40,
     borderRadius: '50%',
-    border: '2px solid #333',
+    border: `2px solid ${BallColors.border}`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

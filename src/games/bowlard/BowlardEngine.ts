@@ -1,7 +1,7 @@
 import { GameBase } from '../base/GameBase';
 import type { Game, Player, BowlingFrame } from '../../types/index';
 import { GameType } from '../../types/index';
-import { initializeBowlingFrames, calculateBowlingScores } from '../../utils/bowlingUtils';
+import { initializeBowlingFrames, calculateBowlingScores, updateFrameStatus } from '../../utils/bowlingUtils';
 
 export class BowlardEngine extends GameBase {
   getGameType(): GameType {
@@ -71,52 +71,20 @@ export class BowlardEngine extends GameBase {
     const frames = [...player.bowlingFrames];
     
     // 現在のフレームを見つける
-    let currentFrame = frames.find(frame => !frame.isComplete);
-    if (!currentFrame) return game; // 全て完了している場合
+    const currentFrameIndex = frames.findIndex(frame => !frame.isComplete);
+    if (currentFrameIndex === -1) return game; // 全て完了している場合
     
-    const frameIndex = currentFrame.frameNumber - 1;
+    const currentFrame = { 
+      ...frames[currentFrameIndex],
+      rolls: [...frames[currentFrameIndex].rolls]
+    };
     
     // 投球数を追加
-    if (frameIndex < 9) {
-      // 1-9フレーム
-      if (currentFrame.rolls.length === 0) {
-        // 1投目
-        currentFrame.rolls.push(pins);
-        if (pins === 10) {
-          // ストライク
-          currentFrame.isStrike = true;
-          currentFrame.isComplete = true;
-        }
-      } else if (currentFrame.rolls.length === 1) {
-        // 2投目
-        currentFrame.rolls.push(pins);
-        if (currentFrame.rolls[0] + pins === 10) {
-          currentFrame.isSpare = true;
-        }
-        currentFrame.isComplete = true;
-      }
-    } else {
-      // 10フレーム目
-      currentFrame.rolls.push(pins);
-      
-      if (currentFrame.rolls.length === 2) {
-        const firstRoll = currentFrame.rolls[0];
-        const secondRoll = currentFrame.rolls[1];
-        
-        if (firstRoll === 10 || firstRoll + secondRoll === 10) {
-          // ストライクまたはスペアの場合、3投目が必要
-          // まだ完了しない
-        } else {
-          // 通常の場合、2投で完了
-          currentFrame.isComplete = true;
-        }
-      } else if (currentFrame.rolls.length === 3) {
-        // 3投目で完了
-        currentFrame.isComplete = true;
-      }
-    }
+    currentFrame.rolls.push(pins);
     
-    frames[frameIndex] = currentFrame;
+    // フレーム状態を更新
+    const updatedFrame = updateFrameStatus(currentFrame, currentFrameIndex);
+    frames[currentFrameIndex] = updatedFrame;
     
     // スコア計算
     const calculatedFrames = calculateBowlingScores(frames);
@@ -124,7 +92,7 @@ export class BowlardEngine extends GameBase {
     const updatedPlayer = {
       ...player,
       bowlingFrames: calculatedFrames,
-      score: calculatedFrames.reduce((total, frame) => total + (frame.score || 0), 0),
+      score: calculatedFrames[calculatedFrames.length - 1]?.score || 0,
     };
     
     return {
@@ -176,7 +144,7 @@ export class BowlardEngine extends GameBase {
     const updatedPlayer = {
       ...player,
       bowlingFrames: recalculatedFrames,
-      score: recalculatedFrames.reduce((total, frame) => total + (frame.score || 0), 0),
+      score: recalculatedFrames[recalculatedFrames.length - 1]?.score || 0,
     };
     
     return {

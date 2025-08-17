@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -13,6 +13,8 @@ import { GameType } from '../types/index';
 import { SetMatchBoard } from './games/SetMatchBoard';
 import { RotationBoard } from './games/RotationBoard';
 import { BowlardBoard } from './games/BowlardBoard';
+import { ConfirmDialog } from './ConfirmDialog';
+import { isGameInProgress } from '../utils/gameUtils';
 
 interface GameBoardProps {
   game: Game;
@@ -21,7 +23,6 @@ interface GameBoardProps {
   onSwitchToPlayer: (playerIndex: number) => void;
   onEndGame: (winnerId?: string) => void;
   onResetGame: () => void;
-  onResetRack: () => void;
   checkAllBallsPocketed: () => boolean;
   onUndoLastShot: () => void;
   onWinSet: (playerId: string) => void;
@@ -33,15 +34,33 @@ const GameBoard: React.FC<GameBoardProps> = ({
   game,
   onPocketBall,
   onSwitchPlayer,
+  onSwitchToPlayer,
   onEndGame,
   onResetGame,
-  onResetRack,
   onUndoLastShot,
   onWinSet,
   onAddPins,
   onUndoBowlingRoll,
 }) => {
   const { t } = useLanguage();
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+
+  const handleHomeButtonClick = () => {
+    if (isGameInProgress(game)) {
+      setShowExitConfirm(true);
+    } else {
+      onResetGame();
+    }
+  };
+
+  const handleConfirmExit = () => {
+    setShowExitConfirm(false);
+    onResetGame();
+  };
+
+  const handleCancelExit = () => {
+    setShowExitConfirm(false);
+  };
 
   const getGameTypeLabel = (type: GameType) => {
     switch (type) {
@@ -62,9 +81,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
         return (
           <SetMatchBoard
             game={game}
-            onPocketBall={onPocketBall}
-            onSwitchPlayer={onSwitchPlayer}
-            onResetRack={onResetRack}
             onWinSet={onWinSet}
             onUndoLastShot={onUndoLastShot}
           />
@@ -77,6 +93,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
             onPocketBall={onPocketBall}
             onSwitchPlayer={onSwitchPlayer}
             onUndoLastShot={onUndoLastShot}
+            onSelectPlayer={(playerId: string) => {
+              const playerIndex = game.players.findIndex(p => p.id === playerId);
+              if (playerIndex !== -1) {
+                onSwitchToPlayer(playerIndex);
+              }
+            }}
           />
         );
       
@@ -107,18 +129,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
     <Box sx={{ p: 2, maxWidth: '1200px', mx: 'auto' }}>
       {/* Header */}
       <Card sx={{ mb: 3, position: 'relative' }}>
-        <CardContent>
+        <CardContent sx={{ py: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box>
-              <Typography variant="h4" component="h1" gutterBottom>
-                {getGameTypeLabel(game.type)}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                {t('game.rack')} {game.currentRack}
-              </Typography>
-            </Box>
+            <Typography variant="h4" component="h1">
+              {getGameTypeLabel(game.type)}
+            </Typography>
             <IconButton
-              onClick={onResetGame}
+              onClick={handleHomeButtonClick}
               title={t('game.backToHome')}
               size="large"
               sx={{ 
@@ -137,6 +154,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
       {/* Game-specific board */}
       {renderGameSpecificBoard()}
+
+      {/* Exit confirmation dialog */}
+      <ConfirmDialog
+        open={showExitConfirm}
+        title={t('confirm.exitGame.title')}
+        message={t('confirm.exitGame.message')}
+        confirmText={t('confirm.exitGame.confirm')}
+        cancelText={t('confirm.exitGame.cancel')}
+        onConfirm={handleConfirmExit}
+        onCancel={handleCancelExit}
+      />
     </Box>
   );
 };

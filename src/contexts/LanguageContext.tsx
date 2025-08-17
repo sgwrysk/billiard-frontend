@@ -27,6 +27,10 @@ const translations: Translations = {
     'language.japanese': '日本語',
     'language.english': 'English',
     'language.select': '言語選択',
+    
+    // Menu
+    'menu.scoreInput': 'スコア入力',
+    'menu.settings': '設定',
 
     // Game setup
     'setup.title': '新しいゲーム',
@@ -120,6 +124,13 @@ const translations: Translations = {
     'common.ok': 'OK',
     'common.yes': 'はい',
     'common.no': 'いいえ',
+    'common.confirm': '確認',
+    
+    // Confirm dialogs
+    'confirm.exitGame.title': 'ゲームを中断',
+    'confirm.exitGame.message': 'ゲームが進行中です。ゲームを中断してホームに戻りますか？\n※進行中のデータは失われます。',
+    'confirm.exitGame.confirm': 'ホームに戻る',
+    'confirm.exitGame.cancel': 'ゲームを続ける',
   },
   en: {
     // Home screen
@@ -129,6 +140,10 @@ const translations: Translations = {
     'language.japanese': '日本語',
     'language.english': 'English',
     'language.select': 'Language Selection',
+    
+    // Menu
+    'menu.scoreInput': 'Score Input',
+    'menu.settings': 'Settings',
 
     // Game setup
     'setup.title': 'New Game',
@@ -220,6 +235,13 @@ const translations: Translations = {
     'common.ok': 'OK',
     'common.yes': 'Yes',
     'common.no': 'No',
+    'common.confirm': 'Confirm',
+    
+    // Confirm dialogs
+    'confirm.exitGame.title': 'Exit Game',
+    'confirm.exitGame.message': 'A game is in progress. Do you want to exit the game and return to home?\n※Progress will be lost.',
+    'confirm.exitGame.confirm': 'Return to Home',
+    'confirm.exitGame.cancel': 'Continue Game',
   },
 };
 

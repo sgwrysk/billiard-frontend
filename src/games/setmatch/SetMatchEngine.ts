@@ -1,6 +1,6 @@
 import { GameBase } from '../base/GameBase';
-import type { Game } from '../../types/index';
-import { GameType } from '../../types/index';
+import type { Game, Player } from '../../types/index';
+import { GameType, GameStatus } from '../../types/index';
 import { getBallScore } from '../../utils/ballUtils';
 
 export class SetMatchEngine extends GameBase {
@@ -10,6 +10,37 @@ export class SetMatchEngine extends GameBase {
   
   getBallNumbers(): number[] {
     return Array.from({ length: 9 }, (_, i) => i + 1);
+  }
+  
+  initializePlayers(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Player[] {
+    return playerSetups.map((setup, index) => ({
+      id: `player-${index + 1}`,
+      name: setup.name,
+      score: 0,
+      ballsPocketed: [],
+      isActive: false, // セットマッチでは最初は誰も選択されていない
+      targetScore: setup.targetScore,
+      targetSets: setup.targetSets,
+      setsWon: 0, // セットマッチ専用
+    }));
+  }
+  
+  initializeGame(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Game {
+    const players = this.initializePlayers(playerSetups);
+    
+    return {
+      id: `game-${Date.now()}`,
+      type: this.getGameType(),
+      status: 'IN_PROGRESS' as const,
+      players,
+      currentPlayerIndex: 0,
+      startTime: new Date(),
+      totalRacks: 1,
+      currentRack: 1,
+      rackInProgress: true,
+      shotHistory: [],
+      scoreHistory: [], // SET_MATCHでは初期のscoreHistoryは空
+    };
   }
   
   handlePocketBall(game: Game, ballNumber: number): Game {
@@ -63,7 +94,7 @@ export class SetMatchEngine extends GameBase {
   
   checkVictoryCondition(game: Game): { isGameOver: boolean; winnerId?: string } {
     for (const player of game.players) {
-      if (player.targetScore && player.score >= player.targetScore) {
+      if (player.targetSets && (player.setsWon || 0) >= player.targetSets) {
         return { isGameOver: true, winnerId: player.id };
       }
     }
@@ -80,6 +111,8 @@ export class SetMatchEngine extends GameBase {
         return this.handleWinSet(game, data.playerId);
       case 'RESET_RACK':
         return this.handleResetRack(game);
+      case 'UNDO_LAST_SHOT':
+        return this.handleUndoLastShot(game);
       default:
         return game;
     }
@@ -103,7 +136,7 @@ export class SetMatchEngine extends GameBase {
       };
     });
     
-    return {
+    const updatedGame = {
       ...game,
       players: updatedPlayers,
       currentRack: game.currentRack + 1,
@@ -116,6 +149,17 @@ export class SetMatchEngine extends GameBase {
         }
       ],
     };
+    
+    // 勝利条件をチェックして、必要に応じてゲームを終了
+    const victoryCheck = this.checkVictoryCondition(updatedGame);
+    if (victoryCheck.isGameOver) {
+      return {
+        ...updatedGame,
+        status: GameStatus.COMPLETED,
+      };
+    }
+    
+    return updatedGame;
   }
   
   private handleResetRack(game: Game): Game {
@@ -140,5 +184,34 @@ export class SetMatchEngine extends GameBase {
   
   protected getBallScore(ballNumber: number): number {
     return getBallScore(ballNumber, this.getGameType());
+  }
+  
+  private handleUndoLastShot(game: Game): Game {
+    // セットマッチでは、最後のセット勝利を取り消す
+    if (game.scoreHistory.length === 0) {
+      return game; // 何も取り消すものがない
+    }
+    
+    const lastEntry = game.scoreHistory[game.scoreHistory.length - 1];
+    const winnerId = lastEntry.playerId;
+    
+    // 最後のセット勝利を取り消し
+    const updatedPlayers = game.players.map(player => {
+      if (player.id === winnerId) {
+        const currentSets = player.setsWon || 0;
+        return {
+          ...player,
+          setsWon: Math.max(0, currentSets - 1), // 0未満にはならない
+        };
+      }
+      return player;
+    });
+    
+    return {
+      ...game,
+      players: updatedPlayers,
+      scoreHistory: game.scoreHistory.slice(0, -1), // 最後のエントリを削除
+      currentRack: Math.max(1, game.currentRack - 1), // 1未満にはならない
+    };
   }
 }

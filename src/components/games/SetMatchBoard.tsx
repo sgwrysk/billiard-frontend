@@ -9,35 +9,20 @@ import {
 } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
-import { getBallColor } from '../../utils/ballUtils';
+import { UIColors, GameColors } from '../../constants/colors';
 
 interface SetMatchBoardProps {
   game: Game;
-  onPocketBall: (ballNumber: number) => void;
-  onSwitchPlayer: () => void;
-  onResetRack: () => void;
   onWinSet: (playerId: string) => void;
   onUndoLastShot: () => void;
 }
 
 export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
   game,
-  onPocketBall,
-  onSwitchPlayer,
-  onResetRack,
   onWinSet,
   onUndoLastShot,
 }) => {
   const { t } = useLanguage();
-  // const currentPlayer = game.players[game.currentPlayerIndex];
-  
-  const ballNumbers = Array.from({ length: 9 }, (_, i) => i + 1);
-  
-  const isBallPocketed = (ballNumber: number) => {
-    return game.players.some(player => 
-      player.ballsPocketed.includes(ballNumber)
-    );
-  };
 
   return (
     <Box>
@@ -47,140 +32,55 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
           <Grid item xs={12} sm={6} key={player.id}>
             <Card 
               elevation={player.isActive ? 6 : 2}
+              onClick={() => onWinSet(player.id)}
               sx={{
-                border: player.isActive ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                border: player.isActive ? `2px solid ${GameColors.playerSelected.background}` : GameColors.playerUnselected.border,
                 transform: player.isActive ? 'scale(1.02)' : 'scale(1)',
                 transition: 'all 0.2s ease-in-out',
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: UIColors.hover.lightBackground,
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                },
+                '&:active': {
+                  transform: 'scale(0.98)',
+                },
               }}
             >
-              <CardContent>
-                <Typography variant="h6">{player.name}</Typography>
-                <Typography variant="h4" color="primary">
-                  {player.score}
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>{player.name}</Typography>
+                <Typography 
+                  color="primary"
+                  sx={{ 
+                    fontSize: { xs: '4rem', sm: '5rem', md: '6rem' },
+                    fontWeight: 'bold',
+                    lineHeight: 1,
+                    textAlign: 'center',
+                    my: 2
+                  }}
+                >
+                  {player.setsWon || 0}
                 </Typography>
                 {player.targetSets && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                     {t('game.targetSets')}: {player.targetSets}
                   </Typography>
                 )}
-                {player.setsWon !== undefined && (
-                  <Typography variant="body2" color="success.main">
-                    {t('game.setsWon')}: {player.setsWon}
-                  </Typography>
-                )}
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => onWinSet(player.id)}
-                  sx={{ mt: 1 }}
-                >
-                  {t('game.winSet')}
-                </Button>
               </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
 
-      {/* Ball Selection */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            {t('game.ballSelect')}
-          </Typography>
-          <Grid container spacing={1}>
-            {ballNumbers.map((ballNumber) => (
-              <Grid item key={ballNumber}>
-                <Button
-                  variant="contained"
-                  disabled={isBallPocketed(ballNumber)}
-                  onClick={() => onPocketBall(ballNumber)}
-                  sx={{
-                    width: { xs: 60, sm: 52 },
-                    height: { xs: 60, sm: 52 },
-                    minWidth: { xs: 60, sm: 52 },
-                    borderRadius: '50%',
-                    fontWeight: 'bold',
-                    fontSize: { xs: '1.2rem', sm: '1.1rem' },
-                    position: 'relative',
-                    overflow: 'hidden',
-                    border: 'none',
-                    padding: 0,
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                    ...(isBallPocketed(ballNumber)
-                      ? { background: 'linear-gradient(145deg, #e6e6e6, #cccccc)' }
-                      : ballNumber > 8
-                        ? { background: `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ballNumber)} 20%, ${getBallColor(ballNumber)} 80%, white 80%, white 100%)` }
-                        : { background: `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%)` }
-                    ),
-                    boxShadow: isBallPocketed(ballNumber)
-                      ? 'inset 2px 2px 4px rgba(0,0,0,0.2)'
-                      : '0 4px 12px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.3)',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: { xs: '32px', sm: '28px' },
-                      height: { xs: '32px', sm: '28px' },
-                      backgroundColor: isBallPocketed(ballNumber) ? '#ddd' : 'white',
-                      borderRadius: '50%',
-                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)',
-                      zIndex: 1,
-                    },
-                    color: isBallPocketed(ballNumber) ? '#999' : '#000',
-                    '&:hover': {
-                      transform: 'scale(1.08)',
-                      boxShadow: isBallPocketed(ballNumber)
-                        ? 'inset 2px 2px 4px rgba(0,0,0,0.2)'
-                        : '0 6px 16px rgba(0,0,0,0.4), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.4)',
-                      '& span': {
-                        transform: 'scale(1.15)',
-                        color: isBallPocketed(ballNumber) ? '#999 !important' : '#000 !important',
-                      }
-                    },
-                    '& > span': {
-                      position: 'relative',
-                      zIndex: 3,
-                      transition: 'transform 0.2s ease',
-                    },
-                  }}
-                >
-                  <span>{ballNumber}</span>
-                </Button>
-              </Grid>
-            ))}
-          </Grid>
-        </CardContent>
-      </Card>
-
       {/* Action Buttons */}
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={4}>
-          <Button 
-            variant="outlined" 
-            fullWidth 
-            onClick={onSwitchPlayer}
-          >
-            {t('game.switchPlayer')}
-          </Button>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Button 
-            variant="outlined" 
-            fullWidth 
-            onClick={onResetRack}
-          >
-            {t('game.resetRack')}
-          </Button>
-        </Grid>
-        <Grid item xs={12} sm={4}>
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={12} sm={6} md={4}>
           <Button 
             variant="outlined" 
             fullWidth 
             onClick={onUndoLastShot}
-            disabled={game.shotHistory.length === 0}
+            disabled={game.scoreHistory.length === 0}
           >
             {t('game.undo')}
           </Button>

@@ -51,6 +51,15 @@ const translations: Translations = {
     'setup.back': '戻る',
     'setup.alternatingBreak': '交互ブレイク',
 
+    // Chess clock settings
+    'setup.chessClock.enabled': 'チェスクロック',
+    'setup.chessClock.title': 'チェスクロック設定',
+    'setup.chessClock.individualTime': 'プレイヤー別に設定',
+    'setup.chessClock.timeLimit': '制限時間',
+    'setup.chessClock.warningEnabled': '警告時間を設定する（デフォルト3分）',
+    'setup.chessClock.warningTime': '警告時間',
+    'setup.chessClock.minutes': '分',
+
     // Game rules
     'rules.nineball': '1番から9番までのボールを順番に狙い、9番ボールを入れた人が勝利',
     'rules.rotation': 'ボール番号がそのまま得点となり、目標得点に最初に到達した人が勝利',
@@ -72,8 +81,10 @@ const translations: Translations = {
     'game.complete': '完了',
     'game.switchPlayer': 'プレイヤー交代',
     'game.backToHome': 'ホームに戻る',
-            'game.swapPlayers': 'プレイヤー入れ替え',
-        'game.break': 'ブレイク',
+    'game.swapPlayers': 'プレイヤー入れ替え',
+    'game.break': 'ブレイク',
+    'game.start': 'スタート',
+    'game.pause': '一時停止',
     'game.unsupportedGameType': 'サポートされていないゲームタイプ',
     'game.pocketedBalls': 'ポケットしたボール',
     'game.setMatchActions': 'セット勝利',
@@ -161,6 +172,15 @@ const translations: Translations = {
     'setup.back': 'Back',
     'setup.alternatingBreak': 'Alternating Break',
 
+    // Chess clock settings
+    'setup.chessClock.enabled': 'Chess Clock',
+    'setup.chessClock.title': 'Chess Clock Settings',
+    'setup.chessClock.individualTime': 'Individual Settings',
+    'setup.chessClock.timeLimit': 'Time Limit',
+    'setup.chessClock.warningEnabled': 'Set warning time (default 3 minutes)',
+    'setup.chessClock.warningTime': 'Warning Time',
+    'setup.chessClock.minutes': 'min',
+
     // Game rules
     'rules.nineball': 'Aim for balls 1-9 in order, the player who pockets the 9-ball wins',
     'rules.rotation': 'Ball numbers equal points, the first player to reach the target score wins',
@@ -184,6 +204,9 @@ const translations: Translations = {
     'game.backToHome': 'Back to Home',
     'game.swapPlayers': 'Swap Players',
     'game.break': 'Break',
+    'game.start': 'Start',
+    'game.pause': 'Pause',
+    'game.unsupportedGameType': 'Unsupported Game Type',
     'game.pocketedBalls': 'Pocketed Balls',
     'game.setMatchActions': 'Set Victory',
     'game.winSet': 'Win Set',

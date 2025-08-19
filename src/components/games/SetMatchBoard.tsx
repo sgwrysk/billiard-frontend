@@ -10,6 +10,7 @@ import {
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
 import { UIColors, GameColors } from '../../constants/colors';
+import ChessClock from '../ChessClock';
 
 interface SetMatchBoardProps {
   game: Game;
@@ -19,6 +20,8 @@ interface SetMatchBoardProps {
   onSwapPlayers?: () => void;
   canSwapPlayers?: boolean;
   canUndoLastShot?: boolean;
+  onTimeUp?: (playerIndex: number) => void;
+  onSwitchToPlayer?: (playerIndex: number) => void;
 }
 
 export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
@@ -28,14 +31,25 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
   alternatingBreak = false,
   onSwapPlayers,
   canSwapPlayers = false,
+  onTimeUp,
+  onSwitchToPlayer,
 }) => {
   const { t } = useLanguage();
 
   return (
     <Box>
-
-
-
+      {/* Chess Clock */}
+      {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (
+        <Box sx={{ mb: 3 }}>
+          <ChessClock
+            chessClock={game.chessClock}
+            players={game.players}
+            currentPlayerIndex={game.currentPlayerIndex}
+            onTimeUp={onTimeUp}
+            onPlayerSelect={onSwitchToPlayer}
+          />
+        </Box>
+      )}
 
       {/* Player Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>

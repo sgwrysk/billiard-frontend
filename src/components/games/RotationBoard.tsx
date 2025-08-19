@@ -13,6 +13,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
 import { getBallColor } from '../../utils/ballUtils';
 import { BallColors, UIColors, GameColors } from '../../constants/colors';
+import ChessClock from '../ChessClock';
 
 interface RotationBoardProps {
   game: Game;
@@ -23,6 +24,8 @@ interface RotationBoardProps {
   onSwapPlayers?: () => void;
   canSwapPlayers?: boolean;
   canUndoLastShot?: boolean;
+  onTimeUp?: (playerIndex: number) => void;
+  onSwitchToPlayer?: (playerIndex: number) => void;
 }
 
 export const RotationBoard: React.FC<RotationBoardProps> = ({
@@ -33,6 +36,8 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   onSelectPlayer,
   onSwapPlayers,
   canSwapPlayers = false,
+  onTimeUp,
+  onSwitchToPlayer,
 }) => {
   const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];
@@ -77,6 +82,19 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
 
   return (
     <Box>
+      {/* Chess Clock */}
+      {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (
+        <Box sx={{ mb: 3 }}>
+          <ChessClock
+            chessClock={game.chessClock}
+            players={game.players}
+            currentPlayerIndex={game.currentPlayerIndex}
+            onTimeUp={onTimeUp}
+            onPlayerSelect={onSwitchToPlayer}
+          />
+        </Box>
+      )}
+
       {/* Sticky Header for Current Player */}
       <Slide direction="down" in={showStickyHeader} mountOnEnter unmountOnExit>
         <Paper

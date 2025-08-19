@@ -17,7 +17,9 @@ import {
 import { Add, Remove } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import { GameType } from '../types/index';
+import type { ChessClockSettings } from '../types/index';
 import { ToggleSwitch } from './common';
+import ChessClockSetup from './ChessClockSetup';
 
 interface PlayerSetup {
   name: string;
@@ -26,7 +28,7 @@ interface PlayerSetup {
 }
 
 interface GameSetupProps {
-  onStartGame: (players: PlayerSetup[], gameType: GameType, alternatingBreak?: boolean) => void;
+  onStartGame: (players: PlayerSetup[], gameType: GameType, alternatingBreak?: boolean, chessClock?: ChessClockSettings) => void;
 }
 
 const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
@@ -40,8 +42,21 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   const [editingTargetScore, setEditingTargetScore] = useState<{ [key: number]: boolean }>({});
   const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
   
+  // Chess clock settings
+  const [chessClock, setChessClock] = useState<ChessClockSettings>({
+    enabled: false,
+    individualTime: false,
+    timeLimit: 30,
+    warningEnabled: false,
+    warningTime: 3,
+    player1TimeLimit: 30,
+    player2TimeLimit: 30,
+  });
+  
   // Preset target scores for Rotation game
   const presetScores = [120, 180, 240];
+  
+
 
   // Update player names when language changes
   useEffect(() => {
@@ -78,7 +93,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   const handleStartGame = () => {
     const validPlayers = players.filter(player => player.name.trim());
     if (validPlayers.length >= 2) {
-      onStartGame(validPlayers, gameType, gameType === GameType.SET_MATCH ? alternatingBreak : undefined);
+      onStartGame(validPlayers, gameType, gameType === GameType.SET_MATCH ? alternatingBreak : undefined, chessClock.enabled ? chessClock : undefined);
     }
   };
 
@@ -96,6 +111,10 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
     // Reset alternating break setting when changing game type (only SET_MATCH supports it)
     if (newGameType !== GameType.SET_MATCH) {
       setAlternatingBreak(false);
+    }
+    // Reset chess clock settings when changing to Bowlard (not supported)
+    if (newGameType === GameType.BOWLARD) {
+      setChessClock(prev => ({ ...prev, enabled: false }));
     }
   };
 
@@ -392,6 +411,33 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
             </Box>
           )}
 
+          {/* チェスクロック設定 - セットマッチとローテーションでのみ表示 */}
+          {(gameType === GameType.SET_MATCH || gameType === GameType.ROTATION) && (
+            <Box sx={{ mt: 3 }}>
+              <ToggleSwitch
+                checked={chessClock.enabled}
+                onChange={(enabled) => setChessClock(prev => ({
+                  ...prev,
+                  enabled,
+                  // Reset to default values when enabling
+                  ...(enabled && {
+                    timeLimit: 30,
+                    warningEnabled: false,
+                    warningTime: 3,
+                    player1TimeLimit: 30,
+                    player2TimeLimit: 30,
+                  })
+                }))}
+                label={t('setup.chessClock.enabled')}
+              />
+              <ChessClockSetup
+                chessClock={chessClock}
+                onChessClockChange={(settings) => setChessClock(settings)}
+                players={players}
+              />
+            </Box>
+          )}
+
           {/* ゲーム開始ボタン */}
           <Button
             fullWidth
@@ -403,7 +449,6 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
           >
             {t('setup.startGame')}
           </Button>
-
 
         </CardContent>
       </Card>

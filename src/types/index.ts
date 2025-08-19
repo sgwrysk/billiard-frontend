@@ -21,6 +21,16 @@ export interface BowlingFrame {
   isComplete: boolean;
 }
 
+// Chess clock settings type definition
+export interface ChessClockSettings {
+  enabled: boolean;
+  individualTime: boolean; // Whether each player has different time limits
+  timeLimit: number; // Time limit in minutes
+  warningEnabled: boolean; // Whether warning time is enabled
+  warningTime: number; // Warning time in minutes
+  player1TimeLimit?: number; // Individual time limit for player 1 (minutes)
+  player2TimeLimit?: number; // Individual time limit for player 2 (minutes)
+}
 
 
 // Game type enumeration
@@ -57,6 +67,7 @@ export interface Game {
   rackInProgress: boolean; // Whether current rack is in progress
   shotHistory: Shot[]; // Shot history
   scoreHistory: ScoreHistory[]; // Score progression history
+  chessClock?: ChessClockSettings; // Chess clock settings
 }
 
 // Shot information type definition

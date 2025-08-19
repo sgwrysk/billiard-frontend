@@ -1,15 +1,20 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { RotationBoard } from '../RotationBoard';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
 import { GameType, GameStatus } from '../../../types/index';
-import type { Game } from '../../../types/index';
+import type { Game, ChessClockSettings } from '../../../types/index';
 
-// Test wrapper with LanguageProvider
+const theme = createTheme();
+
+// Test wrapper with LanguageProvider and ThemeProvider
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <LanguageProvider>
-    {children}
+    <ThemeProvider theme={theme}>
+      {children}
+    </ThemeProvider>
   </LanguageProvider>
 );
 
@@ -642,6 +647,243 @@ describe('RotationBoard', () => {
       const undoButton = screen.getByText('取り消し');
       expect(undoButton).toBeInTheDocument();
       expect(undoButton).toBeDisabled();
+    });
+  });
+
+  describe('Chess Clock Integration', () => {
+    const mockOnTimeUp = vi.fn();
+    const mockOnSwitchToPlayer = vi.fn();
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    const defaultChessClockSettings: ChessClockSettings = {
+      enabled: true,
+      individualTime: false,
+      timeLimit: 1, // 1 minute for testing
+      warningEnabled: true,
+      warningTime: 0.5, // 30 seconds for testing
+      player1TimeLimit: 1,
+      player2TimeLimit: 1,
+    };
+
+    it('should display chess clock when enabled in game settings', () => {
+      const game: Game = {
+        ...createMockGame(),
+        chessClock: defaultChessClockSettings,
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onTimeUp={mockOnTimeUp}
+            onSwitchToPlayer={mockOnSwitchToPlayer}
+          />
+        </TestWrapper>
+      );
+
+      // Chess clock should be displayed
+      const aliceElements = screen.getAllByText('Player 1');
+      const bobElements = screen.getAllByText('Player 2');
+      expect(aliceElements.length).toBeGreaterThanOrEqual(2); // Chess clock + Rotation board
+      expect(bobElements.length).toBeGreaterThanOrEqual(2); // Chess clock + Rotation board
+      
+      // Should show initial time for both players in chess clock
+      const timeDisplays = screen.getAllByText('01:00');
+      expect(timeDisplays.length).toBeGreaterThanOrEqual(2);
+
+      // Should have start/stop button (with PlayArrowIcon)
+      expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
+    });
+
+    it('should not display chess clock when disabled in game settings', () => {
+      const game: Game = {
+        ...createMockGame(),
+        chessClock: { ...defaultChessClockSettings, enabled: false },
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onTimeUp={mockOnTimeUp}
+            onSwitchToPlayer={mockOnSwitchToPlayer}
+          />
+        </TestWrapper>
+      );
+
+      // Chess clock should not be displayed
+      expect(screen.queryByTestId('PlayArrowIcon')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('PauseIcon')).not.toBeInTheDocument();
+    });
+
+    it('should not display chess clock when not configured', () => {
+      const game: Game = {
+        ...createMockGame(),
+        // No chessClock property
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onTimeUp={mockOnTimeUp}
+            onSwitchToPlayer={mockOnSwitchToPlayer}
+          />
+        </TestWrapper>
+      );
+
+      // Chess clock should not be displayed
+      expect(screen.queryByTestId('PlayArrowIcon')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('PauseIcon')).not.toBeInTheDocument();
+    });
+
+    it('should call onSwitchToPlayer when chess clock player button is clicked', () => {
+      const game: Game = {
+        ...createMockGame(),
+        chessClock: defaultChessClockSettings,
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onTimeUp={mockOnTimeUp}
+            onSwitchToPlayer={mockOnSwitchToPlayer}
+          />
+        </TestWrapper>
+      );
+
+      // Click on Player 2's chess clock button
+      const player2ChessClockButton = screen.getAllByRole('button').find(button => 
+        button.textContent?.includes('Player 2')
+      );
+      expect(player2ChessClockButton).toBeInTheDocument();
+      
+      fireEvent.click(player2ChessClockButton!);
+      
+      expect(mockOnSwitchToPlayer).toHaveBeenCalledWith(1);
+    });
+
+    it('should call onTimeUp when chess clock time runs out', async () => {
+      const game: Game = {
+        ...createMockGame(),
+        chessClock: defaultChessClockSettings,
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onTimeUp={mockOnTimeUp}
+            onSwitchToPlayer={mockOnSwitchToPlayer}
+          />
+        </TestWrapper>
+      );
+
+      // Start the chess clock
+      const startButton = screen.getByTestId('PlayArrowIcon').closest('button');
+      fireEvent.click(startButton!);
+
+      // Wait for time to run out (1 minute = 60 seconds)
+      await act(async () => {
+        vi.advanceTimersByTime(60000);
+      });
+
+      expect(mockOnTimeUp).toHaveBeenCalledWith(0);
+    });
+
+    it('should show chess clock above rotation board controls', () => {
+      const game: Game = {
+        ...createMockGame(),
+        chessClock: defaultChessClockSettings,
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onTimeUp={mockOnTimeUp}
+            onSwitchToPlayer={mockOnSwitchToPlayer}
+          />
+        </TestWrapper>
+      );
+
+      // Chess clock should be present
+      expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
+      
+      // Rotation board player cards should also be present
+      expect(screen.getAllByText(/目標: 50/)).toHaveLength(2);
+      
+      // Both should be visible simultaneously
+      const playerCards = screen.getAllByText(/Player 1|Player 2/);
+      expect(playerCards.length).toBeGreaterThanOrEqual(4); // 2 from chess clock + 2 from rotation board
+    });
+
+    it('should handle individual time settings correctly', () => {
+      const individualTimeSettings: ChessClockSettings = {
+        enabled: true,
+        individualTime: true,
+        timeLimit: 30, // Won't be used due to individual time
+        warningEnabled: true,
+        warningTime: 3,
+        player1TimeLimit: 2, // 2 minutes for Player 1
+        player2TimeLimit: 3, // 3 minutes for Player 2
+      };
+
+      const game: Game = {
+        ...createMockGame(),
+        chessClock: individualTimeSettings,
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onTimeUp={mockOnTimeUp}
+            onSwitchToPlayer={mockOnSwitchToPlayer}
+          />
+        </TestWrapper>
+      );
+
+      // Should show individual time limits
+      expect(screen.getByText('02:00')).toBeInTheDocument(); // Player 1: 2 minutes
+      expect(screen.getByText('03:00')).toBeInTheDocument(); // Player 2: 3 minutes
     });
   });
 });

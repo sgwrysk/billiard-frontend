@@ -44,6 +44,12 @@ export const AppColors = {
     secondary: '#ffc107',    // ゴールドアクセント
   },
 
+  // チェスクロック用の色
+  chessClock: {
+    activePlayer: '#d4e4f7',      // アクティブプレイヤー用の輝度が低い青
+    activePlayerHover: '#e8f2fd', // ボーラードのストライク色（マウスオン時）
+  },
+
   // 影・エフェクト用
   effects: {
     shadow: {
@@ -205,5 +211,56 @@ export const GameColors = {
   victory: {
     background: AppColors.success.strong.background,
     text: AppColors.success.strong.text,
+  },
+} as const;
+
+/**
+ * チェスクロック用の色設定
+ * 時間管理の状態を視覚的に表現する色
+ */
+export const ChessClockColors = {
+  // チェスクロック全体の背景色（ボーラードのイニング数表と同様の薄いグレー）
+  background: UIColors.background.lightGray,
+  
+  // プレイヤーボタンの色
+  player: {
+    // デフォルト状態（非アクティブ）- グレーな感じ
+    default: {
+      background: UIColors.background.lightGray,
+      text: UIColors.text.mediumGray,
+      border: `1px solid ${UIColors.border.medium}`,
+    },
+    // アクティブプレイヤー（選択中）- 輝度が低い青を使用
+    active: {
+      background: AppColors.chessClock.activePlayer,
+      text: AppColors.success.strong.text,
+      border: `1px solid ${AppColors.chessClock.activePlayer}`,
+    },
+    // 警告状態（警告時間を超えた場合）
+    warning: {
+      background: AppColors.theme.secondary, // ゴールドアクセント
+      text: 'white',
+      border: `1px solid ${AppColors.theme.secondary}`,
+    },
+    // 時間切れ状態
+    timeUp: {
+      background: '#d32f2f', // 赤色（時間切れ）
+      text: 'white',
+      border: `1px solid #d32f2f`,
+    },
+  },
+  
+  // スタート/ストップボタンの色
+  control: {
+    start: {
+      background: '#4caf50', // 緑色（開始）
+      text: 'white',
+      hover: '#388e3c',
+    },
+    stop: {
+      background: '#f44336', // 赤色（停止）
+      text: 'white',
+      hover: '#d32f2f',
+    },
   },
 } as const;

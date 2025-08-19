@@ -25,6 +25,7 @@ import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
+import type { ChessClockSettings } from './types/index';
 
 // Create Material-UI theme - Deep Blue + Outfit
 const theme = createTheme({
@@ -128,6 +129,17 @@ const AppScreen = {
   VICTORY: 'VICTORY',
 } as const;
 
+function App() {
+  return (
+    <LanguageProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppContent />
+      </ThemeProvider>
+    </LanguageProvider>
+  );
+}
+
 const AppContent: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
   const [currentScreen, setCurrentScreen] = useState<string>(AppScreen.HOME);
@@ -181,9 +193,9 @@ const AppContent: React.FC = () => {
 
   const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
 
-  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean) => {
+  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean, chessClock?: ChessClockSettings) => {
     setAlternatingBreak(alternatingBreakSetting || false);
-    startGame(players, gameType);
+    startGame(players, gameType, chessClock);
     setCurrentScreen(AppScreen.GAME);
   };
 
@@ -452,16 +464,5 @@ const AppContent: React.FC = () => {
     </Box>
   );
 };
-
-function App() {
-  return (
-    <LanguageProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AppContent />
-      </ThemeProvider>
-    </LanguageProvider>
-  );
-}
 
 export default App;

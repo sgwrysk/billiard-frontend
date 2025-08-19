@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { Game } from '../types/index';
+import type { Game, ChessClockSettings } from '../types/index';
 import { GameType, GameStatus } from '../types/index';
 import { GameEngineFactory } from '../games/GameEngineFactory';
 
@@ -16,9 +16,14 @@ export const useGame = () => {
 
 
   // Start a new game
-  const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType) => {
+  const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, chessClock?: ChessClockSettings) => {
     const engine = GameEngineFactory.getEngine(gameType);
     const newGame = engine.initializeGame(playerSetups);
+    
+    // Add chess clock settings if provided
+    if (chessClock) {
+      newGame.chessClock = chessClock;
+    }
 
     setCurrentGame(newGame);
   }, []);
@@ -69,18 +74,22 @@ export const useGame = () => {
 
   // Switch to specific player
   const switchToPlayer = useCallback((playerIndex: number) => {
-    if (!currentGame || playerIndex < 0 || playerIndex >= currentGame.players.length) return;
+    if (!currentGame || playerIndex < 0 || playerIndex >= currentGame.players.length) {
+      return;
+    }
 
     const updatedPlayers = currentGame.players.map((player, index) => ({
       ...player,
       isActive: index === playerIndex,
     }));
 
-    setCurrentGame({
+    const updatedGame = {
       ...currentGame,
       players: updatedPlayers,
       currentPlayerIndex: playerIndex,
-    });
+    };
+    
+    setCurrentGame(updatedGame);
   }, [currentGame]);
 
   // End game

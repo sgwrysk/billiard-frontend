@@ -17,6 +17,7 @@ import {
 import { Add, Remove } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import { GameType } from '../types/index';
+import { ToggleSwitch } from './common';
 
 interface PlayerSetup {
   name: string;
@@ -25,7 +26,7 @@ interface PlayerSetup {
 }
 
 interface GameSetupProps {
-  onStartGame: (players: PlayerSetup[], gameType: GameType) => void;
+  onStartGame: (players: PlayerSetup[], gameType: GameType, alternatingBreak?: boolean) => void;
 }
 
 const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
@@ -37,6 +38,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   const [gameType, setGameType] = useState<GameType>(GameType.SET_MATCH);
   const [editingTargetSets, setEditingTargetSets] = useState<{ [key: number]: boolean }>({});
   const [editingTargetScore, setEditingTargetScore] = useState<{ [key: number]: boolean }>({});
+  const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
   
   // Preset target scores for Rotation game
   const presetScores = [120, 180, 240];
@@ -76,7 +78,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   const handleStartGame = () => {
     const validPlayers = players.filter(player => player.name.trim());
     if (validPlayers.length >= 2) {
-      onStartGame(validPlayers, gameType);
+      onStartGame(validPlayers, gameType, gameType === GameType.SET_MATCH ? alternatingBreak : undefined);
     }
   };
 
@@ -90,6 +92,10 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
       setPlayers(players.map(player => ({ ...player, targetScore: undefined, targetSets: 5 })));
     } else if (newGameType !== GameType.ROTATION) {
       setPlayers(players.map(player => ({ ...player, targetScore: undefined })));
+    }
+    // Reset alternating break setting when changing game type (only SET_MATCH supports it)
+    if (newGameType !== GameType.SET_MATCH) {
+      setAlternatingBreak(false);
     }
   };
 
@@ -374,6 +380,17 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
               </Grid>
             ))}
           </Grid>
+
+          {/* 交互ブレイク設定 */}
+          {gameType === GameType.SET_MATCH && (
+            <Box sx={{ mt: 3 }}>
+              <ToggleSwitch
+                checked={alternatingBreak}
+                onChange={setAlternatingBreak}
+                label={t('setup.alternatingBreak')}
+              />
+            </Box>
+          )}
 
           {/* ゲーム開始ボタン */}
           <Button

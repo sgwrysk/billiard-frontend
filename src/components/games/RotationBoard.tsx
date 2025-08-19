@@ -20,6 +20,9 @@ interface RotationBoardProps {
   onSwitchPlayer: () => void;
   onUndoLastShot: () => void;
   onSelectPlayer?: (playerId: string) => void;
+  onSwapPlayers?: () => void;
+  canSwapPlayers?: boolean;
+  canUndoLastShot?: boolean;
 }
 
 export const RotationBoard: React.FC<RotationBoardProps> = ({
@@ -28,6 +31,9 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   onSwitchPlayer,
   onUndoLastShot,
   onSelectPlayer,
+  onSwapPlayers,
+  canSwapPlayers = false,
+  canUndoLastShot = false,
 }) => {
   const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];
@@ -97,6 +103,8 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           </Box>
         </Paper>
       </Slide>
+
+
 
       {/* Player Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -298,14 +306,52 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           </Button>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Button 
-            variant="outlined" 
-            fullWidth 
-            onClick={onUndoLastShot}
-            disabled={game.shotHistory.length === 0}
-          >
-            {t('game.undo')}
-          </Button>
+          {canSwapPlayers && onSwapPlayers ? (
+            <Button 
+              variant="outlined" 
+              fullWidth 
+              startIcon={<span style={{ fontSize: '1.2rem' }}>🔄</span>}
+              onClick={onSwapPlayers}
+              sx={{
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                height: '48px',
+                minHeight: '48px',
+                '&:hover': {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                  borderColor: 'primary.main',
+                },
+              }}
+            >
+              {t('game.swapPlayers')}
+            </Button>
+          ) : (
+            <Button 
+              variant="outlined" 
+              fullWidth 
+              onClick={onUndoLastShot}
+              disabled={game.shotHistory.length === 0}
+              sx={{ 
+                height: '48px',
+                minHeight: '48px',
+                borderColor: '#e0e0e0',
+                color: '#666666',
+                '&:hover': {
+                  backgroundColor: '#e0e0e0',
+                  color: '#666666',
+                  borderColor: '#e0e0e0',
+                },
+                '&:disabled': {
+                  borderColor: '#e0e0e0',
+                  color: '#666666',
+                  opacity: 0.6,
+                },
+              }}
+            >
+              {t('game.undo')}
+            </Button>
+          )}
         </Grid>
       </Grid>
     </Box>

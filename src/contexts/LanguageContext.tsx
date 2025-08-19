@@ -49,6 +49,7 @@ const translations: Translations = {
     'setup.removePlayer': 'プレイヤー削除',
     'setup.startGame': 'ゲーム開始',
     'setup.back': '戻る',
+    'setup.alternatingBreak': '交互ブレイク',
 
     // Game rules
     'rules.nineball': '1番から9番までのボールを順番に狙い、9番ボールを入れた人が勝利',
@@ -71,6 +72,8 @@ const translations: Translations = {
     'game.complete': '完了',
     'game.switchPlayer': 'プレイヤー交代',
     'game.backToHome': 'ホームに戻る',
+            'game.swapPlayers': 'プレイヤー入れ替え',
+        'game.break': 'ブレイク',
     'game.unsupportedGameType': 'サポートされていないゲームタイプ',
     'game.pocketedBalls': 'ポケットしたボール',
     'game.setMatchActions': 'セット勝利',
@@ -156,6 +159,7 @@ const translations: Translations = {
     'setup.removePlayer': 'Remove Player',
     'setup.startGame': 'Start Game',
     'setup.back': 'Back',
+    'setup.alternatingBreak': 'Alternating Break',
 
     // Game rules
     'rules.nineball': 'Aim for balls 1-9 in order, the player who pockets the 9-ball wins',
@@ -178,6 +182,8 @@ const translations: Translations = {
     'game.complete': 'Complete',
     'game.switchPlayer': 'Switch Player',
     'game.backToHome': 'Back to Home',
+    'game.swapPlayers': 'Swap Players',
+    'game.break': 'Break',
     'game.pocketedBalls': 'Pocketed Balls',
     'game.setMatchActions': 'Set Victory',
     'game.winSet': 'Win Set',

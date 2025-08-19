@@ -862,4 +862,180 @@ describe('useGame', () => {
       expect(result.current.currentGame?.players[1].ballsPocketed).toEqual([]);
     });
   });
+
+  describe('Player Swap Functionality', () => {
+    it('should swap players correctly in SET_MATCH when game is in initial state', () => {
+      const { result } = renderHook(() => useGame());
+      
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetSets: 5 }, { name: 'Player 2', targetSets: 5 }],
+          GameType.SET_MATCH
+        );
+      });
+
+      const initialPlayer1 = result.current.currentGame?.players[0];
+      const initialPlayer2 = result.current.currentGame?.players[1];
+
+      // Swap players
+      act(() => {
+        result.current.swapPlayers();
+      });
+
+      // Players should be swapped
+      expect(result.current.currentGame?.players[0].name).toBe(initialPlayer2?.name);
+      expect(result.current.currentGame?.players[1].name).toBe(initialPlayer1?.name);
+    });
+
+    it('should swap players correctly in ROTATION when game is in initial state', () => {
+      const { result } = renderHook(() => useGame());
+      
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetScore: 120 }, { name: 'Player 2', targetScore: 120 }],
+          GameType.ROTATION
+        );
+      });
+
+      const initialPlayer1 = result.current.currentGame?.players[0];
+      const initialPlayer2 = result.current.currentGame?.players[1];
+
+      // Swap players
+      act(() => {
+        result.current.swapPlayers();
+      });
+
+      // Players should be swapped
+      expect(result.current.currentGame?.players[0].name).toBe(initialPlayer2?.name);
+      expect(result.current.currentGame?.players[1].name).toBe(initialPlayer1?.name);
+    });
+
+    it('should not swap players when game is not in initial state for SET_MATCH', () => {
+      const { result } = renderHook(() => useGame());
+      
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetSets: 5 }, { name: 'Player 2', targetSets: 5 }],
+          GameType.SET_MATCH
+        );
+      });
+
+      // Simulate a set being won
+      act(() => {
+        result.current.winSet(result.current.currentGame!.players[0].id);
+      });
+
+      const playerOrderBeforeSwap = result.current.currentGame?.players.map(p => p.name);
+
+      // Try to swap players (should not work)
+      act(() => {
+        result.current.swapPlayers();
+      });
+
+      // Player order should remain the same
+      expect(result.current.currentGame?.players.map(p => p.name)).toEqual(playerOrderBeforeSwap);
+    });
+
+    it('should not swap players when game is not in initial state for ROTATION', () => {
+      const { result } = renderHook(() => useGame());
+      
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetScore: 120 }, { name: 'Player 2', targetScore: 120 }],
+          GameType.ROTATION
+        );
+      });
+
+      // Simulate a ball being pocketed
+      act(() => {
+        result.current.pocketBall(1);
+      });
+
+      const playerOrderBeforeSwap = result.current.currentGame?.players.map(p => p.name);
+
+      // Try to swap players (should not work)
+      act(() => {
+        result.current.swapPlayers();
+      });
+
+      // Player order should remain the same
+      expect(result.current.currentGame?.players.map(p => p.name)).toEqual(playerOrderBeforeSwap);
+    });
+
+    it('should correctly identify when players can be swapped for different game types', () => {
+      const { result } = renderHook(() => useGame());
+      
+      // Test SET_MATCH
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetSets: 5 }, { name: 'Player 2', targetSets: 5 }],
+          GameType.SET_MATCH
+        );
+      });
+
+      // Initially, players can be swapped
+      expect(result.current.canSwapPlayers()).toBe(true);
+
+      // After winning a set, players cannot be swapped
+      act(() => {
+        result.current.winSet(result.current.currentGame!.players[0].id);
+      });
+      expect(result.current.canSwapPlayers()).toBe(false);
+
+      // Test ROTATION
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetScore: 120 }, { name: 'Player 2', targetScore: 120 }],
+          GameType.ROTATION
+        );
+      });
+
+      // Initially, players can be swapped
+      expect(result.current.canSwapPlayers()).toBe(true);
+
+      // After pocketing a ball, players cannot be swapped
+      act(() => {
+        result.current.pocketBall(1);
+      });
+      expect(result.current.canSwapPlayers()).toBe(false);
+    });
+
+    it('should correctly identify when undo is available for different game types', () => {
+      const { result } = renderHook(() => useGame());
+      
+      // Test SET_MATCH
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetSets: 5 }, { name: 'Player 2', targetSets: 5 }],
+          GameType.SET_MATCH
+        );
+      });
+
+      // Initially, undo is not available
+      expect(result.current.canUndoLastShot()).toBe(false);
+
+      // After winning a set, undo is available
+      act(() => {
+        result.current.winSet(result.current.currentGame!.players[0].id);
+      });
+      expect(result.current.canUndoLastShot()).toBe(true);
+
+      // Test ROTATION
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetScore: 120 }, { name: 'Player 2', targetScore: 120 }],
+          GameType.ROTATION
+        );
+      });
+
+      // Initially, undo is not available
+      expect(result.current.canUndoLastShot()).toBe(false);
+
+      // After pocketing a ball, undo is available
+      act(() => {
+        result.current.pocketBall(1);
+      });
+      expect(result.current.canUndoLastShot()).toBe(true);
+    });
+  });
 });

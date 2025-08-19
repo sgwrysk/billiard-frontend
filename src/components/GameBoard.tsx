@@ -28,6 +28,10 @@ interface GameBoardProps {
   onWinSet: (playerId: string) => void;
   onAddPins?: (pins: number) => void;
   onUndoBowlingRoll?: () => void;
+  alternatingBreak?: boolean;
+  onSwapPlayers?: () => void;
+  canSwapPlayers?: () => boolean;
+  canUndoLastShot?: () => boolean;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -41,6 +45,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onWinSet,
   onAddPins,
   onUndoBowlingRoll,
+  alternatingBreak = false,
+  onSwapPlayers,
+  canSwapPlayers,
+  canUndoLastShot,
 }) => {
   const { t } = useLanguage();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -79,11 +87,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
     switch (game.type) {
       case GameType.SET_MATCH:
         return (
-          <SetMatchBoard
-            game={game}
-            onWinSet={onWinSet}
-            onUndoLastShot={onUndoLastShot}
-          />
+          <>
+
+            <SetMatchBoard
+              game={game}
+              onWinSet={onWinSet}
+              onUndoLastShot={onUndoLastShot}
+              alternatingBreak={alternatingBreak}
+              onSwapPlayers={onSwapPlayers}
+              canSwapPlayers={canSwapPlayers ? canSwapPlayers() : false}
+              canUndoLastShot={canUndoLastShot ? canUndoLastShot() : false}
+            />
+          </>
         );
       
       case GameType.ROTATION:
@@ -99,6 +114,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 onSwitchToPlayer(playerIndex);
               }
             }}
+            onSwapPlayers={onSwapPlayers}
+            canSwapPlayers={canSwapPlayers ? canSwapPlayers() : false}
+            canUndoLastShot={canUndoLastShot ? canUndoLastShot() : false}
           />
         );
       

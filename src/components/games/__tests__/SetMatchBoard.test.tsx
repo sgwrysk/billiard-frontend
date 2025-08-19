@@ -356,4 +356,542 @@ describe('SetMatchBoard', () => {
     const zeroTexts = screen.getAllByText('0');
     expect(zeroTexts).toHaveLength(2);
   });
+
+  describe('Player Swap Button', () => {
+    const mockOnSwapPlayers = vi.fn();
+
+    it('should display swap button when canSwapPlayers is true and game is in initial state', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0, // No sets won yet
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0, // No sets won yet
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+          />
+        </TestWrapper>
+      );
+
+      // Swap button should be visible
+      expect(screen.getByText('プレイヤー入れ替え')).toBeInTheDocument();
+      expect(screen.getByText('プレイヤー入れ替え')).toBeEnabled();
+    });
+
+    it('should not display swap button when canSwapPlayers is false', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 1, // Player 1 has won a set
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={false}
+          />
+        </TestWrapper>
+      );
+
+      // Swap button should not be visible, undo button should be visible instead
+      expect(screen.queryByText('プレイヤー入れ替え')).not.toBeInTheDocument();
+      expect(screen.getByText('取り消し')).toBeInTheDocument();
+    });
+
+    it('should call onSwapPlayers when swap button is clicked', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+          />
+        </TestWrapper>
+      );
+
+      // Click the swap button
+      const swapButton = screen.getByText('プレイヤー入れ替え');
+      fireEvent.click(swapButton);
+
+      // onSwapPlayers should be called
+      expect(mockOnSwapPlayers).toHaveBeenCalledTimes(1);
+    });
+
+    it('should display undo button when canSwapPlayers is false', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 1, // Player 1 has won a set
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={false}
+          />
+        </TestWrapper>
+      );
+
+      // Undo button should be visible but disabled (since no score history)
+      const undoButton = screen.getByText('取り消し');
+      expect(undoButton).toBeInTheDocument();
+      expect(undoButton).toBeDisabled();
+    });
+
+    it('should handle alternating break display correctly', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+            alternatingBreak={true}
+          />
+        </TestWrapper>
+      );
+
+      // Break icon should be displayed on the first player (odd rack)
+      expect(screen.getByText('🎱')).toBeInTheDocument();
+    });
+
+    it('should display break icon only on the correct player based on rack number', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1, // Second rack (even number)
+        currentRack: 2,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+            alternatingBreak={true}
+          />
+        </TestWrapper>
+      );
+
+      // Break icon should be displayed on the second player (even rack)
+      expect(screen.getByText('🎱')).toBeInTheDocument();
+      
+      // Check that only one break icon is displayed
+      const breakIcons = screen.getAllByText('🎱');
+      expect(breakIcons).toHaveLength(1);
+    });
+
+    it('should not display break icon when alternatingBreak is false', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 0,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+            alternatingBreak={false}
+          />
+        </TestWrapper>
+      );
+
+      // No break icon should be displayed
+      expect(screen.queryByText('🎱')).not.toBeInTheDocument();
+    });
+
+    it('should correctly display break icon for different rack numbers', () => {
+      // Test for rack 1 (odd)
+      const gameRack1: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 0, // First rack
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      const { rerender } = render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={gameRack1}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+            alternatingBreak={true}
+          />
+        </TestWrapper>
+      );
+
+      // Rack 1 (odd): Player 2 should have break icon
+      expect(screen.getByText('🎱')).toBeInTheDocument();
+      const breakIconsRack1 = screen.getAllByText('🎱');
+      expect(breakIconsRack1).toHaveLength(1);
+
+      // Test for rack 2 (even)
+      const gameRack2: Game = {
+        ...gameRack1,
+        totalRacks: 1, // Second rack
+        currentRack: 2,
+      };
+
+      rerender(
+        <TestWrapper>
+          <SetMatchBoard
+            game={gameRack2}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+            alternatingBreak={true}
+          />
+        </TestWrapper>
+      );
+
+      // Rack 2 (even): Player 1 should have break icon
+      expect(screen.getByText('🎱')).toBeInTheDocument();
+      const breakIconsRack2 = screen.getAllByText('🎱');
+      expect(breakIconsRack2).toHaveLength(1);
+    });
+
+    it('should handle alternating break display after set wins', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.SET_MATCH,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetSets: 3,
+            setsWon: 0,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 0,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      const { rerender } = render(
+        <TestWrapper>
+          <SetMatchBoard
+            game={game}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+            alternatingBreak={true}
+          />
+        </TestWrapper>
+      );
+
+      // Initial state: Rack 1 (odd), Player 2 should have break
+      expect(screen.getByText('🎱')).toBeInTheDocument();
+
+      // Simulate set win, moving to rack 2
+      const gameAfterSetWin: Game = {
+        ...game,
+        totalRacks: 1, // After first set win
+        currentRack: 2,
+        players: [
+          {
+            ...game.players[0],
+            setsWon: 1, // Player 1 won a set
+          },
+          game.players[1],
+        ],
+        scoreHistory: [
+          {
+            playerId: game.players[0].id,
+            score: 1,
+            timestamp: new Date(),
+          },
+        ],
+      };
+
+      rerender(
+        <TestWrapper>
+          <SetMatchBoard
+            game={gameAfterSetWin}
+            onWinSet={mockOnWinSet}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={false}
+            alternatingBreak={true}
+          />
+        </TestWrapper>
+      );
+
+      // After set win: Rack 2 (even), Player 1 should have break
+      expect(screen.getByText('🎱')).toBeInTheDocument();
+      const breakIconsAfterSetWin = screen.getAllByText('🎱');
+      expect(breakIconsAfterSetWin).toHaveLength(1);
+    });
+  });
 });

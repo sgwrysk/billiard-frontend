@@ -432,4 +432,216 @@ describe('RotationBoard', () => {
     expect(screen.getAllByText('2').length).toBeGreaterThan(1); // Once in selection, once in player card
     expect(screen.getAllByText('3').length).toBeGreaterThan(1); // Once in selection, once in player card
   });
+
+  describe('Player Swap Button', () => {
+    const mockOnSwapPlayers = vi.fn();
+
+    it('should display swap button when canSwapPlayers is true and game is in initial state', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.ROTATION,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0, // No score yet
+            ballsPocketed: [],
+            isActive: false,
+            targetScore: 50,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0, // No score yet
+            ballsPocketed: [],
+            isActive: false,
+            targetScore: 50,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+          />
+        </TestWrapper>
+      );
+
+      // Swap button should be visible
+      expect(screen.getByText('プレイヤー入れ替え')).toBeInTheDocument();
+      expect(screen.getByText('プレイヤー入れ替え')).toBeEnabled();
+    });
+
+    it('should not display swap button when canSwapPlayers is false', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.ROTATION,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 15, // Player 1 has scored
+            ballsPocketed: [1, 2, 3],
+            isActive: false,
+            targetScore: 50,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetScore: 50,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={false}
+          />
+        </TestWrapper>
+      );
+
+      // Swap button should not be visible, undo button should be visible instead
+      expect(screen.queryByText('プレイヤー入れ替え')).not.toBeInTheDocument();
+      expect(screen.getByText('取り消し')).toBeInTheDocument();
+    });
+
+    it('should call onSwapPlayers when swap button is clicked', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.ROTATION,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetScore: 50,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetScore: 50,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onSwapPlayers={mockOnSwapPlayers}
+            canSwapPlayers={true}
+          />
+        </TestWrapper>
+      );
+
+      // Click the swap button
+      const swapButton = screen.getByText('プレイヤー入れ替え');
+      fireEvent.click(swapButton);
+
+      // onSwapPlayers should be called
+      expect(mockOnSwapPlayers).toHaveBeenCalledTimes(1);
+    });
+
+    it('should display undo button when canSwapPlayers is false', () => {
+      const game: Game = {
+        id: 'test-game-1',
+        type: GameType.ROTATION,
+        status: GameStatus.IN_PROGRESS,
+        players: [
+          {
+            id: 'player-1',
+            name: 'Player 1',
+            score: 15, // Player 1 has scored
+            ballsPocketed: [1, 2, 3],
+            isActive: false,
+            targetScore: 50,
+          },
+          {
+            id: 'player-2',
+            name: 'Player 2',
+            score: 0,
+            ballsPocketed: [],
+            isActive: false,
+            targetScore: 50,
+          },
+        ],
+        currentPlayerIndex: 0,
+        startTime: new Date(),
+        totalRacks: 1,
+        currentRack: 1,
+        rackInProgress: false,
+        shotHistory: [],
+        scoreHistory: [],
+      };
+
+      render(
+        <TestWrapper>
+          <RotationBoard
+            game={game}
+            onPocketBall={mockOnPocketBall}
+            onSwitchPlayer={mockOnSwitchPlayer}
+            onUndoLastShot={mockOnUndoLastShot}
+            onSelectPlayer={mockOnSelectPlayer}
+            onSwapPlayers={mockOnSwapPlayers}
+            canUndoLastShot={true}
+          />
+        </TestWrapper>
+      );
+
+      // Undo button should be visible but disabled (since no shot history)
+      const undoButton = screen.getByText('取り消し');
+      expect(undoButton).toBeInTheDocument();
+      expect(undoButton).toBeDisabled();
+    });
+  });
 });

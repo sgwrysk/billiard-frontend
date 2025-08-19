@@ -140,6 +140,7 @@ export class SetMatchEngine extends GameBase {
       ...game,
       players: updatedPlayers,
       currentRack: game.currentRack + 1,
+      totalRacks: game.totalRacks + 1, // セット完了時にtotalRacksを更新
       scoreHistory: [
         ...game.scoreHistory,
         {
@@ -212,6 +213,7 @@ export class SetMatchEngine extends GameBase {
       players: updatedPlayers,
       scoreHistory: game.scoreHistory.slice(0, -1), // 最後のエントリを削除
       currentRack: Math.max(1, game.currentRack - 1), // 1未満にはならない
+      totalRacks: Math.max(0, game.totalRacks - 1), // セット取り消し時にtotalRacksも更新
     };
   }
 }

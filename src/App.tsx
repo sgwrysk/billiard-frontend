@@ -146,6 +146,9 @@ const AppContent: React.FC = () => {
     winSet,
     addPins,
     undoBowlingRoll,
+    swapPlayers,
+    canSwapPlayers,
+    canUndoLastShot,
   } = useGame();
   
   const [finishedGame, setFinishedGame] = useState<any>(null);
@@ -174,7 +177,10 @@ const AppContent: React.FC = () => {
   }, [currentGame]);
 
 
-  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType) => {
+  const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
+
+  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean) => {
+    setAlternatingBreak(alternatingBreakSetting || false);
     startGame(players, gameType);
     setCurrentScreen(AppScreen.GAME);
   };
@@ -194,7 +200,12 @@ const AppContent: React.FC = () => {
 
   const handleResetGame = () => {
     resetGame();
+    setAlternatingBreak(false);
     setCurrentScreen(AppScreen.SETUP);
+  };
+
+  const handleSwapPlayers = () => {
+    swapPlayers();
   };
 
 
@@ -346,6 +357,10 @@ const AppContent: React.FC = () => {
             onWinSet={winSet}
             onAddPins={addPins}
             onUndoBowlingRoll={undoBowlingRoll}
+            alternatingBreak={alternatingBreak}
+            onSwapPlayers={handleSwapPlayers}
+            canSwapPlayers={canSwapPlayers}
+            canUndoLastShot={canUndoLastShot}
           />
         )}
         

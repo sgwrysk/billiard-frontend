@@ -95,6 +95,53 @@ export const useGame = () => {
     setCurrentGame(null);
   }, []);
 
+  // Check if game is in initial state (can swap players or undo actions)
+  const isGameInInitialState = useCallback(() => {
+    if (!currentGame) return false;
+
+    switch (currentGame.type) {
+      case GameType.SET_MATCH:
+        // セットマッチ: まだセットを獲得していない状態
+        return currentGame.players.reduce((sum, p) => sum + (p.setsWon || 0), 0) === 0;
+      
+      case GameType.ROTATION:
+        // ローテーション: 両方のプレイヤーがまだ得点していない状態
+        return currentGame.players.every(p => p.score === 0);
+      
+      case GameType.BOWLARD:
+        // ボーラード: 両方のプレイヤーがまだフレームを開始していない状態
+        return currentGame.players.every(p => !p.bowlingFrames || p.bowlingFrames.length === 0);
+      
+      default:
+        return false;
+    }
+  }, [currentGame]);
+
+  // Check if players can be swapped (same as isGameInInitialState)
+  const canSwapPlayers = useCallback(() => {
+    return isGameInInitialState();
+  }, [isGameInInitialState]);
+
+  // Check if undo is available (opposite of isGameInInitialState)
+  const canUndoLastShot = useCallback(() => {
+    return !isGameInInitialState();
+  }, [isGameInInitialState]);
+
+  // Swap players (only before game starts)
+  const swapPlayers = useCallback(() => {
+    if (!currentGame || !canSwapPlayers()) return;
+
+    const updatedPlayers = [...currentGame.players];
+    const temp = updatedPlayers[0];
+    updatedPlayers[0] = updatedPlayers[1];
+    updatedPlayers[1] = temp;
+
+    setCurrentGame({
+      ...currentGame,
+      players: updatedPlayers,
+    });
+  }, [currentGame, canSwapPlayers]);
+
   // Start rematch
   const startRematch = useCallback((finishedGame: Game) => {
     if (!finishedGame) return;
@@ -205,6 +252,9 @@ export const useGame = () => {
     switchPlayer,
     switchToPlayer,
     undoLastShot,
+    swapPlayers,
+    canSwapPlayers,
+    canUndoLastShot,
     
     // Game-specific actions
     resetRack,

@@ -28,7 +28,6 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
   alternatingBreak = false,
   onSwapPlayers,
   canSwapPlayers = false,
-  canUndoLastShot = false,
 }) => {
   const { t } = useLanguage();
 

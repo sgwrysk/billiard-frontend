@@ -101,11 +101,158 @@ describe('App', () => {
       expect(screen.getByText('Alice')).toBeInTheDocument();
     });
 
-    // Reset game using Home button
-    const resetButton = screen.getByTitle(/ホームに戻る/);
-    fireEvent.click(resetButton);
+    // Return to setup screen using home button
+    const homeButton = screen.getByTitle(/ホームに戻る/);
+    fireEvent.click(homeButton);
 
     await waitFor(() => {
+      expect(screen.getByText(/ゲーム開始/)).toBeInTheDocument();
+    });
+  });
+
+  it('should display game type in AppBar title when game is active', async () => {
+    render(<App />);
+    
+    // Start a Set Match game
+    const playerInputs = screen.getAllByLabelText(/プレイヤー名/);
+    fireEvent.change(playerInputs[0], { target: { value: 'Alice' } });
+    fireEvent.change(playerInputs[1], { target: { value: 'Bob' } });
+
+    const startButton = screen.getByRole('button', { name: /ゲーム開始/ });
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      // AppBar should show "セットマッチ" instead of "ビリヤードスコア"
+      expect(screen.getByText('セットマッチ')).toBeInTheDocument();
+      expect(screen.queryByText('ビリヤードスコア')).not.toBeInTheDocument();
+    });
+  });
+
+  it('should display different game types for different games', async () => {
+    render(<App />);
+    
+    // Start a Rotation game
+    const playerInputs = screen.getAllByLabelText(/プレイヤー名/);
+    fireEvent.change(playerInputs[0], { target: { value: 'Alice' } });
+    fireEvent.change(playerInputs[1], { target: { value: 'Bob' } });
+
+    // Change game type to Rotation by clicking on the select and then the option
+    const gameTypeSelects = screen.getAllByRole('combobox');
+    const gameTypeSelect = gameTypeSelects[1]; // 2番目のcombobox（ゲームタイプ選択）
+    fireEvent.mouseDown(gameTypeSelect);
+    const rotationOption = screen.getByText('ローテーション');
+    fireEvent.click(rotationOption);
+
+    const startButton = screen.getByRole('button', { name: /ゲーム開始/ });
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      // AppBar should show "ローテーション"
+      expect(screen.getByText('ローテーション')).toBeInTheDocument();
+    });
+  });
+
+  it('should show Home icon in AppBar when game is active', async () => {
+    render(<App />);
+    
+    // Start a game
+    const playerInputs = screen.getAllByLabelText(/プレイヤー名/);
+    fireEvent.change(playerInputs[0], { target: { value: 'Alice' } });
+    fireEvent.change(playerInputs[1], { target: { value: 'Bob' } });
+
+    const startButton = screen.getByRole('button', { name: /ゲーム開始/ });
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      // Home icon should be visible in AppBar
+      const homeButton = screen.getByTitle(/ホームに戻る/);
+      expect(homeButton).toBeInTheDocument();
+    });
+  });
+
+  it('should not show Home icon in AppBar on home/setup screen', () => {
+    render(<App />);
+    
+    // Home icon should not be visible on setup screen
+    const homeButton = screen.queryByTitle(/ホームに戻る/);
+    expect(homeButton).not.toBeInTheDocument();
+  });
+
+  it('should return to home without confirmation when game is in initial state', async () => {
+    render(<App />);
+    
+    // Start a game
+    const playerInputs = screen.getAllByLabelText(/プレイヤー名/);
+    fireEvent.change(playerInputs[0], { target: { value: 'Alice' } });
+    fireEvent.change(playerInputs[1], { target: { value: 'Bob' } });
+
+    const startButton = screen.getByRole('button', { name: /ゲーム開始/ });
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+    });
+
+    // Click Home icon - should return to home without confirmation
+    const homeButton = screen.getByTitle(/ホームに戻る/);
+    fireEvent.click(homeButton);
+
+    await waitFor(() => {
+      // Should return to setup screen without confirmation dialog
+      expect(screen.getByText(/ゲーム開始/)).toBeInTheDocument();
+    });
+  });
+
+  it('should display Bowlard game type in AppBar title', async () => {
+    render(<App />);
+    
+    // Start a Bowlard game
+    const playerInputs = screen.getAllByLabelText(/プレイヤー名/);
+    fireEvent.change(playerInputs[0], { target: { value: 'Alice' } });
+
+    // Change game type to Bowlard by clicking on the select and then the option
+    const gameTypeSelects = screen.getAllByRole('combobox');
+    const gameTypeSelect = gameTypeSelects[1]; // 2番目のcombobox（ゲームタイプ選択）
+    fireEvent.mouseDown(gameTypeSelect);
+    const bowlardOption = screen.getByText('ボーラード');
+    fireEvent.click(bowlardOption);
+
+    const startButton = screen.getByRole('button', { name: /ゲーム開始/ });
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      // AppBar should show "ボーラード"
+      expect(screen.getByText('ボーラード')).toBeInTheDocument();
+    });
+  });
+
+  it('should return to home without confirmation for Bowlard in initial state', async () => {
+    render(<App />);
+    
+    // Start a Bowlard game
+    const playerInputs = screen.getAllByLabelText(/プレイヤー名/);
+    fireEvent.change(playerInputs[0], { target: { value: 'Alice' } });
+
+    // Change game type to Bowlard by clicking on the select and then the option
+    const gameTypeSelects = screen.getAllByRole('combobox');
+    const gameTypeSelect = gameTypeSelects[1]; // 2番目のcombobox（ゲームタイプ選択）
+    fireEvent.mouseDown(gameTypeSelect);
+    const bowlardOption = screen.getByText('ボーラード');
+    fireEvent.click(bowlardOption);
+
+    const startButton = screen.getByRole('button', { name: /ゲーム開始/ });
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('ボーラード')).toBeInTheDocument();
+    });
+
+    // Click Home icon - should return to home without confirmation for Bowlard
+    const homeButton = screen.getByTitle(/ホームに戻る/);
+    fireEvent.click(homeButton);
+
+    await waitFor(() => {
+      // Should return to setup screen without confirmation dialog
       expect(screen.getByText(/ゲーム開始/)).toBeInTheDocument();
     });
   });

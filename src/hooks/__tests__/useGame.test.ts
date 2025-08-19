@@ -1039,3 +1039,48 @@ describe('useGame', () => {
     });
   });
 });
+
+describe('useGame - canSwapPlayers', () => {
+  it('should return false when no game is active', () => {
+    const { result } = renderHook(() => useGame());
+    expect(result.current.canSwapPlayers()).toBe(false);
+  });
+
+  it('should return true when Set Match game starts', () => {
+    const { result } = renderHook(() => useGame());
+    
+    act(() => {
+      result.current.startGame([
+        { name: 'Player 1', targetSets: 5 },
+        { name: 'Player 2', targetSets: 5 }
+      ], GameType.SET_MATCH);
+    });
+
+    expect(result.current.canSwapPlayers()).toBe(true);
+  });
+
+  it('should return true when Rotation game starts', () => {
+    const { result } = renderHook(() => useGame());
+    
+    act(() => {
+      result.current.startGame([
+        { name: 'Player 1', targetScore: 120 },
+        { name: 'Player 2', targetScore: 120 }
+      ], GameType.ROTATION);
+    });
+
+    expect(result.current.canSwapPlayers()).toBe(true);
+  });
+
+  it('should return true when Bowlard game starts', () => {
+    const { result } = renderHook(() => useGame());
+    
+    act(() => {
+      result.current.startGame([
+        { name: 'Player 1' }
+      ], GameType.BOWLARD);
+    });
+
+    expect(result.current.canSwapPlayers()).toBe(true);
+  });
+});

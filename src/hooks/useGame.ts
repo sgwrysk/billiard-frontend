@@ -109,8 +109,11 @@ export const useGame = () => {
         return currentGame.players.every(p => p.score === 0);
       
       case GameType.BOWLARD:
-        // ボーラード: 両方のプレイヤーがまだフレームを開始していない状態
-        return currentGame.players.every(p => !p.bowlingFrames || p.bowlingFrames.length === 0);
+        // ボーラード: 最初の投球が行われるまでを初期状態とする
+        return currentGame.players.every(p => 
+          !p.bowlingFrames || 
+          p.bowlingFrames.every(frame => frame.rolls.length === 0)
+        );
       
       default:
         return false;

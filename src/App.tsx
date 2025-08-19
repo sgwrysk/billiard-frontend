@@ -23,6 +23,7 @@ import { LanguageProvider, useLanguage, type Language as LanguageType } from './
 import GameSetup from './components/GameSetup';
 import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
+import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
 
 // Create Material-UI theme - Deep Blue + Outfit
@@ -152,6 +153,7 @@ const AppContent: React.FC = () => {
   } = useGame();
   
   const [finishedGame, setFinishedGame] = useState<any>(null);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // ゲーム終了を監視して自動的に勝利画面に遷移
   useEffect(() => {
@@ -257,6 +259,51 @@ const AppContent: React.FC = () => {
     handleMenuClose();
   };
 
+  const handleHomeButtonClick = () => {
+    if (currentScreen === AppScreen.GAME && currentGame) {
+      // ゲームが初期状態の場合は直接ホームに戻る
+      if (canSwapPlayers()) {
+        resetGame();
+        setCurrentScreen(AppScreen.HOME);
+      } else {
+        // ゲームが進行中の場合は確認ダイアログを表示
+        setShowExitConfirm(true);
+      }
+    } else {
+      setCurrentScreen(AppScreen.HOME);
+    }
+  };
+
+  const handleConfirmExit = () => {
+    setShowExitConfirm(false);
+    resetGame();
+    setCurrentScreen(AppScreen.HOME);
+  };
+
+  const handleCancelExit = () => {
+    setShowExitConfirm(false);
+  };
+
+  const getGameTypeLabel = (type: GameType) => {
+    switch (type) {
+      case GameType.SET_MATCH:
+        return t('setup.gameType.setmatch');
+      case GameType.ROTATION:
+        return t('setup.gameType.rotation');
+      case GameType.BOWLARD:
+        return t('setup.gameType.bowlard');
+      default:
+        return type;
+    }
+  };
+
+  const getAppBarTitle = () => {
+    if (currentScreen === AppScreen.GAME && currentGame) {
+      return getGameTypeLabel(currentGame.type);
+    }
+    return t('app.title');
+  };
+
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'grey.50' }}>
       {/* App bar */}
@@ -274,8 +321,27 @@ const AppContent: React.FC = () => {
           </IconButton>
           
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {t('app.title')}
+            {getAppBarTitle()}
           </Typography>
+
+          {/* Home button - only show in game screen */}
+          {currentScreen === AppScreen.GAME && currentGame && (
+            <IconButton
+              onClick={handleHomeButtonClick}
+              title={t('game.backToHome')}
+              size="large"
+              sx={{ 
+                mr: 2,
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                }
+              }}
+            >
+              <HomeIcon />
+            </IconButton>
+          )}
           
           {/* Language selector */}
           <FormControl size="small" sx={{ mr: 2, minWidth: 120 }}>
@@ -372,6 +438,17 @@ const AppContent: React.FC = () => {
           />
         )}
       </Container>
+
+      {/* Exit confirmation dialog */}
+      <ConfirmDialog
+        open={showExitConfirm}
+        title={t('confirm.exitGame.title')}
+        message={t('confirm.exitGame.message')}
+        confirmText={t('confirm.exitGame.confirm')}
+        cancelText={t('confirm.exitGame.cancel')}
+        onConfirm={handleConfirmExit}
+        onCancel={handleCancelExit}
+      />
     </Box>
   );
 };

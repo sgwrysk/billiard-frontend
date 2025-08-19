@@ -33,7 +33,6 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   onSelectPlayer,
   onSwapPlayers,
   canSwapPlayers = false,
-  canUndoLastShot = false,
 }) => {
   const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];

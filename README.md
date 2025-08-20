@@ -17,6 +17,9 @@ A modern billiard score management application built with React + TypeScript + M
 - 👥 **2-Player Games**: All games support exactly 2 players
 - 🎯 **Real-time Scoring**: Live score updates during gameplay
 - 🔄 **Undo Function**: Correct mistakenly entered scores
+- ⏰ **Chess Clock**: Optional time management with individual player timers and warning alerts
+- 🔄 **Player Swapping**: Switch player positions during gameplay
+- 🎲 **Alternating Break**: Optional alternating break shots for fair play
 - 🏆 **Victory Screen**: Celebrate wins with game statistics
 - 📊 **Game History**: View past game results
 - 🌍 **Internationalization**: Japanese/English language support
@@ -28,6 +31,8 @@ A modern billiard score management application built with React + TypeScript + M
 - Player-specific handicaps (e.g., Player 1 needs 5 sets, Player 2 needs 4 sets)
 - Large scoreboard-style display
 - Set history table showing which player won each set
+- Alternating break functionality
+- Player position swapping during gameplay
 
 ### Rotation Game
 - Ball numbers equal points (1 ball = 1 point, 15 ball = 15 points)
@@ -35,6 +40,7 @@ A modern billiard score management application built with React + TypeScript + M
 - Player-specific target scores for handicaps
 - Re-racking when all 15 balls are pocketed
 - Score progression graph on victory screen
+- Player position swapping during gameplay
 
 ### Bowlard Game
 - Bowling-style scoring system with billiard ball aesthetics
@@ -51,6 +57,7 @@ A modern billiard score management application built with React + TypeScript + M
 - **State Management**: React Hooks + Context API
 - **Charts**: Chart.js + react-chartjs-2
 - **Internationalization**: Custom i18n context
+- **Testing**: Vitest + React Testing Library (380+ tests, 95%+ coverage)
 - **Deployment**: Render (Static Site)
 
 ## 📦 Installation & Setup
@@ -71,6 +78,9 @@ npm install
 # Start development server
 npm run dev
 
+# Run tests
+npm test
+
 # Build for production
 npm run build
 
@@ -81,22 +91,27 @@ npm run preview
 ## 🎮 How to Use
 
 ### 1. Game Setup
-1. Select game type (Set Match or Rotation)
+1. Select game type (Set Match, Rotation, or Bowlard)
 2. Enter player names (default: Player 1, Player 2)
-3. Set target (sets for Set Match, points for Rotation)
+3. Set target (sets for Set Match, points for Rotation, or frames for Bowlard)
 4. Use preset buttons for common targets
-5. Click "Start Game"
+5. Configure optional chess clock with time limits and warnings
+6. Enable alternating break for Set Match (optional)
+7. Click "Start Game"
 
 ### 2. Set Match Gameplay
 1. Click on player info to add a set
 2. Use "Undo" button to correct mistakes
-3. Game ends when a player reaches target sets
+3. Use "Swap Players" button to change player positions
+4. Chess clock automatically switches between players (if enabled)
+5. Game ends when a player reaches target sets
 
 ### 3. Rotation Gameplay
 1. Click pocketed ball numbers to add points
 2. Game automatically re-racks after all 15 balls
 3. Use "Undo" button to correct ball entries
-4. Game ends when a player reaches target score
+4. Use "Swap Players" button to change player positions
+5. Game ends when a player reaches target score
 
 ### 4. Bowlard Gameplay
 1. Enter number of pins knocked down for each roll
@@ -104,13 +119,21 @@ npm run preview
 3. Play 10 frames with up to 2 rolls per frame (3 for frame 10)
 4. Game ends after completing all 10 frames
 
-### 5. Victory Screen
+### 5. Chess Clock Features (Optional)
+- Individual time limits for each player
+- Configurable warning time alerts
+- Visual indicators for active player and time remaining
+- Automatic switching between players
+- Time up notifications
+
+### 6. Victory Screen
 - Displays game statistics and winner
 - Shows score progression graph (Rotation) or set history table (Set Match)
+- Displays final time remaining (if chess clock was used)
 - Offers rematch with same settings
 - Tracks cumulative wins per player
 
-### 6. Language Support
+### 7. Language Support
 - Switch between Japanese/English on home screen
 - All UI text and player names are translated
 
@@ -172,6 +195,34 @@ MIT License
 
 Bug reports and feature requests are welcome! Please use GitHub Issues.
 
+## 🧪 Testing
+
+This project includes comprehensive test coverage:
+
+### Test Framework
+- **Vitest**: Fast and modern test runner
+- **React Testing Library**: Component testing utilities
+- **@testing-library/jest-dom**: Additional matchers
+
+### Coverage
+- **380+ Tests**: Comprehensive test suite
+- **95%+ Coverage**: High code coverage across components, hooks, and utilities
+- **Component Tests**: All UI components thoroughly tested
+- **Utility Tests**: Complete coverage of utility functions
+- **Integration Tests**: Game flow and user interaction tests
+
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with UI
+npm run test:ui
+```
+
 ## 🎯 Future Enhancements
 
 - Database integration for persistent game history
@@ -179,6 +230,7 @@ Bug reports and feature requests are welcome! Please use GitHub Issues.
 - Tournament bracket support
 - Advanced statistics and analytics
 - Social features and player profiles
+- Multiplayer online support
 
 ---
 

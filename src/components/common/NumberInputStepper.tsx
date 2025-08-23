@@ -116,6 +116,8 @@ const NumberInputStepper: React.FC<NumberInputStepperProps> = ({
             style: {
               textAlign: 'center',
               color: '#000000',
+              WebkitTextFillColor: '#000000',
+              fontWeight: 600,
               ...AppStyles.monoFont,
             }
           }}
@@ -123,12 +125,15 @@ const NumberInputStepper: React.FC<NumberInputStepperProps> = ({
             width: 60,
             '& .MuiInputBase-input': {
               color: '#000000 !important',
+              WebkitTextFillColor: '#000000 !important',
             },
             '& .MuiOutlinedInput-input': {
               color: '#000000 !important',
+              WebkitTextFillColor: '#000000 !important',
             },
             '& input': {
               color: '#000000 !important',
+              WebkitTextFillColor: '#000000 !important',
             }
           }}
         />

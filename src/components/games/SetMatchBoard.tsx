@@ -11,6 +11,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
 import { UIColors, GameColors, AppStyles } from '../../constants/colors';
 import ChessClock from '../ChessClock';
+import SetHistory from '../SetHistory';
 
 interface SetMatchBoardProps {
   game: Game;
@@ -37,7 +38,7 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
   const { t } = useLanguage();
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)' }}>
       {/* Chess Clock */}
       {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (
         <Box sx={{ mb: 3 }}>
@@ -51,8 +52,9 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
         </Box>
       )}
 
-      {/* Player Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      {/* Player Cards - keep compact to ensure bottom controls are visible */}
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Grid container spacing={2} sx={{ mb: 2 }} alignItems="stretch">
         {game.players.map((player) => (
           <Grid item xs={12} sm={6} key={player.id}>
             <Card 
@@ -64,6 +66,7 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 transform: player.isActive ? 'scale(1.02)' : 'scale(1)',
                 transition: 'all 0.2s ease-in-out',
                 cursor: 'pointer',
+                height: '100%',
                 '&:hover': {
                   backgroundColor: UIColors.hover.lightBackground,
                   transform: 'scale(1.05)',
@@ -74,8 +77,17 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 },
               }}
             >
-              <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>{player.name}</Typography>
+              <CardContent sx={{ textAlign: 'center', py: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 1.5,
+                    fontSize: { xs: '1rem', md: '1.25rem', lg: '1.4rem' },
+                    fontWeight: 700,
+                  }}
+                >
+                  {player.name}
+                </Typography>
                 
                 {/* Break Icon - only show on the player who breaks */}
                 {alternatingBreak && (() => {
@@ -104,17 +116,22 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 <Typography 
                   color="primary"
                   sx={{ 
-                    fontSize: { xs: '4rem', sm: '5rem', md: '6rem' },
+                    // Small screens keep fixed size; md+ scales fluidly with viewport width and caps at a max
+                    fontSize: { xs: '4.5rem', sm: '5.5rem', md: 'clamp(7rem, 9vw, 16rem)' },
                     fontWeight: 'bold',
                     lineHeight: 1,
                     textAlign: 'center',
-                    my: 2
+                    my: { xs: 1.5, md: 2.5 }
                   }}
                 >
                   <span style={AppStyles.monoFont}>{player.setsWon || 0}</span>
                 </Typography>
                 {player.targetSets && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ mt: 2, fontSize: { xs: '0.85rem', md: '1rem' } }}
+                  >
                     {t('game.targetSets')}: <span style={AppStyles.monoFont}>{player.targetSets}</span>
                   </Typography>
                 )}
@@ -123,17 +140,19 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
           </Grid>
         ))}
       </Grid>
+      </Box>
 
-      {/* Swap players link-like button (bottom-left) */}
-      {canSwapPlayers && onSwapPlayers && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: -1, mb: 2 }}>
+      {/* Top controls row: swap link (left) and undo button (right). Keep layout stable when swap is hidden */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: -1 }}>
+        {canSwapPlayers && onSwapPlayers ? (
           <Button
             variant="text"
             color="primary"
             onClick={onSwapPlayers}
             sx={{
               px: 0,
-              minWidth: 'auto',
+              minWidth: 140, // reserve width so layout doesn't shift
+              justifyContent: 'flex-start',
               textDecoration: 'underline',
               '&:hover': { textDecoration: 'underline' },
             }}
@@ -141,38 +160,39 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
           >
             {t('game.swapPlayers')}
           </Button>
-        </Box>
-      )}
+        ) : (
+          <Box sx={{ minWidth: 140 }} />
+        )}
 
-      {/* Action Buttons */}
-      <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12} sm={6} md={4}>
-          <Button 
-            variant="outlined" 
-            fullWidth 
-            onClick={onUndoLastShot}
-            disabled={game.scoreHistory.length === 0}
-            sx={{ 
-              height: '48px',
-              minHeight: '48px',
+        <Button 
+          variant="outlined" 
+          onClick={onUndoLastShot}
+          disabled={game.scoreHistory.length === 0}
+          sx={{ 
+            height: '48px',
+            minHeight: '48px',
+            borderColor: '#e0e0e0',
+            color: '#666666',
+            '&:hover': {
+              backgroundColor: '#e0e0e0',
+              color: '#666666',
+              borderColor: '#e0e0e0',
+            },
+            '&:disabled': {
               borderColor: '#e0e0e0',
               color: '#666666',
-              '&:hover': {
-                backgroundColor: '#e0e0e0',
-                color: '#666666',
-                borderColor: '#e0e0e0',
-              },
-              '&:disabled': {
-                borderColor: '#e0e0e0',
-                color: '#666666',
-                opacity: 0.6,
-              },
-            }}
-          >
-            {t('game.undo')}
-          </Button>
-        </Grid>
-      </Grid>
+              opacity: 0.6,
+            },
+          }}
+        >
+          {t('game.undo')}
+        </Button>
+      </Box>
+
+      {/* Set history (always visible, even with no history yet) */}
+      <SetHistory game={game} />
+
+      {/* Action Buttons row removed; undo moved to top controls */}
     </Box>
   );
 };

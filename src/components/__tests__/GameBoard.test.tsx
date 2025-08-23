@@ -73,8 +73,8 @@ describe('GameBoard', () => {
       );
 
       // SetMatchBoard specific elements should be present
-      expect(screen.getByText('Player 1')).toBeInTheDocument();
-      expect(screen.getByText('Player 2')).toBeInTheDocument();
+      expect(screen.getAllByText('Player 1').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Player 2').length).toBeGreaterThan(0);
     });
 
     it('passes correct props to SetMatchBoard', () => {
@@ -99,8 +99,8 @@ describe('GameBoard', () => {
       );
 
       // Verify that the props are passed correctly by checking for elements that would be rendered based on those props
-      expect(screen.getByText('Player 1')).toBeInTheDocument();
-      expect(screen.getByText('Player 2')).toBeInTheDocument();
+      expect(screen.getAllByText('Player 1').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Player 2').length).toBeGreaterThan(0);
     });
   });
 
@@ -114,7 +114,7 @@ describe('GameBoard', () => {
       );
 
       // RotationBoard specific elements should be present
-      expect(screen.getByText('Player 1')).toBeInTheDocument();
+      expect(screen.getAllByText('Player 1').length).toBeGreaterThan(0);
       expect(screen.getByText('Player 2')).toBeInTheDocument();
     });
 
@@ -243,8 +243,8 @@ describe('GameBoard', () => {
         </MockLanguageProvider>
       );
 
-      expect(screen.getByText('Player 1')).toBeInTheDocument();
-      expect(screen.getByText('Player 2')).toBeInTheDocument();
+      expect(screen.getAllByText('Player 1').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Player 2').length).toBeGreaterThan(0);
     });
 
     it('handles undefined optional props gracefully', () => {
@@ -267,7 +267,7 @@ describe('GameBoard', () => {
         </MockLanguageProvider>
       );
 
-      expect(screen.getByText('Player 1')).toBeInTheDocument();
+      expect(screen.getAllByText('Player 1').length).toBeGreaterThan(0);
     });
   });
 
@@ -284,7 +284,7 @@ describe('GameBoard', () => {
 
       // The time up handling is internal to the component
       // We can verify the component renders correctly
-      expect(screen.getByText('Player 1')).toBeInTheDocument();
+      expect(screen.getAllByText('Player 1').length).toBeGreaterThan(0);
       
       consoleSpy.mockRestore();
     });

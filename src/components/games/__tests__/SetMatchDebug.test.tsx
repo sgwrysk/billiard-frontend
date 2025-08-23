@@ -160,7 +160,7 @@ describe('SetMatch Debug Tests', () => {
     );
 
     // Get player card and click it
-    const player1Card = screen.getByText('Click Player 1').closest('.MuiCard-root');
+    const player1Card = screen.getAllByText('Click Player 1')[0].closest('.MuiCard-root');
     console.log('Player 1 card found:', !!player1Card);
     
     if (player1Card) {

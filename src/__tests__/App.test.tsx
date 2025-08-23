@@ -57,8 +57,8 @@ describe('App', () => {
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
-      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getAllByText('Alice').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Bob').length).toBeGreaterThan(0);
     });
   });
 
@@ -74,7 +74,7 @@ describe('App', () => {
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getAllByText('Alice').length).toBeGreaterThan(0);
     });
 
     // Return to setup screen using home button
@@ -98,7 +98,7 @@ describe('App', () => {
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getAllByText('Alice').length).toBeGreaterThan(0);
     });
 
     // Return to setup screen using home button
@@ -190,7 +190,7 @@ describe('App', () => {
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getAllByText('Alice').length).toBeGreaterThan(0);
     });
 
     // Click Home icon - should return to home without confirmation

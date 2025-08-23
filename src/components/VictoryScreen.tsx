@@ -11,12 +11,6 @@ import {
   Grid,
   Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
 } from '@mui/material';
 import { 
   EmojiEvents, 
@@ -41,6 +35,7 @@ import type { Game } from '../types/index';
 import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
 import { UIColors, BowlardColors, AppStyles } from '../constants/colors';
+import SetHistory from './SetHistory';
 
 ChartJS.register(
   CategoryScale,
@@ -334,66 +329,6 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       .length;
   };
 
-  // Generate set history table for Set Match
-  const generateSetHistoryTable = () => {
-    if (game.type !== GameType.SET_MATCH || !game.scoreHistory || game.scoreHistory.length === 0) {
-      return null;
-    }
-
-    // Get all set wins in chronological order
-    // Set match entries are those with score: 1 (indicating a set win)
-    const setWins = game.scoreHistory
-      .filter(entry => entry.score === 1) // Set match entries have score: 1
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-
-    const totalSetsPlayed = setWins.length; // Total number of sets played
-    
-    return (
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow sx={{ bgcolor: 'primary.50' }}>
-              <TableCell sx={{ fontWeight: 'bold', minWidth: 120 }}>
-                {t('victory.player')}
-              </TableCell>
-              {Array.from({ length: totalSetsPlayed }, (_, i) => (
-                <TableCell key={i + 1} align="center" sx={{ fontWeight: 'bold', minWidth: 50 }}>
-                  <span style={AppStyles.monoFont}>{i + 1}</span>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {game.players.map(player => (
-              <TableRow key={player.id}>
-                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'grey.50' }}>
-                  {player.name}
-                </TableCell>
-                {Array.from({ length: totalSetsPlayed }, (_, setIndex) => {
-                  const setNumber = setIndex + 1;
-                  const isWinner = setWins[setIndex]?.playerId === player.id;
-                  
-                  return (
-                    <TableCell key={setNumber} align="center">
-                      {isWinner ? (
-                        <Typography variant="h6" color="success.main">
-                          ⭕
-                        </Typography>
-                      ) : (
-                        <Typography variant="h6" color="grey.300">
-                          ⚪
-                        </Typography>
-                      )}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
 
   const chartOptions = {
     responsive: true,
@@ -882,16 +817,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         </CardContent>
       </Card>
 
-      {/* セットマッチ: セット獲得履歴テーブル */}
-      {game.type === GameType.SET_MATCH && generateSetHistoryTable() && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              {t('victory.setHistory')}
-            </Typography>
-            {generateSetHistoryTable()}
-          </CardContent>
-        </Card>
+      {/* セットマッチ: 共通 SetHistory コンポーネントで統一表示 */}
+      {game.type === GameType.SET_MATCH && (
+        <SetHistory game={game} />
       )}
 
       {/* その他のゲーム: スコア推移グラフ */}

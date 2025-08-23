@@ -86,13 +86,13 @@ describe('SetMatchBoard', () => {
       </TestWrapper>
     );
 
-    // Check if players are displayed
-    expect(screen.getByText('Player 1')).toBeInTheDocument();
-    expect(screen.getByText('Player 2')).toBeInTheDocument();
+    // Check if players are displayed (allow multiple occurrences due to set history table)
+    expect(screen.getAllByText('Player 1').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Player 2').length).toBeGreaterThan(0);
 
     // Check if set counts are displayed correctly
-    expect(screen.getByText('2')).toBeInTheDocument(); // Player 1's sets
-    expect(screen.getByText('1')).toBeInTheDocument(); // Player 2's sets
+    expect(screen.getAllByText('2').length).toBeGreaterThan(0); // Player 1's sets may appear in multiple places
+    expect(screen.getAllByText('1').length).toBeGreaterThan(0); // Player 2's sets may appear in multiple places
 
     // Check if target sets are displayed
     expect(screen.getAllByText((_, element) => {
@@ -145,7 +145,7 @@ describe('SetMatchBoard', () => {
     );
 
     // Click on Player 1's card
-    const player1Card = screen.getByText('Player 1').closest('.MuiCard-root');
+    const player1Card = screen.getAllByText('Player 1')[0].closest('.MuiCard-root');
     expect(player1Card).toBeInTheDocument();
     
     if (player1Card) {
@@ -307,8 +307,8 @@ describe('SetMatchBoard', () => {
     );
 
     // Player 1 should have higher elevation (active)
-    const player1Card = screen.getByText('Player 1').closest('.MuiCard-root');
-    const player2Card = screen.getByText('Player 2').closest('.MuiCard-root');
+    const player1Card = screen.getAllByText('Player 1')[0].closest('.MuiCard-root');
+    const player2Card = screen.getAllByText('Player 2')[0].closest('.MuiCard-root');
 
     // We can't easily test CSS styles in jsdom, but we can verify the cards exist
     expect(player1Card).toBeInTheDocument();

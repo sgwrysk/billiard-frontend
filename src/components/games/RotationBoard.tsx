@@ -150,16 +150,25 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
               }}
             >
               <CardContent>
-                <Typography variant="h6">{player.name}</Typography>
-                <Typography variant="h4" color="primary">
+                <Typography 
+                  variant="h6"
+                  sx={{ fontSize: { xs: '1.1rem', md: '1.4rem', lg: '1.6rem' }, fontWeight: 700 }}
+                >
+                  {player.name}
+                </Typography>
+                <Typography 
+                  variant="h4" 
+                  color="primary"
+                  sx={{ fontSize: { xs: '2rem', md: '2.6rem', lg: '3rem' }, fontWeight: 800 }}
+                >
                   <span style={AppStyles.monoFont}>{player.score}</span>
                 </Typography>
                 {player.targetScore && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.85rem', md: '1rem' } }}>
                     {t('game.target')}: <span style={AppStyles.monoFont}>{player.targetScore}</span>
                   </Typography>
                 )}
-                <Typography variant="body2" color="success.main">
+                <Typography variant="body2" color="success.main" sx={{ fontSize: { xs: '0.9rem', md: '1.05rem' } }}>
                   {t('game.remaining')}: <span style={AppStyles.monoFont}>{getRemainingScore(player)}</span>
                 </Typography>
                 
@@ -231,12 +240,9 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
         ))}
       </Grid>
 
-      {/* Ball Selection */}
-      <Card sx={{ mb: 3 }} ref={ballSectionRef}>
+      {/* Ball Selection - moved above the controls row */}
+      <Card sx={{ mb: 2 }} ref={ballSectionRef}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            {t('game.ballSelect')}
-          </Typography>
           <Grid container spacing={1}>
             {ballNumbers.map((ballNumber) => (
               <Grid item key={ballNumber}>
@@ -310,16 +316,17 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
         </CardContent>
       </Card>
 
-      {/* Swap players link-like button (bottom-left) */}
-      {canSwapPlayers && onSwapPlayers && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: -1, mb: 2 }}>
+      {/* Top controls row: swap link (left) and actions (right). Keep layout stable when swap is hidden */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        {canSwapPlayers && onSwapPlayers ? (
           <Button
             variant="text"
             color="primary"
             onClick={onSwapPlayers}
             sx={{
               px: 0,
-              minWidth: 'auto',
+              minWidth: 140,
+              justifyContent: 'flex-start',
               textDecoration: 'underline',
               '&:hover': { textDecoration: 'underline' },
             }}
@@ -327,25 +334,21 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           >
             {t('game.swapPlayers')}
           </Button>
-        </Box>
-      )}
+        ) : (
+          <Box sx={{ minWidth: 140 }} />
+        )}
 
-      {/* Action Buttons */}
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <Button 
             variant="contained" 
             color="primary"
-            fullWidth 
             onClick={onSwitchPlayer}
+            sx={{ display: { xs: 'inline-flex', sm: 'none' } }}
           >
             {t('game.switchPlayer')}
           </Button>
-        </Grid>
-        <Grid item xs={12} sm={6}>
           <Button 
             variant="outlined" 
-            fullWidth 
             onClick={onUndoLastShot}
             disabled={game.shotHistory.length === 0}
             sx={{ 
@@ -367,8 +370,12 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           >
             {t('game.undo')}
           </Button>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
+
+      
+
+      {/* Action Buttons row removed; actions moved to top controls */}
     </Box>
   );
 };

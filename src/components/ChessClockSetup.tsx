@@ -113,7 +113,14 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
                 onClick={() => handlePresetTimeLimitChange(time)}
                 variant={chessClock.timeLimit === time ? 'filled' : 'outlined'}
                 color={chessClock.timeLimit === time ? 'primary' : 'default'}
-                sx={{ ...AppStyles.monoFont, cursor: 'pointer' }}
+                sx={{ 
+                  fontFamily: '"Courier New", Courier, "Lucida Console", Monaco, monospace',
+                  cursor: 'pointer',
+                  '& .MuiChip-label': {
+                    fontFamily: '"Courier New", Courier, "Lucida Console", Monaco, monospace !important',
+                    color: 'text.primary !important'
+                  }
+                }}
               />
             ))}
           </Box>

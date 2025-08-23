@@ -82,26 +82,6 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
 
   return (
     <Box>
-      {/* Swap players link-like button */}
-      {canSwapPlayers && onSwapPlayers && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-          <Button
-            variant="text"
-            color="primary"
-            startIcon={<span style={{ fontSize: '1.1rem' }}>🔄</span>}
-            onClick={onSwapPlayers}
-            sx={{
-              px: 0,
-              minWidth: 'auto',
-              textDecoration: 'underline',
-              '&:hover': { textDecoration: 'underline' },
-            }}
-            title={t('game.swapPlayers')}
-          >
-            {t('game.swapPlayers')}
-          </Button>
-        </Box>
-      )}
       {/* Chess Clock */}
       {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (
         <Box sx={{ mb: 3 }}>
@@ -329,6 +309,26 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           </Grid>
         </CardContent>
       </Card>
+
+      {/* Swap players link-like button (bottom-left) */}
+      {canSwapPlayers && onSwapPlayers && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: -1, mb: 2 }}>
+          <Button
+            variant="text"
+            color="primary"
+            onClick={onSwapPlayers}
+            sx={{
+              px: 0,
+              minWidth: 'auto',
+              textDecoration: 'underline',
+              '&:hover': { textDecoration: 'underline' },
+            }}
+            title={t('game.swapPlayers')}
+          >
+            {t('game.swapPlayers')}
+          </Button>
+        </Box>
+      )}
 
       {/* Action Buttons */}
       <Grid container spacing={2}>

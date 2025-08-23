@@ -143,12 +143,8 @@ describe('ChessClockSetup', () => {
       const minusButton = screen.getByTestId('RemoveIcon');
       fireEvent.click(minusButton);
       
-      expect(mockOnChange).toHaveBeenCalledWith({
-        ...minTimeSettings,
-        timeLimit: 1,
-        player1TimeLimit: 1,
-        player2TimeLimit: 1,
-      });
+      // Should not call onChange when at minimum value
+      expect(mockOnChange).not.toHaveBeenCalled();
     });
 
     it('should update time limit when input field is changed', () => {
@@ -157,6 +153,7 @@ describe('ChessClockSetup', () => {
       
       const timeInput = screen.getByDisplayValue('30');
       fireEvent.change(timeInput, { target: { value: '45' } });
+      fireEvent.blur(timeInput); // NumberInputStepper updates on blur
       
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultChessClockSettings,
@@ -206,6 +203,7 @@ describe('ChessClockSetup', () => {
       
       const player1TimeInput = screen.getAllByDisplayValue('30')[0];
       fireEvent.change(player1TimeInput, { target: { value: '25' } });
+      fireEvent.blur(player1TimeInput); // NumberInputStepper updates on blur
       
       expect(mockOnChange).toHaveBeenCalledWith({
         ...individualTimeSettings,
@@ -278,10 +276,8 @@ describe('ChessClockSetup', () => {
       const minusButton = screen.getAllByTestId('RemoveIcon')[1];
       fireEvent.click(minusButton);
       
-      expect(mockOnChange).toHaveBeenCalledWith({
-        ...warningEnabledSettings,
-        warningTime: 1,
-      });
+      // Should not call onChange when at minimum value
+      expect(mockOnChange).not.toHaveBeenCalled();
     });
 
     it('should not increment warning time above time limit minus 1', () => {
@@ -292,10 +288,8 @@ describe('ChessClockSetup', () => {
       const plusButton = screen.getAllByTestId('AddIcon')[1];
       fireEvent.click(plusButton);
       
-      expect(mockOnChange).toHaveBeenCalledWith({
-        ...warningEnabledSettings,
-        warningTime: 29, // Should not exceed timeLimit - 1
-      });
+      // Should not call onChange when at maximum value
+      expect(mockOnChange).not.toHaveBeenCalled();
     });
 
     it('should update warning time when input field is changed', () => {
@@ -305,6 +299,7 @@ describe('ChessClockSetup', () => {
       
       const warningTimeInput = screen.getByDisplayValue('3');
       fireEvent.change(warningTimeInput, { target: { value: '5' } });
+      fireEvent.blur(warningTimeInput); // NumberInputStepper updates on blur
       
       expect(mockOnChange).toHaveBeenCalledWith({
         ...warningEnabledSettings,

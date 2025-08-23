@@ -4,16 +4,12 @@ import {
   Card,
   CardContent,
   Typography,
-  TextField,
-  IconButton,
   Chip,
   Grid,
 } from '@mui/material';
-import { Add, Remove } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { ChessClockSettings } from '../types/index';
-import { ToggleSwitch } from './common';
-import { AppStyles } from '../constants/colors';
+import { ToggleSwitch, NumberInputStepper } from './common';
 
 interface ChessClockSetupProps {
   chessClock: ChessClockSettings;
@@ -109,11 +105,18 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
               <Chip
                 key={time}
                 label={time.toString()}
-                size="small"
+                size="medium"
                 onClick={() => handlePresetTimeLimitChange(time)}
                 variant={chessClock.timeLimit === time ? 'filled' : 'outlined'}
                 color={chessClock.timeLimit === time ? 'primary' : 'default'}
-                sx={{ cursor: 'pointer' }}
+                sx={{ 
+                  cursor: 'pointer',
+                  minHeight: 36, 
+                  fontSize: '0.875rem',
+                  '& .MuiChip-label': { 
+                    padding: '0 12px' 
+                  }
+                }}
               />
             ))}
           </Box>
@@ -127,36 +130,13 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
                     <Typography variant="body2" sx={{ minWidth: 60 }}>
                       {player.name || `${t('setup.playerName')} ${index + 1}`}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handlePlayerTimeLimitChange(index, Math.max(1, (chessClock[`player${index + 1}TimeLimit` as keyof ChessClockSettings] as number) - 1))}
-                      >
-                        <Remove fontSize="small" />
-                      </IconButton>
-                      <TextField
-                        size="small"
-                        value={chessClock[`player${index + 1}TimeLimit` as keyof ChessClockSettings]}
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value) || 1;
-                          handlePlayerTimeLimitChange(index, value);
-                        }}
-                        sx={{ 
-                          width: 60,
-                          '& .MuiInputBase-input': {
-                            ...AppStyles.monoFont,
-                            textAlign: 'center'
-                          }
-                        }}
-                        inputProps={{ min: 1 }}
-                      />
-                      <IconButton
-                        size="small"
-                        onClick={() => handlePlayerTimeLimitChange(index, (chessClock[`player${index + 1}TimeLimit` as keyof ChessClockSettings] as number) + 1)}
-                      >
-                        <Add fontSize="small" />
-                      </IconButton>
-                    </Box>
+                    <NumberInputStepper
+                      value={chessClock[`player${index + 1}TimeLimit` as keyof ChessClockSettings] as number}
+                      onChange={(value) => handlePlayerTimeLimitChange(index, value)}
+                      min={1}
+                      max={999}
+                      step={1}
+                    />
                   </Box>
                 </Grid>
               ))}
@@ -164,36 +144,13 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
           ) : (
             // Common time limit
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() => handleTimeLimitChange(Math.max(1, chessClock.timeLimit - 1))}
-                >
-                  <Remove fontSize="small" />
-                </IconButton>
-                <TextField
-                  size="small"
-                  value={chessClock.timeLimit}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value) || 1;
-                    handleTimeLimitChange(value);
-                  }}
-                  sx={{ 
-                    width: 60,
-                    '& .MuiInputBase-input': {
-                      ...AppStyles.monoFont,
-                      textAlign: 'center'
-                    }
-                  }}
-                  inputProps={{ min: 1 }}
-                />
-                <IconButton
-                  size="small"
-                  onClick={() => handleTimeLimitChange(chessClock.timeLimit + 1)}
-                >
-                  <Add fontSize="small" />
-                </IconButton>
-              </Box>
+              <NumberInputStepper
+                value={chessClock.timeLimit}
+                onChange={handleTimeLimitChange}
+                min={1}
+                max={999}
+                step={1}
+              />
             </Box>
           )}
         </Box>
@@ -223,36 +180,14 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
         {/* Warning time setting */}
         {chessClock.warningEnabled && (
           <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <IconButton
-                size="small"
-                onClick={() => handleWarningTimeChange(Math.max(1, chessClock.warningTime - 1))}
-              >
-                <Remove fontSize="small" />
-              </IconButton>
-              <TextField
-                size="small"
-                value={chessClock.warningTime}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value) || 1;
-                  handleWarningTimeChange(value);
-                }}
-                sx={{ 
-                  width: 60,
-                  '& .MuiInputBase-input': {
-                    ...AppStyles.monoFont,
-                    textAlign: 'center'
-                  }
-                }}
-                inputProps={{ min: 1, max: chessClock.timeLimit - 1 }}
-              />
-              <IconButton
-                size="small"
-                onClick={() => handleWarningTimeChange(Math.min(chessClock.warningTime + 1, chessClock.timeLimit - 1))}
-              >
-                <Add fontSize="small" />
-              </IconButton>
-            </Box>
+            <NumberInputStepper
+              value={chessClock.warningTime}
+              onChange={handleWarningTimeChange}
+              min={1}
+              max={chessClock.timeLimit - 1}
+              step={1}
+              label={`${t('setup.chessClock.warningTime')}（${t('setup.chessClock.minutes')}）`}
+            />
           </Box>
         )}
       </CardContent>

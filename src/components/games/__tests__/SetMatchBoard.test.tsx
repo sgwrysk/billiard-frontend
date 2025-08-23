@@ -95,8 +95,8 @@ describe('SetMatchBoard', () => {
     expect(screen.getByText('1')).toBeInTheDocument(); // Player 2's sets
 
     // Check if target sets are displayed
-    expect(screen.getAllByText((_, node) => {
-      return node?.textContent?.includes('セット数: 3') || false;
+    expect(screen.getAllByText((_, element) => {
+      return element?.textContent === 'セット数: 3';
     })).toHaveLength(2);
   });
 

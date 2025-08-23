@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game, BowlingFrame } from '../../types/index';
-import { BowlardColors, AppColors, UIColors } from '../../constants/colors';
+import { BowlardColors, AppColors, UIColors, AppStyles } from '../../constants/colors';
 
 interface BowlardBoardProps {
   game: Game;
@@ -596,7 +596,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
                       },
                     }}
                   >
-                    {getPinButtonText(pins)}
+                    <span style={AppStyles.monoFont}>{getPinButtonText(pins)}</span>
                   </Button>
                 </Grid>
               ))}

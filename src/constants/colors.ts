@@ -1,7 +1,18 @@
 /**
- * アプリ全体で使用する色の定数
- * 統一感のあるデザインを実現するための共通色設定
+ * アプリ全体で使用する色の定数とスタイル設定
+ * 統一感のあるデザインを実現するための共通色・フォント設定
  */
+
+/**
+ * アプリ全体で使用する共通スタイル設定
+ */
+export const AppStyles = {
+  // 数字表示用のモノスペースフォント設定
+  // 時間、スコア、ピン数など、数字の横幅を統一したい箇所で使用
+  monoFont: {
+    fontFamily: '"Courier New", Courier, "Lucida Console", Monaco, monospace',
+  },
+} as const;
 
 export const AppColors = {
   // ニュートラル（中立）色

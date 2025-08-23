@@ -12,7 +12,7 @@ import {
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
 import { getBallColor } from '../../utils/ballUtils';
-import { BallColors, UIColors, GameColors } from '../../constants/colors';
+import { BallColors, UIColors, GameColors, AppStyles } from '../../constants/colors';
 import ChessClock from '../ChessClock';
 
 interface RotationBoardProps {
@@ -115,7 +115,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
               {currentPlayer.name}
             </Typography>
             <Typography variant="body1" sx={{ color: 'black' }}>
-              {currentPlayer.score}/{currentPlayer.targetScore || 0} ({t('game.remaining')}: {getRemainingScore(currentPlayer)})
+              <span style={AppStyles.monoFont}>{currentPlayer.score}</span>/<span style={AppStyles.monoFont}>{currentPlayer.targetScore || 0}</span> ({t('game.remaining')}: <span style={AppStyles.monoFont}>{getRemainingScore(currentPlayer)}</span>)
             </Typography>
           </Box>
         </Paper>
@@ -152,15 +152,15 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
               <CardContent>
                 <Typography variant="h6">{player.name}</Typography>
                 <Typography variant="h4" color="primary">
-                  {player.score}
+                  <span style={AppStyles.monoFont}>{player.score}</span>
                 </Typography>
                 {player.targetScore && (
                   <Typography variant="body2" color="text.secondary">
-                    {t('game.target')}: {player.targetScore}
+                    {t('game.target')}: <span style={AppStyles.monoFont}>{player.targetScore}</span>
                   </Typography>
                 )}
                 <Typography variant="body2" color="success.main">
-                  {t('game.remaining')}: {getRemainingScore(player)}
+                  {t('game.remaining')}: <span style={AppStyles.monoFont}>{getRemainingScore(player)}</span>
                 </Typography>
                 
                 {/* Pocketed Balls Display */}
@@ -214,7 +214,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                             fontSize: '0.75rem',
                             fontWeight: 'bold'
                           }}>
-                            {ballNumber}
+                            <span style={AppStyles.monoFont}>{ballNumber}</span>
                           </span>
                         </Box>
                       ))
@@ -302,7 +302,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                     },
                   }}
                 >
-                  <span>{ballNumber}</span>
+                  <span style={AppStyles.monoFont}>{ballNumber}</span>
                 </Button>
               </Grid>
             ))}

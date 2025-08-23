@@ -95,7 +95,9 @@ describe('SetMatchBoard', () => {
     expect(screen.getByText('1')).toBeInTheDocument(); // Player 2's sets
 
     // Check if target sets are displayed
-    expect(screen.getAllByText(/セット数: 3/)).toHaveLength(2);
+    expect(screen.getAllByText((_, node) => {
+      return node?.textContent?.includes('セット数: 3') || false;
+    })).toHaveLength(2);
   });
 
   it('should call onWinSet when player card is clicked', () => {
@@ -1256,7 +1258,9 @@ describe('SetMatchBoard', () => {
       expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
       
       // Set match player cards should also be present
-      const setCountElements = screen.getAllByText('セット数: 3');
+      const setCountElements = screen.getAllByText((_, node) => {
+        return node?.textContent === 'セット数: 3';
+      });
       expect(setCountElements.length).toBeGreaterThanOrEqual(2); // Both players show set count
       
       // Both should be visible simultaneously

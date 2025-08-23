@@ -204,7 +204,9 @@ describe('VictoryScreen', () => {
     
     // Should show pocketed balls by rack
     expect(screen.getByText('ポケットしたボール')).toBeInTheDocument();
-    expect(screen.getByText('ラック 1')).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 1';
+    })).toBeInTheDocument();
   });
 
   it('should handle SET_MATCH with empty score history', () => {
@@ -442,9 +444,15 @@ describe('VictoryScreen', () => {
     
     // Should show pocketed balls section with rack structure
     expect(screen.getByText('ポケットしたボール')).toBeInTheDocument();
-    expect(screen.getByText('ラック 1')).toBeInTheDocument();
-    expect(screen.getByText('Player 1 (3個)')).toBeInTheDocument();
-    expect(screen.getByText('Player 2 (2個)')).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 1';
+    })).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'Player 1 (3個)';
+    })).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'Player 2 (2個)';
+    })).toBeInTheDocument();
   });
 
   it('should calculate inning scores correctly for ROTATION game', () => {
@@ -577,9 +585,15 @@ describe('VictoryScreen', () => {
     
     // Should show pocketed balls section with correct counts and rack structure
     expect(screen.getByText('ポケットしたボール')).toBeInTheDocument();
-    expect(screen.getByText('ラック 1')).toBeInTheDocument();
-    expect(screen.getByText('Player 1 (4個)')).toBeInTheDocument();
-    expect(screen.getByText('Player 2 (2個)')).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 1';
+    })).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'Player 1 (4個)';
+    })).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'Player 2 (2個)';
+    })).toBeInTheDocument();
   });
 
   it('should display pocketed balls by rack for multiple racks', () => {
@@ -706,15 +720,27 @@ describe('VictoryScreen', () => {
     
     // Should show pocketed balls section with multiple racks
     expect(screen.getByText('ポケットしたボール')).toBeInTheDocument();
-    expect(screen.getByText('ラック 1')).toBeInTheDocument();
-    expect(screen.getByText('ラック 2')).toBeInTheDocument();
-    expect(screen.getByText('ラック 3')).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 1';
+    })).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 2';
+    })).toBeInTheDocument();
+    expect(screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 3';
+    })).toBeInTheDocument();
     
     // Check rack-specific ball counts
     // Note: The UI shows balls per rack, not total balls
-    const rack1Section = screen.getByText('ラック 1').closest('div');
-    const rack2Section = screen.getByText('ラック 2').closest('div');
-    const rack3Section = screen.getByText('ラック 3').closest('div');
+    const rack1Section = screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 1';
+    }).closest('div');
+    const rack2Section = screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 2';
+    }).closest('div');
+    const rack3Section = screen.getByText((_, node) => {
+      return node?.textContent === 'ラック 3';
+    }).closest('div');
     
     expect(rack1Section).toBeInTheDocument();
     expect(rack2Section).toBeInTheDocument();

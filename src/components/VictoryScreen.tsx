@@ -40,7 +40,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import type { Game } from '../types/index';
 import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
-import { UIColors, BowlardColors } from '../constants/colors';
+import { UIColors, BowlardColors, AppStyles } from '../constants/colors';
 
 ChartJS.register(
   CategoryScale,
@@ -85,7 +85,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     const duration = game.endTime.getTime() - game.startTime.getTime();
     const minutes = Math.floor(duration / 60000);
     const seconds = Math.floor((duration % 60000) / 1000);
-    return language === 'en' ? `${minutes}m ${seconds}s` : `${minutes}分${seconds}秒`;
+    return language === 'en' ? (<span style={AppStyles.monoFont}>{minutes}m {seconds}s</span>) : (<span style={AppStyles.monoFont}>{minutes}分{seconds}秒</span>);
   };
 
 
@@ -358,7 +358,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
               </TableCell>
               {Array.from({ length: totalSetsPlayed }, (_, i) => (
                 <TableCell key={i + 1} align="center" sx={{ fontWeight: 'bold', minWidth: 50 }}>
-                  {i + 1}
+                  <span style={AppStyles.monoFont}>{i + 1}</span>
                 </TableCell>
               ))}
             </TableRow>
@@ -460,7 +460,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              {t('setup.gameType.bowlard')} - {t('victory.finalScore')}: {game.players[0]?.score || 0}
+              {t('setup.gameType.bowlard')} - {t('victory.finalScore')}: <span style={AppStyles.monoFont}>{game.players[0]?.score || 0}</span>
             </Typography>
             
             {/* ボーリングスコアシート（表形式） */}
@@ -484,7 +484,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                       backgroundColor: BowlardColors.number.background
                     }}
                   >
-                    {i + 1}
+                    <span style={AppStyles.monoFont}>{i + 1}</span>
                   </Box>
                 ))}
                 
@@ -585,7 +585,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                         justifyContent: 'center'
                       }}
                     >
-                      {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                      <span style={AppStyles.monoFont}>{frame?.isComplete && frame?.score !== undefined ? frame.score : ''}</span>
                     </Box>
                   );
                 })}
@@ -670,7 +670,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                           justifyContent: 'center'
                         }}
                       >
-                        {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                        <span style={AppStyles.monoFont}>{frame?.isComplete && frame?.score !== undefined ? frame.score : ''}</span>
                       </Box>
                     );
                   })}
@@ -800,7 +800,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                           justifyContent: 'center'
                         }}
                       >
-                        {frame?.isComplete && frame?.score !== undefined ? frame.score : ''}
+                        <span style={AppStyles.monoFont}>{frame?.isComplete && frame?.score !== undefined ? frame.score : ''}</span>
                       </Box>
                     );
                   })}
@@ -834,7 +834,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                     <Typography><strong>プレイ時間:</strong> {getGameDuration()}</Typography>
                   </Box>
                   {game.type === GameType.ROTATION && (
-                    <Typography><strong>ラック数:</strong> {game.totalRacks}</Typography>
+                    <Typography><strong>ラック数:</strong> <span style={AppStyles.monoFont}>{game.totalRacks}</span></Typography>
                   )}
                 </Stack>
               </Paper>
@@ -868,8 +868,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                           </Box>
                           <Typography variant="h6" color="primary">
                             {game.type === GameType.SET_MATCH 
-                              ? `${calculateActualSetsWon(player.id)}セット` 
-                              : `${player.score}点`
+                              ? <span style={AppStyles.monoFont}>{`${calculateActualSetsWon(player.id)}セット`}</span>
+                              : <span style={AppStyles.monoFont}>{`${player.score}点`}</span>
                             }
                           </Typography>
                         </Box>
@@ -922,12 +922,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
               {rackData.map(rack => (
                 <Box key={rack.rackNumber} sx={{ mb: 4 }}>
                   <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
-                    ラック {rack.rackNumber}
+                    ラック <span style={AppStyles.monoFont}>{rack.rackNumber}</span>
                   </Typography>
                   {rack.players.map(playerData => (
                     <Box key={playerData.playerId} sx={{ mb: 2, ml: 2 }}>
                       <Typography variant="subtitle1" gutterBottom>
-                        {playerData.playerName} ({playerData.ballsPocketed.length}個)
+                        {playerData.playerName} (<span style={AppStyles.monoFont}>{playerData.ballsPocketed.length}</span>個)
                       </Typography>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, ml: 1 }}>
                         {playerData.ballsPocketed.length > 0 ? (

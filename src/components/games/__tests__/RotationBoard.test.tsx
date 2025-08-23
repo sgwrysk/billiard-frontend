@@ -89,7 +89,9 @@ describe('RotationBoard', () => {
     expect(tenTexts.length).toBeGreaterThan(0); // Player 2's score (and ball 10)
 
     // Check if target scores are displayed
-    expect(screen.getAllByText(/目標: 50/)).toHaveLength(2);
+    expect(screen.getAllByText((_, node) => {
+      return node?.textContent?.includes('目標: 50') || false;
+    })).toHaveLength(2);
 
     // Check if remaining scores are displayed
     expect(screen.getByText(/残り: 35/)).toBeInTheDocument(); // Player 1 remaining: 50-15=35
@@ -844,7 +846,9 @@ describe('RotationBoard', () => {
       expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
       
       // Rotation board player cards should also be present
-      expect(screen.getAllByText(/目標: 50/)).toHaveLength(2);
+      expect(screen.getAllByText((_, node) => {
+      return node?.textContent?.includes('目標: 50') || false;
+    })).toHaveLength(2);
       
       // Both should be visible simultaneously
       const playerCards = screen.getAllByText(/Player 1|Player 2/);

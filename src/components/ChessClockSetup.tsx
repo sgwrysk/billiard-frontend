@@ -13,6 +13,7 @@ import { Add, Remove } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { ChessClockSettings } from '../types/index';
 import { ToggleSwitch } from './common';
+import { AppStyles } from '../constants/colors';
 
 interface ChessClockSetupProps {
   chessClock: ChessClockSettings;
@@ -107,7 +108,7 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
             {presetTimeLimits.map((time) => (
               <Chip
                 key={time}
-                label={time.toString()}
+                label={<span style={AppStyles.monoFont}>{time.toString()}</span>}
                 size="small"
                 onClick={() => handlePresetTimeLimitChange(time)}
                 variant={chessClock.timeLimit === time ? 'filled' : 'outlined'}
@@ -141,7 +142,7 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
                           handlePlayerTimeLimitChange(index, value);
                         }}
                         sx={{ width: 60 }}
-                        inputProps={{ min: 1, style: { textAlign: 'center' } }}
+                        inputProps={{ min: 1, style: { ...AppStyles.monoFont, textAlign: 'center' } }}
                       />
                       <IconButton
                         size="small"
@@ -172,7 +173,7 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
                     handleTimeLimitChange(value);
                   }}
                   sx={{ width: 60 }}
-                  inputProps={{ min: 1, style: { textAlign: 'center' } }}
+                  inputProps={{ min: 1, style: { ...AppStyles.monoFont, textAlign: 'center' } }}
                 />
                 <IconButton
                   size="small"
@@ -225,7 +226,7 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
                   handleWarningTimeChange(value);
                 }}
                 sx={{ width: 60 }}
-                inputProps={{ min: 1, max: chessClock.timeLimit - 1, style: { textAlign: 'center' } }}
+                inputProps={{ min: 1, max: chessClock.timeLimit - 1, style: { ...AppStyles.monoFont, textAlign: 'center' } }}
               />
               <IconButton
                 size="small"

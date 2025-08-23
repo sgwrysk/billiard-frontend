@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
-import { UIColors, GameColors } from '../../constants/colors';
+import { UIColors, GameColors, AppStyles } from '../../constants/colors';
 import ChessClock from '../ChessClock';
 
 interface SetMatchBoardProps {
@@ -111,11 +111,11 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                     my: 2
                   }}
                 >
-                  {player.setsWon || 0}
+                  <span style={AppStyles.monoFont}>{player.setsWon || 0}</span>
                 </Typography>
                 {player.targetSets && (
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                    {t('game.targetSets')}: {player.targetSets}
+                    {t('game.targetSets')}: <span style={AppStyles.monoFont}>{player.targetSets}</span>
                   </Typography>
                 )}
               </CardContent>

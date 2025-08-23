@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { PlayArrow, Pause } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ChessClockColors, AppColors } from '../constants/colors';
+import { ChessClockColors, AppColors, AppStyles } from '../constants/colors';
 import type { ChessClockSettings, Player } from '../types/index';
 
 interface ChessClockProps {
@@ -201,7 +201,11 @@ const ChessClock: React.FC<ChessClockProps> = ({
           <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
             {players[0]?.name || t('setup.playerName') + ' 1'}
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 'bold', 
+            fontSize: { xs: '1.25rem', sm: '1.5rem' },
+            ...AppStyles.monoFont
+          }}>
             {formatTime(playerTimes[0]?.remainingTime || 0)}
           </Typography>
         </Box>
@@ -249,7 +253,11 @@ const ChessClock: React.FC<ChessClockProps> = ({
           <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
             {players[1]?.name || t('setup.playerName') + ' 2'}
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 'bold', 
+            fontSize: { xs: '1.25rem', sm: '1.5rem' },
+            ...AppStyles.monoFont
+          }}>
             {formatTime(playerTimes[1]?.remainingTime || 0)}
           </Typography>
         </Box>

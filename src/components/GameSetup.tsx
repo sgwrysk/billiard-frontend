@@ -199,7 +199,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                         value={player.targetSets || 5}
                         onChange={(value) => handleUpdatePlayerTargetSets(index, value)}
                         min={1}
-                        max={21}
+                        max={100}
                         step={1}
                       />
                     </Box>

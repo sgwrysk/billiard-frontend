@@ -152,6 +152,7 @@ describe('ChessClockSetup', () => {
       renderChessClockSetup(defaultChessClockSettings, mockOnChange);
       
       const timeInput = screen.getByDisplayValue('30');
+      fireEvent.focus(timeInput); // Need to focus first to enter editing mode
       fireEvent.change(timeInput, { target: { value: '45' } });
       fireEvent.blur(timeInput); // NumberInputStepper updates on blur
       
@@ -202,6 +203,7 @@ describe('ChessClockSetup', () => {
       renderChessClockSetup(individualTimeSettings, mockOnChange);
       
       const player1TimeInput = screen.getAllByDisplayValue('30')[0];
+      fireEvent.focus(player1TimeInput); // Need to focus first to enter editing mode
       fireEvent.change(player1TimeInput, { target: { value: '25' } });
       fireEvent.blur(player1TimeInput); // NumberInputStepper updates on blur
       
@@ -298,6 +300,7 @@ describe('ChessClockSetup', () => {
       renderChessClockSetup(warningEnabledSettings, mockOnChange);
       
       const warningTimeInput = screen.getByDisplayValue('3');
+      fireEvent.focus(warningTimeInput); // Need to focus first to enter editing mode
       fireEvent.change(warningTimeInput, { target: { value: '5' } });
       fireEvent.blur(warningTimeInput); // NumberInputStepper updates on blur
       

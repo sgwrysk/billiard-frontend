@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   IconButton,
@@ -27,6 +27,8 @@ const NumberInputStepper: React.FC<NumberInputStepperProps> = ({
   label,
   disabled = false,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   const handleDecrement = () => {
     if (!disabled && value > min) {
@@ -42,16 +44,46 @@ const NumberInputStepper: React.FC<NumberInputStepperProps> = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    if (newValue === '') {
-      onChange(min);
-    } else {
-      const numericValue = parseInt(newValue);
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!disabled) {
+      setIsEditing(true);
+      setInputValue(value.toString());
+      // Select all text when focusing
+      e.target.select();
+    }
+  };
+
+  const handleBlur = () => {
+    if (isEditing) {
+      const numericValue = parseInt(inputValue);
       if (!isNaN(numericValue)) {
         const clampedValue = Math.max(min, Math.min(max, numericValue));
         onChange(clampedValue);
+      } else {
+        // If invalid input, keep current value
+        onChange(value);
       }
+      setIsEditing(false);
+      setInputValue('');
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isEditing) {
+      const newValue = e.target.value;
+      // Allow empty string and digits only
+      if (newValue === '' || /^\d+$/.test(newValue)) {
+        setInputValue(newValue);
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleBlur();
+    } else if (e.key === 'Escape') {
+      setIsEditing(false);
+      setInputValue('');
     }
   };
 
@@ -73,18 +105,30 @@ const NumberInputStepper: React.FC<NumberInputStepperProps> = ({
         
         <TextField
           type="text"
-          value={value.toString()}
+          value={isEditing ? inputValue : value.toString()}
           onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           size="small"
           disabled={disabled}
+          inputProps={{
+            style: {
+              textAlign: 'center',
+              color: '#000000',
+              ...AppStyles.monoFont,
+            }
+          }}
           sx={{
             width: 60,
             '& .MuiInputBase-input': {
-              textAlign: 'center',
-              ...AppStyles.monoFont,
+              color: '#000000 !important',
             },
             '& .MuiOutlinedInput-input': {
-              color: 'rgba(0, 0, 0, 0.87) !important',
+              color: '#000000 !important',
+            },
+            '& input': {
+              color: '#000000 !important',
             }
           }}
         />

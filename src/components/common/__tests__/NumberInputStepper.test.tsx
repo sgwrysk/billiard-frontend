@@ -121,7 +121,7 @@ describe('NumberInputStepper', () => {
     expect(valueInput).toBeInTheDocument();
   });
 
-  it('should handle text input and update value immediately', () => {
+  it('should handle text input and update value on blur', () => {
     const mockOnChange = vi.fn();
     render(
       <TestWrapper>
@@ -130,12 +130,14 @@ describe('NumberInputStepper', () => {
     );
 
     const input = screen.getByDisplayValue('5');
+    fireEvent.focus(input);
     fireEvent.change(input, { target: { value: '15' } });
+    fireEvent.blur(input);
 
     expect(mockOnChange).toHaveBeenCalledWith(15);
   });
 
-  it('should update value on text change', () => {
+  it('should update value on Enter key press', () => {
     const mockOnChange = vi.fn();
     render(
       <TestWrapper>
@@ -144,12 +146,14 @@ describe('NumberInputStepper', () => {
     );
 
     const input = screen.getByDisplayValue('5');
+    fireEvent.focus(input);
     fireEvent.change(input, { target: { value: '8' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
 
     expect(mockOnChange).toHaveBeenCalledWith(8);
   });
 
-  it('should call onChange when input value changes', () => {
+  it('should handle Escape key to cancel editing', () => {
     const mockOnChange = vi.fn();
     render(
       <TestWrapper>
@@ -158,9 +162,12 @@ describe('NumberInputStepper', () => {
     );
 
     const input = screen.getByDisplayValue('5');
+    fireEvent.focus(input);
     fireEvent.change(input, { target: { value: '8' } });
+    fireEvent.keyDown(input, { key: 'Escape' });
 
-    expect(mockOnChange).toHaveBeenCalledWith(8);
+    expect(mockOnChange).not.toHaveBeenCalled();
+    expect(screen.getByDisplayValue('5')).toBeInTheDocument(); // Should show original value
   });
 
   it('should clamp input value to min/max range', () => {
@@ -172,7 +179,9 @@ describe('NumberInputStepper', () => {
     );
 
     const input = screen.getByDisplayValue('5');
+    fireEvent.focus(input);
     fireEvent.change(input, { target: { value: '15' } });
+    fireEvent.blur(input);
 
     expect(mockOnChange).toHaveBeenCalledWith(10); // Should be clamped to max
   });
@@ -228,5 +237,41 @@ describe('NumberInputStepper', () => {
     
     // Check if monospace font family is applied
     expect(computedStyles.fontFamily).toContain('Courier New');
+  });
+
+  it('should allow clearing all digits during editing', () => {
+    const mockOnChange = vi.fn();
+    render(
+      <TestWrapper>
+        <NumberInputStepper value={123} onChange={mockOnChange} />
+      </TestWrapper>
+    );
+
+    const input = screen.getByDisplayValue('123');
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: '' } });
+    
+    // Should allow empty input during editing
+    expect(input).toHaveValue('');
+    
+    // But when blur with empty, should keep original value
+    fireEvent.blur(input);
+    expect(mockOnChange).toHaveBeenCalledWith(123);
+  });
+
+  it('should select all text on focus', () => {
+    const mockOnChange = vi.fn();
+    render(
+      <TestWrapper>
+        <NumberInputStepper value={123} onChange={mockOnChange} />
+      </TestWrapper>
+    );
+
+    const input = screen.getByDisplayValue('123') as HTMLInputElement;
+    const selectSpy = vi.spyOn(input, 'select');
+    
+    fireEvent.focus(input);
+    
+    expect(selectSpy).toHaveBeenCalled();
   });
 });

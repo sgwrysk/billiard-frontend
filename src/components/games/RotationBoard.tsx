@@ -100,7 +100,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
         <Paper
           sx={{
             position: 'fixed',
-            top: 0,
+            top: 64,
             left: 0,
             right: 0,
             zIndex: 1100,

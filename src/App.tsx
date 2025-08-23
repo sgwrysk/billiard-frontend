@@ -319,7 +319,7 @@ const AppContent: React.FC = () => {
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'grey.50' }}>
       {/* App bar */}
-      <AppBar position="static">
+      <AppBar position="fixed" sx={{ zIndex: 1200 }}>
         <Toolbar>
           {/* Hamburger menu */}
           <IconButton
@@ -413,7 +413,7 @@ const AppContent: React.FC = () => {
       </Menu>
 
       {/* Main content */}
-      <Container maxWidth="lg" sx={{ py: 3, minHeight: 'calc(100vh - 64px)' }}>
+      <Container maxWidth="lg" sx={{ py: 3, mt: 8, minHeight: 'calc(100vh - 64px)' }}>
         {currentScreen === AppScreen.HOME && (
           <GameSetup onStartGame={handleStartGame} />
         )}

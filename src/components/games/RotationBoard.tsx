@@ -82,6 +82,26 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
 
   return (
     <Box>
+      {/* Swap players link-like button */}
+      {canSwapPlayers && onSwapPlayers && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+          <Button
+            variant="text"
+            color="primary"
+            startIcon={<span style={{ fontSize: '1.1rem' }}>🔄</span>}
+            onClick={onSwapPlayers}
+            sx={{
+              px: 0,
+              minWidth: 'auto',
+              textDecoration: 'underline',
+              '&:hover': { textDecoration: 'underline' },
+            }}
+            title={t('game.swapPlayers')}
+          >
+            {t('game.swapPlayers')}
+          </Button>
+        </Box>
+      )}
       {/* Chess Clock */}
       {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (
         <Box sx={{ mb: 3 }}>
@@ -323,52 +343,30 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           </Button>
         </Grid>
         <Grid item xs={12} sm={6}>
-          {canSwapPlayers && onSwapPlayers ? (
-            <Button 
-              variant="outlined" 
-              fullWidth 
-              startIcon={<span style={{ fontSize: '1.2rem' }}>🔄</span>}
-              onClick={onSwapPlayers}
-              sx={{
-                borderColor: 'primary.main',
-                color: 'primary.main',
-                height: '48px',
-                minHeight: '48px',
-                '&:hover': {
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  borderColor: 'primary.main',
-                },
-              }}
-            >
-              {t('game.swapPlayers')}
-            </Button>
-          ) : (
-            <Button 
-              variant="outlined" 
-              fullWidth 
-              onClick={onUndoLastShot}
-              disabled={game.shotHistory.length === 0}
-              sx={{ 
-                height: '48px',
-                minHeight: '48px',
+          <Button 
+            variant="outlined" 
+            fullWidth 
+            onClick={onUndoLastShot}
+            disabled={game.shotHistory.length === 0}
+            sx={{ 
+              height: '48px',
+              minHeight: '48px',
+              borderColor: '#e0e0e0',
+              color: '#666666',
+              '&:hover': {
+                backgroundColor: '#e0e0e0',
+                color: '#666666',
+                borderColor: '#e0e0e0',
+              },
+              '&:disabled': {
                 borderColor: '#e0e0e0',
                 color: '#666666',
-                '&:hover': {
-                  backgroundColor: '#e0e0e0',
-                  color: '#666666',
-                  borderColor: '#e0e0e0',
-                },
-                '&:disabled': {
-                  borderColor: '#e0e0e0',
-                  color: '#666666',
-                  opacity: 0.6,
-                },
-              }}
-            >
-              {t('game.undo')}
-            </Button>
-          )}
+                opacity: 0.6,
+              },
+            }}
+          >
+            {t('game.undo')}
+          </Button>
         </Grid>
       </Grid>
     </Box>

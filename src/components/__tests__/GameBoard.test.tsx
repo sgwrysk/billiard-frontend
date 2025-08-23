@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import GameBoard from '../GameBoard';
 import { LanguageProvider } from '../../contexts/LanguageContext';
@@ -274,7 +274,7 @@ describe('GameBoard', () => {
   describe('Time handling', () => {
     it('handles time up events for players', () => {
       const game = createMockGame(GameType.SET_MATCH);
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       render(
         <MockLanguageProvider>

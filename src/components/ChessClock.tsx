@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
   Typography,
   Paper,
-  Slide,
 } from '@mui/material';
 import { PlayArrow, Pause } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -36,8 +35,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
   const [isRunning, setIsRunning] = useState(false);
   const [playerTimes, setPlayerTimes] = useState<PlayerTimeState[]>([]);
   const [lastUpdateTime, setLastUpdateTime] = useState<number>(Date.now());
-  const [showStickyVersion, setShowStickyVersion] = useState(false);
-  const chessClockRef = useRef<HTMLDivElement>(null);
+  // Always show fixed version
 
   // Initialize player times only once when component mounts or chess clock is enabled
   useEffect(() => {
@@ -64,18 +62,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
     // Note: We don't reset lastUpdateTime here to preserve the continuous timer
   }, [currentPlayerIndex]);
 
-  // Scroll monitoring for sticky version
-  useEffect(() => {
-    const handleScroll = () => {
-      if (chessClockRef.current) {
-        const rect = chessClockRef.current.getBoundingClientRect();
-        setShowStickyVersion(rect.bottom < 64); // Show sticky when original is hidden behind AppBar
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // No scroll monitoring needed for fixed header
 
   // Timer logic
   useEffect(() => {
@@ -278,38 +265,26 @@ const ChessClock: React.FC<ChessClockProps> = ({
 
   return (
     <Box>
-      {/* Sticky Chess Clock */}
-      <Slide direction="down" in={showStickyVersion} mountOnEnter unmountOnExit>
-        <Paper
-          sx={{
-            position: 'fixed',
-            top: 64,
-            left: 0,
-            right: 0,
-            zIndex: 1050,
-            p: { xs: 1.5, sm: 2 },
-            backgroundColor: ChessClockColors.background,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          }}
-        >
-          <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>
-            {renderChessClockContent()}
-          </Box>
-        </Paper>
-      </Slide>
-
-      {/* Original Chess Clock */}
-      <Paper 
-        ref={chessClockRef}
-        elevation={2} 
-        sx={{ 
-          p: { xs: 1.5, sm: 2 }, // 小画面ではパディングを少し小さく
-          mb: 2, 
+      {/* Fixed Chess Clock under AppBar */}
+      <Paper
+        sx={{
+          position: 'fixed',
+          top: 64,
+          left: 0,
+          right: 0,
+          zIndex: 1050,
+          p: { xs: 1.5, sm: 2 },
           backgroundColor: ChessClockColors.background,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         }}
       >
-        {renderChessClockContent()}
+        <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>
+          {renderChessClockContent()}
+        </Box>
       </Paper>
+
+      {/* Spacer to avoid overlap with fixed header */}
+      <Box sx={{ height: { xs: 96, sm: 112 }, mb: 2 }} />
     </Box>
   );
 };

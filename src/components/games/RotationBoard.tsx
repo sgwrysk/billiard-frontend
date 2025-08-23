@@ -100,10 +100,10 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
         <Paper
           sx={{
             position: 'fixed',
-            top: 64,
+            top: game.chessClock?.enabled ? 144 : 64, // チェスクロック有効時は下にずらす
             left: 0,
             right: 0,
-            zIndex: 1100,
+            zIndex: 1040,
             p: 2,
             backgroundColor: UIColors.background.white,
             borderBottom: `1px solid ${UIColors.border.light}`,

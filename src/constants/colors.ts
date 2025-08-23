@@ -223,6 +223,12 @@ export const GameColors = {
     background: AppColors.success.strong.background,
     text: AppColors.success.strong.text,
   },
+  // リーチ状態（あと1セットで勝利）
+  reach: {
+    background: '#ffebee', // 薄い赤の背景
+    text: '#d32f2f',       // 濃い赤のテキスト
+    border: '#d32f2f',     // 濃い赤のボーダー
+  },
 } as const;
 
 /**

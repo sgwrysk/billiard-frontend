@@ -37,19 +37,28 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  // リーチ状態の判定（あと1セットで勝利）
+  const isPlayerInReach = (player: typeof game.players[0]) => {
+    return player.targetSets && player.setsWon === (player.targetSets - 1);
+  };
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      minHeight: 'calc(100vh - 64px)',
+      // Add top padding when chess clock is enabled to prevent overlap
+      pt: game.chessClock?.enabled ? { xs: 10, sm: 12 } : 0
+    }}>
       {/* Chess Clock */}
       {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (
-        <Box sx={{ mb: 3 }}>
-          <ChessClock
-            chessClock={game.chessClock}
-            players={game.players}
-            currentPlayerIndex={game.currentPlayerIndex}
-            onTimeUp={onTimeUp}
-            onPlayerSelect={onSwitchToPlayer}
-          />
-        </Box>
+        <ChessClock
+          chessClock={game.chessClock}
+          players={game.players}
+          currentPlayerIndex={game.currentPlayerIndex}
+          onTimeUp={onTimeUp}
+          onPlayerSelect={onSwitchToPlayer}
+        />
       )}
 
       {/* Player Cards - keep compact to ensure bottom controls are visible */}
@@ -77,11 +86,22 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 },
               }}
             >
-              <CardContent sx={{ textAlign: 'center', py: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <CardContent sx={{ 
+                textAlign: 'center', 
+                py: { xs: 0.25, md: 0.5 }, 
+                px: { xs: 0.25, md: 0.5 },
+                display: 'flex', 
+                flexDirection: 'column', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '100%',
+                minHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' }
+              }}>
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    mb: 1.5,
+                    mt: { xs: 0.5, md: 0.8 },
+                    mb: 0,
                     fontSize: { xs: '1rem', md: '1.25rem', lg: '1.4rem' },
                     fontWeight: 700,
                   }}
@@ -114,14 +134,22 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 })()}
                 
                 <Typography 
-                  color="primary"
                   sx={{ 
-                    // Small screens keep fixed size; md+ scales fluidly with viewport width and caps at a max
-                    fontSize: { xs: '4.5rem', sm: '5.5rem', md: 'clamp(7rem, 9vw, 16rem)' },
+                    color: isPlayerInReach(player) ? GameColors.reach.text : 'primary.main',
+                    // Responsive font size that scales with both viewport and container
+                    // xs: 5rem, sm: 6.5rem, md: starts from 8rem and scales with viewport, capped at 20rem
+                    fontSize: { 
+                      xs: '5rem', 
+                      sm: '6.5rem', 
+                      md: 'clamp(8rem, 12vw, 20rem)',
+                      lg: 'clamp(10rem, 14vw, 24rem)'
+                    },
                     fontWeight: 'bold',
                     lineHeight: 1,
                     textAlign: 'center',
-                    my: { xs: 1.5, md: 2.5 }
+                    my: 0,
+                    // Additional spacing adjustments for larger text
+                    minHeight: { xs: '2.5rem', sm: '4rem', md: '5.5rem', lg: '6.5rem' },
                   }}
                 >
                   <span style={AppStyles.monoFont}>{player.setsWon || 0}</span>
@@ -130,7 +158,7 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                   <Typography 
                     variant="body2" 
                     color="text.secondary" 
-                    sx={{ mt: 2, fontSize: { xs: '0.85rem', md: '1rem' } }}
+                    sx={{ mt: { xs: 0.05, md: 0.1 }, fontSize: { xs: '0.85rem', md: '1rem' } }}
                   >
                     {t('game.targetSets')}: <span style={AppStyles.monoFont}>{player.targetSets}</span>
                   </Typography>
@@ -142,8 +170,11 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
       </Grid>
       </Box>
 
+      {/* Set history (always visible, even with no history yet) */}
+      <SetHistory game={game} />
+
       {/* Top controls row: swap link (left) and undo button (right). Keep layout stable when swap is hidden */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: -1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: 2 }}>
         {canSwapPlayers && onSwapPlayers ? (
           <Button
             variant="text"
@@ -188,9 +219,6 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
           {t('game.undo')}
         </Button>
       </Box>
-
-      {/* Set history (always visible, even with no history yet) */}
-      <SetHistory game={game} />
 
       {/* Action Buttons row removed; undo moved to top controls */}
     </Box>

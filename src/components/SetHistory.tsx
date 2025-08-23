@@ -37,24 +37,24 @@ const SetHistory: React.FC<SetHistoryProps> = ({ game }) => {
     const suggested = totalSetsPlayed + minAdditionalToFinish;
     visibleSetCount = Math.max(minInitial, suggested, 1);
   }
-  const tableMinWidth = 180 + 56 * visibleSetCount;
+  const tableMinWidth = 120 + 56 * visibleSetCount;
 
   return (
     <Card variant="outlined" sx={{ mb: 2, bgcolor: 'grey.50' }}>
       <CardContent>
         <TableContainer component={Paper} sx={{ width: '100%', overflowX: 'auto' }}>
-          <Table size="small" sx={{ tableLayout: 'fixed', width: '100%', minWidth: tableMinWidth, '& .MuiTableCell-root': { py: 1, px: 1.25 }, '& thead .MuiTableCell-root': { py: 1, height: 36 } }}>
+          <Table size="small" sx={{ tableLayout: 'auto', width: '100%', minWidth: tableMinWidth, '& .MuiTableCell-root': { py: 1, px: 1.25 }, '& thead .MuiTableCell-root': { py: 1, height: 36 } }}>
             {/* Fix column widths and keep a minimum of one set column so height stays */}
             <colgroup>
-              {/* Player name column: auto width to fit content */}
-              <col />
+              {/* Player name column: fit content with minimal padding */}
+              <col style={{ width: '1%' }} />
               {Array.from({ length: visibleSetCount }, (_, i) => (
                 <col key={`set-col-${i}`} style={{ width: 56 }} />
               ))}
             </colgroup>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold', minWidth: 120, position: 'sticky', left: 0, zIndex: 3, bgcolor: 'background.paper', borderRight: '1px solid', borderColor: 'divider' }} />
+                <TableCell sx={{ fontWeight: 'bold', width: '1%', whiteSpace: 'nowrap', position: 'sticky', left: 0, zIndex: 3, bgcolor: 'background.paper', borderRight: '1px solid', borderColor: 'divider' }} />
                 {Array.from({ length: visibleSetCount }, (_, i) => (
                   <TableCell key={`set-head-${i}`} align="center" sx={{ fontWeight: 'bold' }}>
                     <span style={AppStyles.monoFont as any}>{i + 1}</span>
@@ -65,7 +65,7 @@ const SetHistory: React.FC<SetHistoryProps> = ({ game }) => {
             <TableBody>
               {game.players.map(player => (
                 <TableRow key={player.id}>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: 'grey.50', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', position: 'sticky', left: 0, zIndex: 2, borderRight: '1px solid', borderColor: 'divider' }}>{player.name}</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: 'grey.50', whiteSpace: 'nowrap', position: 'sticky', left: 0, zIndex: 2, borderRight: '1px solid', borderColor: 'divider', width: '1%', pr: 2 }}>{player.name}</TableCell>
                   {Array.from({ length: visibleSetCount }, (_, setIndex) => {
                     const isWinner = setWins[setIndex]?.playerId === player.id;
                     const isVisible = setIndex < totalSetsPlayed;

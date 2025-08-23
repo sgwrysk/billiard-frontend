@@ -108,12 +108,12 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
             {presetTimeLimits.map((time) => (
               <Chip
                 key={time}
-                label={<span style={AppStyles.monoFont}>{time.toString()}</span>}
+                label={time.toString()}
                 size="small"
                 onClick={() => handlePresetTimeLimitChange(time)}
                 variant={chessClock.timeLimit === time ? 'filled' : 'outlined'}
                 color={chessClock.timeLimit === time ? 'primary' : 'default'}
-                sx={{ cursor: 'pointer' }}
+                sx={{ ...AppStyles.monoFont, cursor: 'pointer' }}
               />
             ))}
           </Box>

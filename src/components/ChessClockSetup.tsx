@@ -6,7 +6,7 @@ import {
   Typography,
   TextField,
   IconButton,
-  Button,
+  Chip,
   Grid,
 } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
@@ -106,21 +106,15 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
           {/* Preset time limits */}
           <Box sx={{ mb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {presetTimeLimits.map((time) => (
-              <Button
+              <Chip
                 key={time}
+                label={time.toString()}
                 size="small"
-                variant={chessClock.timeLimit === time ? 'contained' : 'outlined'}
-                color={chessClock.timeLimit === time ? 'primary' : 'inherit'}
                 onClick={() => handlePresetTimeLimitChange(time)}
-                sx={{
-                  minWidth: '48px',
-                  height: '32px',
-                  ...AppStyles.monoFont,
-                  fontSize: '0.875rem'
-                }}
-              >
-                {time}
-              </Button>
+                variant={chessClock.timeLimit === time ? 'filled' : 'outlined'}
+                color={chessClock.timeLimit === time ? 'primary' : 'default'}
+                sx={{ cursor: 'pointer' }}
+              />
             ))}
           </Box>
           

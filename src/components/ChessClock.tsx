@@ -166,7 +166,10 @@ const ChessClock: React.FC<ChessClockProps> = ({
         setIsRunning(false);
       }
       // Don't reset lastUpdateTime here - let the timer continue naturally
-      onPlayerSelect(playerIndex);
+      
+      // チェスクロックの正しい動作：自分のボタンを押すと相手がアクティブになる
+      const nextPlayerIndex = playerIndex === 0 ? 1 : 0;
+      onPlayerSelect(nextPlayerIndex);
     }
   };
 
@@ -178,7 +181,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
       alignItems: 'center', 
       justifyContent: 'space-between',
       gap: { xs: 1, sm: 2 }, // 小画面ではギャップを小さく
-      minHeight: { xs: 70, sm: 80 }, // 小画面では高さを少し小さく
+      minHeight: { xs: 60, sm: 65 }, // より小さい高さに調整
       width: '100%',
     }}>
       {/* Player 1 Button */}
@@ -188,20 +191,29 @@ const ChessClock: React.FC<ChessClockProps> = ({
         onClick={() => handlePlayerSelect(0)}
         sx={{
           flex: 1,
-          minHeight: { xs: 50, sm: 60 }, // 小画面では高さを少し小さく
+          minHeight: { xs: 40, sm: 45 }, // より小さいサイズに調整
           fontSize: '1rem',
           fontWeight: 'bold',
+          ml: { xs: 4.5, sm: 6 }, // 左側の余白をさらに大きく
           ...getPlayerButtonStyle(0),
+          // フォーカス・選択エフェクトを無効化
+          '&:focus': { outline: 'none', boxShadow: 'none' },
+          '&:active': { outline: 'none', boxShadow: 'none' },
         }}
 
       >
         <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+          <Typography variant="body2" sx={{ 
+            fontWeight: 'bold', 
+            mb: 0.5, 
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            display: { xs: 'block', sm: 'none' }  // スマホのみ表示
+          }}>
             {players[0]?.name || t('setup.playerName') + ' 1'}
           </Typography>
           <Typography variant="h5" sx={{ 
             fontWeight: 'bold', 
-            fontSize: { xs: '1.25rem', sm: '1.5rem' },
+            fontSize: { xs: '1.25rem', sm: '2rem', md: '2.5rem' }, // より大きく表示
             ...AppStyles.monoFont
           }}>
             {formatTime(playerTimes[0]?.remainingTime || 0)}
@@ -215,8 +227,8 @@ const ChessClock: React.FC<ChessClockProps> = ({
         size="large"
         onClick={handleStartStop}
         sx={{
-          minWidth: { xs: 60, sm: 80 }, // 小画面では60px、通常では80px
-          minHeight: { xs: 50, sm: 60 }, // 小画面では50px、通常では60px
+          minWidth: { xs: 60, sm: 80 }, // 元のサイズに戻す
+          minHeight: { xs: 50, sm: 60 }, // 元のサイズに戻す
           backgroundColor: isRunning ? ChessClockColors.control.stop.background : ChessClockColors.control.start.background,
           color: 'white',
           '&:hover': {
@@ -226,9 +238,9 @@ const ChessClock: React.FC<ChessClockProps> = ({
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {isRunning ? (
-            <Pause sx={{ fontSize: { xs: 24, sm: 32 } }} /> // 小画面では24px、通常では32px
+            <Pause sx={{ fontSize: { xs: 24, sm: 32 } }} /> // 元のアイコンサイズに戻す
           ) : (
-            <PlayArrow sx={{ fontSize: { xs: 24, sm: 32 } }} /> // 小画面では24px、通常では32px
+            <PlayArrow sx={{ fontSize: { xs: 24, sm: 32 } }} /> // 元のアイコンサイズに戻す
           )}
         </Box>
       </Button>
@@ -240,20 +252,29 @@ const ChessClock: React.FC<ChessClockProps> = ({
         onClick={() => handlePlayerSelect(1)}
         sx={{
           flex: 1,
-          minHeight: { xs: 50, sm: 60 }, // 小画面では高さを少し小さく
+          minHeight: { xs: 40, sm: 45 }, // より小さいサイズに調整
           fontSize: '1rem',
           fontWeight: 'bold',
+          mr: { xs: 4.5, sm: 6 }, // 右側の余白をさらに大きく
           ...getPlayerButtonStyle(1),
+          // フォーカス・選択エフェクトを無効化
+          '&:focus': { outline: 'none', boxShadow: 'none' },
+          '&:active': { outline: 'none', boxShadow: 'none' },
         }}
 
       >
         <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+          <Typography variant="body2" sx={{ 
+            fontWeight: 'bold', 
+            mb: 0.5, 
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            display: { xs: 'block', sm: 'none' }  // スマホのみ表示
+          }}>
             {players[1]?.name || t('setup.playerName') + ' 2'}
           </Typography>
           <Typography variant="h5" sx={{ 
             fontWeight: 'bold', 
-            fontSize: { xs: '1.25rem', sm: '1.5rem' },
+            fontSize: { xs: '1.25rem', sm: '2rem', md: '2.5rem' }, // より大きく表示
             ...AppStyles.monoFont
           }}>
             {formatTime(playerTimes[1]?.remainingTime || 0)}

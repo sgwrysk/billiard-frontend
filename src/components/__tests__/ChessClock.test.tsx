@@ -332,7 +332,8 @@ describe('ChessClock', () => {
       const player1Button = screen.getByText('Alice').closest('button');
       fireEvent.click(player1Button!);
       
-      expect(mockOnPlayerSelect).toHaveBeenCalledWith(0);
+      // チェスクロックの正しい動作：プレイヤー1のボタンを押すとプレイヤー2がアクティブになる
+      expect(mockOnPlayerSelect).toHaveBeenCalledWith(1);
     });
 
     it('should call onPlayerSelect when player 2 button is clicked', () => {
@@ -342,7 +343,8 @@ describe('ChessClock', () => {
       const player2Button = screen.getByText('Bob').closest('button');
       fireEvent.click(player2Button!);
       
-      expect(mockOnPlayerSelect).toHaveBeenCalledWith(1);
+      // チェスクロックの正しい動作：プレイヤー2のボタンを押すとプレイヤー1がアクティブになる
+      expect(mockOnPlayerSelect).toHaveBeenCalledWith(0);
     });
 
     it('should call onPlayerSelect even when player time is up', async () => {
@@ -363,7 +365,8 @@ describe('ChessClock', () => {
       
       // Should still call onPlayerSelect when clicked
       fireEvent.click(player1Button!);
-      expect(mockOnPlayerSelect).toHaveBeenCalledWith(0);
+      // チェスクロックの正しい動作：プレイヤー1のボタンを押すとプレイヤー2がアクティブになる
+      expect(mockOnPlayerSelect).toHaveBeenCalledWith(1);
     });
 
     it('should stop timer when time-up player is selected', async () => {
@@ -389,7 +392,8 @@ describe('ChessClock', () => {
       expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
       
       // onPlayerSelect should be called
-      expect(mockOnPlayerSelect).toHaveBeenCalledWith(0);
+      // チェスクロックの正しい動作：プレイヤー1のボタンを押すとプレイヤー2がアクティブになる
+      expect(mockOnPlayerSelect).toHaveBeenCalledWith(1);
     });
   });
 

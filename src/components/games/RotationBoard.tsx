@@ -81,18 +81,19 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   };
 
   return (
-    <Box>
+    <Box sx={{ 
+      // Add top padding when chess clock is enabled to prevent overlap
+      pt: game.chessClock?.enabled ? { xs: 10, sm: 12 } : 0
+    }}>
       {/* Chess Clock */}
       {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (
-        <Box sx={{ mb: 3 }}>
-          <ChessClock
-            chessClock={game.chessClock}
-            players={game.players}
-            currentPlayerIndex={game.currentPlayerIndex}
-            onTimeUp={onTimeUp}
-            onPlayerSelect={onSwitchToPlayer}
-          />
-        </Box>
+        <ChessClock
+          chessClock={game.chessClock}
+          players={game.players}
+          currentPlayerIndex={game.currentPlayerIndex}
+          onTimeUp={onTimeUp}
+          onPlayerSelect={onSwitchToPlayer}
+        />
       )}
 
       {/* Sticky Header for Current Player */}

@@ -795,7 +795,8 @@ describe('RotationBoard', () => {
       
       fireEvent.click(player2ChessClockButton!);
       
-      expect(mockOnSwitchToPlayer).toHaveBeenCalledWith(1);
+      // チェスクロックの正しい動作：プレイヤー2のボタンを押すとプレイヤー1がアクティブになる
+      expect(mockOnSwitchToPlayer).toHaveBeenCalledWith(0);
     });
 
     it('should call onTimeUp when chess clock time runs out', async () => {

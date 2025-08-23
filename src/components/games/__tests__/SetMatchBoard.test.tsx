@@ -1145,7 +1145,8 @@ describe('SetMatchBoard', () => {
       
       fireEvent.click(bobChessClockButton!);
       
-      expect(mockOnSwitchToPlayer).toHaveBeenCalledWith(1);
+      // チェスクロックの正しい動作：プレイヤー2(Bob)のボタンを押すとプレイヤー1がアクティブになる
+      expect(mockOnSwitchToPlayer).toHaveBeenCalledWith(0);
     });
 
     it('should call onTimeUp when chess clock time runs out', async () => {

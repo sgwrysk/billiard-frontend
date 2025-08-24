@@ -876,4 +876,165 @@ describe('VictoryScreen', () => {
     // No set history table should be displayed
     expect(screen.queryByText('セット獲得履歴')).not.toBeInTheDocument();
   });
+
+  it('should render BOWLARD victory screen with bowling frames', () => {
+    const bowlardGame: Game = {
+      id: 'bowlard-test',
+      type: GameType.BOWLARD,
+      status: GameStatus.FINISHED,
+      players: [
+        {
+          id: 'player-1',
+          name: 'Bowler',
+          score: 150,
+          ballsPocketed: [],
+          isActive: false,
+          bowlingFrames: [
+            {
+              frameNumber: 1,
+              rolls: [7, 3],
+              score: 15,
+              isComplete: true,
+              isStrike: false,
+              isSpare: true
+            },
+            {
+              frameNumber: 2,
+              rolls: [10],
+              score: 35,
+              isComplete: true,
+              isStrike: true,
+              isSpare: false
+            }
+          ]
+        }
+      ],
+      currentPlayerIndex: 0,
+      currentRack: 1,
+      rackInProgress: false,
+      totalRacks: 0,
+      startTime: new Date(),
+      endTime: new Date(),
+      scoreHistory: [],
+      shotHistory: []
+    };
+
+    render(
+      <TestWrapper>
+        <VictoryScreen
+          game={bowlardGame}
+          onRematch={mockOnRematch}
+          onBackToMenu={mockOnBackToMenu}
+        />
+      </TestWrapper>
+    );
+
+    // Check if Bowlard specific content is displayed
+    expect(screen.getByText('ボーラード')).toBeInTheDocument();
+    expect(screen.getByText(/最終スコア/)).toBeInTheDocument();
+    expect(screen.getByText('150')).toBeInTheDocument();
+  });
+
+  it('should handle BOWLARD with no bowling frames', () => {
+    const bowlardGame: Game = {
+      id: 'bowlard-empty',
+      type: GameType.BOWLARD,
+      status: GameStatus.FINISHED,
+      players: [
+        {
+          id: 'player-1',
+          name: 'Bowler',
+          score: 0,
+          ballsPocketed: [],
+          isActive: false,
+          bowlingFrames: []
+        }
+      ],
+      currentPlayerIndex: 0,
+      currentRack: 1,
+      rackInProgress: false,
+      totalRacks: 0,
+      startTime: new Date(),
+      endTime: new Date(),
+      scoreHistory: [],
+      shotHistory: []
+    };
+
+    render(
+      <TestWrapper>
+        <VictoryScreen
+          game={bowlardGame}
+          onRematch={mockOnRematch}
+          onBackToMenu={mockOnBackToMenu}
+        />
+      </TestWrapper>
+    );
+
+    // Should still render the victory screen
+    expect(screen.getByText('ボーラード')).toBeInTheDocument();
+    expect(screen.getByText('0')).toBeInTheDocument();
+  });
+
+  it('should handle ROTATION with complex shot history and multiple racks', () => {
+    const rotationGame: Game = {
+      id: 'rotation-complex',
+      type: GameType.ROTATION,
+      status: GameStatus.FINISHED,
+      players: [
+        {
+          id: 'player-1',
+          name: 'Player A',
+          score: 45,
+          ballsPocketed: [1, 3, 5],
+          isActive: false,
+          targetScore: 61
+        },
+        {
+          id: 'player-2', 
+          name: 'Player B',
+          score: 61,
+          ballsPocketed: [2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+          isActive: false,
+          targetScore: 61
+        }
+      ],
+      currentPlayerIndex: 1,
+      currentRack: 2,
+      rackInProgress: false,
+      totalRacks: 2,
+      startTime: new Date(),
+      endTime: new Date(),
+      winner: 'player-2',
+      scoreHistory: [
+        { playerId: 'player-1', score: 1, timestamp: new Date() },
+        { playerId: 'player-1', score: 4, timestamp: new Date() },
+        { playerId: 'player-2', score: 2, timestamp: new Date() },
+        { playerId: 'player-2', score: 6, timestamp: new Date() }
+      ],
+      shotHistory: [
+        { playerId: 'player-1', ballNumber: 1, timestamp: new Date(), isSunk: true, isFoul: false },
+        { playerId: 'player-1', ballNumber: 3, timestamp: new Date(), isSunk: true, isFoul: false },
+        { playerId: 'player-2', ballNumber: 2, timestamp: new Date(), isSunk: true, isFoul: false },
+        { playerId: 'player-2', ballNumber: 4, timestamp: new Date(), isSunk: true, isFoul: false }
+      ]
+    };
+
+    render(
+      <TestWrapper>
+        <VictoryScreen
+          game={rotationGame}
+          onRematch={mockOnRematch}
+          onBackToMenu={mockOnBackToMenu}
+        />
+      </TestWrapper>
+    );
+
+    // Should show rotation-specific content
+    expect(screen.getByText('Player B')).toBeInTheDocument();
+    expect(screen.getByText('スコア推移')).toBeInTheDocument();
+    
+    // Should display rack information in game details
+    expect(screen.getByText('ラック数:')).toBeInTheDocument();
+  });
+
 });

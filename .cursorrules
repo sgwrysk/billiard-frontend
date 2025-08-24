@@ -1,0 +1,52 @@
+# Cursor Rules for Billiard Frontend Project
+
+## Code Quality & Testing
+- Always run `npm test` before any code changes
+- Always run `npm run build` before commits to ensure TypeScript compliance
+- Maintain 90%+ test coverage (`npm test -- --coverage`)
+- Fix all ESLint errors (warnings are acceptable)
+- Use shared test utilities from `src/__tests__/utils/testHelpers.tsx`
+
+## Git & Deployment
+- Run full test suite before any commit
+- Commit messages in Japanese describing functional changes
+- Always include: `🤖 Generated with [Claude Code](https://claude.ai/code)` and `Co-Authored-By: Claude <noreply@anthropic.com>`
+- Only push when explicitly requested
+
+## Architecture & Patterns
+- Follow existing Material-UI and TypeScript patterns
+- Maintain responsive design (xs, sm, md, lg breakpoints)
+- Use Japanese as primary UI language
+- Minimize use of `any` type
+- Prefer editing existing files over creating new ones
+
+## Game-Specific Rules
+- SetMatch: Set history and player swapping functionality
+- Rotation: Ball pocketing history and score calculation
+- Bowlard: Frame management and score display
+- ChessClock: Responsive design with correct interaction logic
+
+## File Structure
+- Components: `/src/components/` (UI components)
+- Games: `/src/games/` (game engines)
+- Tests: Follow existing `__tests__/` pattern
+- Utils: Shared utilities in `/src/utils/`
+- Types: All TypeScript definitions in `/src/types/`
+
+## Testing Standards
+- All new code must have corresponding tests
+- Use factory functions from testHelpers.tsx
+- Mock external dependencies properly
+- Test both happy path and edge cases
+- Maintain test file size under 1000 lines
+
+## Debugging Commands
+- Specific test: `npm test -- --run path/to/test.tsx`
+- Coverage details: `npm test -- --coverage --reporter=verbose`
+- Build verbose: `npm run build --verbose`
+
+## Remember
+- Mobile-first responsive design
+- Existing code patterns over new implementations
+- User experience and accessibility
+- Gradual improvements over major refactors

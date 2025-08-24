@@ -143,7 +143,6 @@ describe('LanguageContext', () => {
       return (
         <div>
           <span data-testid="current-language">{language}</span>
-          <span data-testid="buy-me-coffee-text">{t('menu.buyMeCoffee')}</span>
           <span data-testid="score-input-text">{t('menu.scoreInput')}</span>
           <button onClick={() => setLanguage('en')}>Switch to English</button>
           <button onClick={() => setLanguage('ja')}>Switch to Japanese</button>
@@ -151,18 +150,17 @@ describe('LanguageContext', () => {
       );
     };
 
-    it('should translate Buy Me Coffee correctly in Japanese', () => {
+    it('should translate Score Input correctly in Japanese', () => {
       render(
         <LanguageProvider>
           <MenuTestComponent />
         </LanguageProvider>
       );
 
-      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('開発者にコーヒーをおごる');
       expect(screen.getByTestId('score-input-text')).toHaveTextContent('スコア入力');
     });
 
-    it('should translate Buy Me Coffee correctly in English', () => {
+    it('should translate Score Input correctly in English', () => {
       render(
         <LanguageProvider>
           <MenuTestComponent />
@@ -171,11 +169,10 @@ describe('LanguageContext', () => {
 
       fireEvent.click(screen.getByText('Switch to English'));
 
-      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('Buy Coffee for Developer');
       expect(screen.getByTestId('score-input-text')).toHaveTextContent('Score Input');
     });
 
-    it('should switch Buy Me Coffee text when language changes', () => {
+    it('should switch Score Input text when language changes', () => {
       render(
         <LanguageProvider>
           <MenuTestComponent />
@@ -183,15 +180,15 @@ describe('LanguageContext', () => {
       );
 
       // Start with Japanese
-      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('開発者にコーヒーをおごる');
+      expect(screen.getByTestId('score-input-text')).toHaveTextContent('スコア入力');
 
       // Switch to English
       fireEvent.click(screen.getByText('Switch to English'));
-      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('Buy Coffee for Developer');
+      expect(screen.getByTestId('score-input-text')).toHaveTextContent('Score Input');
 
       // Switch back to Japanese
       fireEvent.click(screen.getByText('Switch to Japanese'));
-      expect(screen.getByTestId('buy-me-coffee-text')).toHaveTextContent('開発者にコーヒーをおごる');
+      expect(screen.getByTestId('score-input-text')).toHaveTextContent('スコア入力');
     });
   });
 });

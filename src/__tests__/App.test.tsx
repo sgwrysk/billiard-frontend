@@ -268,23 +268,6 @@ describe('App', () => {
 
       await waitFor(() => {
         expect(screen.getByText(/スコア入力/)).toBeInTheDocument();
-        expect(screen.getByText(/開発者にコーヒーをおごる/)).toBeInTheDocument();
-      });
-    });
-
-    it('should show Buy Me Coffee menu item with coffee icon', async () => {
-      render(<App />);
-      
-      const menuButton = screen.getByLabelText('menu');
-      fireEvent.click(menuButton);
-
-      await waitFor(() => {
-        const coffeeMenuItem = screen.getByText(/開発者にコーヒーをおごる/);
-        expect(coffeeMenuItem).toBeInTheDocument();
-        
-        // Check if coffee icon is present (LocalCafe icon)
-        const coffeeIcon = coffeeMenuItem.closest('[role="menuitem"]')?.querySelector('svg');
-        expect(coffeeIcon).toBeInTheDocument();
       });
     });
 
@@ -295,12 +278,10 @@ describe('App', () => {
       fireEvent.click(menuButton);
 
       await waitFor(() => {
-        // Find all menu items and check if divider exists between them
+        // Find menu items and check if divider exists
         const scoreInputItem = screen.getByText(/スコア入力/);
-        const coffeeItem = screen.getByText(/開発者にコーヒーをおごる/);
         
         expect(scoreInputItem).toBeInTheDocument();
-        expect(coffeeItem).toBeInTheDocument();
         
         // Check that divider exists (Material-UI Divider creates an hr element)
         const divider = document.querySelector('hr');
@@ -308,67 +289,5 @@ describe('App', () => {
       });
     });
 
-    it('should open Buy Me Coffee URL when menu item is clicked', async () => {
-      render(<App />);
-      
-      const menuButton = screen.getByLabelText('menu');
-      fireEvent.click(menuButton);
-
-      await waitFor(() => {
-        const coffeeMenuItem = screen.getByText(/開発者にコーヒーをおごる/);
-        fireEvent.click(coffeeMenuItem);
-        
-        expect(windowOpenMock).toHaveBeenCalledWith(
-          'https://buymeacoffee.com/latteemielr',
-          '_blank',
-          'noopener,noreferrer'
-        );
-      });
-    });
-
-    it('should close menu when Buy Me Coffee item is clicked', async () => {
-      render(<App />);
-      
-      const menuButton = screen.getByLabelText('menu');
-      fireEvent.click(menuButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/開発者にコーヒーをおごる/)).toBeInTheDocument();
-      });
-
-      const coffeeMenuItem = screen.getByText(/開発者にコーヒーをおごる/);
-      fireEvent.click(coffeeMenuItem);
-
-      await waitFor(() => {
-        expect(screen.queryByText(/開発者にコーヒーをおごる/)).not.toBeInTheDocument();
-      });
-    });
-
-    it('should show Buy Me Coffee in English when language is switched', async () => {
-      render(<App />);
-      
-      // Switch to English - find the language select element specifically
-      const languageSelect = screen.getByText('🇯🇵').closest('[role="combobox"]');
-      fireEvent.mouseDown(languageSelect!);
-      
-      await waitFor(() => {
-        const englishOption = screen.getByText(/English/);
-        fireEvent.click(englishOption);
-      });
-
-      // Wait for language change to take effect
-      await waitFor(() => {
-        expect(screen.getByText('Billiard Score')).toBeInTheDocument();
-      });
-
-      // Open hamburger menu
-      const menuButton = screen.getByLabelText('menu');
-      fireEvent.click(menuButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/Buy Coffee for Developer/)).toBeInTheDocument();
-        expect(screen.getByText(/Score Input/)).toBeInTheDocument();
-      });
-    });
   });
 });

@@ -30,7 +30,6 @@ const translations: Translations = {
     // Menu
     'menu.scoreInput': 'スコア入力',
     'menu.settings': '設定',
-    'menu.buyMeCoffee': '開発者にコーヒーをおごる',
 
     // Game setup
     'setup.title': '新しいゲーム',
@@ -151,7 +150,6 @@ const translations: Translations = {
     // Menu
     'menu.scoreInput': 'Score Input',
     'menu.settings': 'Settings',
-    'menu.buyMeCoffee': 'Buy Coffee for Developer',
 
     // Game setup
     'setup.title': 'New Game',

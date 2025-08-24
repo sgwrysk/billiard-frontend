@@ -21,13 +21,14 @@ export const isGameInProgress = (game: Game): boolean => {
         (player.ballsPocketed && player.ballsPocketed.length > 0)
       );
       
-    case GameType.BOWLARD:
+    case GameType.BOWLARD: {
       // Bowlard: bowling frames exist and any frame has recorded rolls
       const player = game.players[0];
       if (!player.bowlingFrames || player.bowlingFrames.length === 0) {
         return false;
       }
       return player.bowlingFrames.some(frame => frame.rolls.length > 0);
+    }
       
     default:
       return false;

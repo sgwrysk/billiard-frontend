@@ -27,7 +27,8 @@ export class BowlardEngine extends GameBase {
   }
   
   handlePocketBall(game: Game, _ballNumber: number): Game {
-    // Bowlard doesn't use ball pockets
+    // Bowlard doesn't use ball pockets - _ballNumber parameter ignored
+    // This method is required by the interface but not used in Bowlard
     return game;
   }
   
@@ -53,10 +54,13 @@ export class BowlardEngine extends GameBase {
     return true;
   }
   
-  handleCustomAction(game: Game, action: string, data?: any): Game {
+  handleCustomAction(game: Game, action: string, data?: unknown): Game {
     switch (action) {
       case 'ADD_PINS':
-        return this.handleAddPins(game, data.pins);
+        if (data && typeof data === 'object' && 'pins' in data) {
+          return this.handleAddPins(game, (data as { pins: number }).pins);
+        }
+        return game;
       case 'UNDO_BOWLING_ROLL':
         return this.handleUndoBowlingRoll(game);
       default:

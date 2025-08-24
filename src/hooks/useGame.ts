@@ -49,7 +49,9 @@ export const useGame = () => {
     } else {
       // Check if all balls are pocketed (for rack reset in games like Rotation)
       if (engine.hasCustomLogic() && 'checkAllBallsPocketed' in engine) {
-        const allBallsPocketed = (engine as any).checkAllBallsPocketed(updatedGame);
+        const allBallsPocketed = 'checkAllBallsPocketed' in engine && 
+          typeof (engine as unknown as { checkAllBallsPocketed: (game: Game) => boolean }).checkAllBallsPocketed === 'function' ?
+          (engine as unknown as { checkAllBallsPocketed: (game: Game) => boolean }).checkAllBallsPocketed(updatedGame) : false;
         if (allBallsPocketed && engine.handleCustomAction) {
           // Auto-reset rack for next round
           const resetGame = engine.handleCustomAction(updatedGame, 'RESET_RACK');
@@ -168,7 +170,7 @@ export const useGame = () => {
   }, [startGame]);
 
   // Handle game-specific actions
-  const handleGameAction = useCallback((action: string, data?: any) => {
+  const handleGameAction = useCallback((action: string, data?: unknown) => {
     if (!currentGame) return;
 
     const engine = GameEngineFactory.getEngine(currentGame.type);
@@ -233,9 +235,8 @@ export const useGame = () => {
       
       // Check if game has ended
       if (updatedGame.status === GameStatus.COMPLETED) {
-
-        
-
+        // Game completion logic handled by game engines
+        // Additional completion handling can be added here if needed
       }
     }
   }, [currentGame]);

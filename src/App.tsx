@@ -26,6 +26,7 @@ import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
+import type { Game } from './types/index';
 import type { ChessClockSettings } from './types/index';
 
 // Create Material-UI theme - Deep Blue + Outfit
@@ -165,7 +166,7 @@ const AppContent: React.FC = () => {
     canUndoLastShot,
   } = useGame();
   
-  const [finishedGame, setFinishedGame] = useState<any>(null);
+  const [finishedGame, setFinishedGame] = useState<Game | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // Monitor game completion and automatically transition to victory screen
@@ -231,7 +232,7 @@ const AppContent: React.FC = () => {
     if (!finishedGame) return;
     
     // Create rematch players from finished game
-    const rematchPlayers = finishedGame.players.map((player: any) => ({
+    const rematchPlayers = finishedGame.players.map((player) => ({
       name: player.name,
       targetScore: player.targetScore,
       targetSets: player.targetSets,

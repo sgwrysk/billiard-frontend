@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box } from '@mui/material';
-import type { Game, ScoreHistory } from '../types';
+import type { Game, ScoreHistory, Player } from '../types';
 import { AppStyles } from '../constants/colors';
 
 interface SetHistoryProps {
@@ -26,8 +26,8 @@ const SetHistory: React.FC<SetHistoryProps> = ({ game }) => {
   });
   const winsA = playerA ? (winsByPlayer[playerA.id] || 0) : 0;
   const winsB = playerB ? (winsByPlayer[playerB.id] || 0) : 0;
-  const targetA = (playerA as any)?.targetSets as number | undefined;
-  const targetB = (playerB as any)?.targetSets as number | undefined;
+  const targetA = (playerA as Player)?.targetSets;
+  const targetB = (playerB as Player)?.targetSets;
   let visibleSetCount = Math.max(totalSetsPlayed, 1);
   if (typeof targetA === 'number' && typeof targetB === 'number') {
     const minInitial = Math.min(targetA, targetB);
@@ -57,7 +57,7 @@ const SetHistory: React.FC<SetHistoryProps> = ({ game }) => {
                 <TableCell sx={{ fontWeight: 'bold', width: '1%', whiteSpace: 'nowrap', position: 'sticky', left: 0, zIndex: 3, bgcolor: 'background.paper', borderRight: '1px solid', borderColor: 'divider' }} />
                 {Array.from({ length: visibleSetCount }, (_, i) => (
                   <TableCell key={`set-head-${i}`} align="center" sx={{ fontWeight: 'bold' }}>
-                    <span style={AppStyles.monoFont as any}>{i + 1}</span>
+                    <span style={AppStyles.monoFont}>{i + 1}</span>
                   </TableCell>
                 ))}
               </TableRow>

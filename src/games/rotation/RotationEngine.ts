@@ -86,7 +86,7 @@ export class RotationEngine extends GameBase {
     return true;
   }
   
-  handleCustomAction(game: Game, action: string, _data?: any): Game {
+  handleCustomAction(game: Game, action: string, _data?: unknown): Game {
     switch (action) {
       case 'RESET_RACK':
         return this.handleResetRack(game);

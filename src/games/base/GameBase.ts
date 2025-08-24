@@ -23,7 +23,7 @@ export interface IGameEngine {
   hasCustomLogic(): boolean;
   
   /** Handle custom game action */
-  handleCustomAction?(game: Game, action: string, data?: any): Game;
+  handleCustomAction?(game: Game, action: string, data?: unknown): Game;
   
   /** Get ball numbers used in the game */
   getBallNumbers(): number[];
@@ -116,6 +116,7 @@ export abstract class GameBase implements IGameEngine {
   
   protected getBallScore(_ballNumber: number): number {
     // Default is 1 point, override as needed
+    // _ballNumber parameter is available for subclasses to customize scoring
     return 1;
   }
   

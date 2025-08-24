@@ -31,7 +31,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useLanguage } from '../contexts/LanguageContext';
-import type { Game } from '../types/index';
+import type { Game, BowlingFrame } from '../types/index';
 import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
 import { UIColors, BowlardColors, AppStyles, AppColors } from '../constants/colors';
@@ -200,8 +200,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     const sortedScoreHistory = [...game.scoreHistory].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     
     // Group consecutive shots by the same player into innings
+    type InningType = { playerId: string; shots: Array<{ playerId: string; score: number; timestamp: Date }>; startTime: Date };
     const innings: { playerId: string; totalScore: number; timestamp: Date }[] = [];
-    let currentInning: { playerId: string; shots: Array<{ playerId: string; score: number; timestamp: Date }>; startTime: Date } | null = null;
+    let currentInning: InningType | null = null;
 
     sortedScoreHistory.forEach(entry => {
       // For rotation, each entry represents a pocketed ball
@@ -427,7 +428,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                 {Array.from({ length: 10 }, (_, frameIndex) => {
                   const frame = game.players[0]?.bowlingFrames?.[frameIndex];
                   
-                  const renderRollResult = (frame: any, rollIndex: number) => {
+                  const renderRollResult = (frame: BowlingFrame, rollIndex: number) => {
                     const roll = frame?.rolls[rollIndex];
                     if (roll === undefined) return '';
                     
@@ -557,7 +558,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                   {Array.from({ length: 5 }, (_, frameIndex) => {
                     const frame = game.players[0]?.bowlingFrames?.[frameIndex];
                     
-                    const renderRollResult = (frame: any, rollIndex: number) => {
+                    const renderRollResult = (frame: BowlingFrame, rollIndex: number) => {
                       const roll = frame?.rolls[rollIndex];
                       if (roll === undefined) return '';
                       
@@ -641,7 +642,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                     const frameIndex = i + 5;
                     const frame = game.players[0]?.bowlingFrames?.[frameIndex];
                     
-                    const renderRollResult = (frame: any, rollIndex: number) => {
+                    const renderRollResult = (frame: BowlingFrame, rollIndex: number) => {
                       const roll = frame?.rolls[rollIndex];
                       if (roll === undefined) return '';
                       

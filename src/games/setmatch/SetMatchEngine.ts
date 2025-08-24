@@ -105,10 +105,13 @@ export class SetMatchEngine extends GameBase {
     return true;
   }
   
-  handleCustomAction(game: Game, action: string, data?: any): Game {
+  handleCustomAction(game: Game, action: string, data?: unknown): Game {
     switch (action) {
       case 'WIN_SET':
-        return this.handleWinSet(game, data.playerId);
+        if (data && typeof data === 'object' && 'playerId' in data) {
+          return this.handleWinSet(game, (data as { playerId: string }).playerId);
+        }
+        return game;
       case 'RESET_RACK':
         return this.handleResetRack(game);
       case 'UNDO_LAST_SHOT':

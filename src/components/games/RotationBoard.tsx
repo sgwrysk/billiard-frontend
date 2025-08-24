@@ -10,7 +10,7 @@ import {
   Slide,
 } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
-import type { Game } from '../../types/index';
+import type { Game, Player } from '../../types/index';
 import { getBallColor } from '../../utils/ballUtils';
 import { BallColors, UIColors, GameColors, AppStyles, AppColors } from '../../constants/colors';
 import ChessClock from '../ChessClock';
@@ -65,7 +65,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
     );
   };
   
-  const getRemainingScore = (player: any) => {
+  const getRemainingScore = (player: Player) => {
     if (!player.targetScore) return 0;
     return Math.max(0, player.targetScore - player.score);
   };

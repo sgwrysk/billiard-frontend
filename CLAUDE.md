@@ -1,20 +1,22 @@
-# AI Assistant Guidelines for Billiard Frontend Project
+# AI Assistant Guidelines for Billiard Frontend Project / ビリヤード・フロントエンドプロジェクト AIアシスタントガイドライン
 
+This file contains project-specific guidelines and instructions for Claude Code, Cursor, and other AI tools.  
 このファイルはClaude Code、Cursor、その他AIツール向けのプロジェクト固有のガイドラインと指示を記載しています。
 
-## 📋 必須のワークフロー
+## 📋 Required Workflow / 必須のワークフロー
 
-### 🔧 **コードの変更・デプロイ前チェックリスト**
-1. **テスト実行**: `npm test` - 全テストがパスすることを確認
-2. **ビルド確認**: `npm run build` - TypeScriptエラーがないことを確認
-3. **リントチェック**: `npm run lint` (警告は許可、エラーは修正)
-4. **カバレッジ確認**: `npm test -- --coverage` (90%以上を維持)
+### 🔧 **Pre-Code Change & Deploy Checklist / コードの変更・デプロイ前チェックリスト**
+1. **Run Tests / テスト実行**: `npm test` - Ensure all tests pass / 全テストがパスすることを確認
+2. **Build Check / ビルド確認**: `npm run build` - Verify no TypeScript errors / TypeScriptエラーがないことを確認
+3. **Lint Check / リントチェック**: `npm run lint` (warnings OK, fix errors / 警告は許可、エラーは修正)
+4. **Coverage Check / カバレッジ確認**: `npm test -- --coverage` (maintain 90%+ / 90%以上を維持)
 
-### 📤 **Git操作のルール**
-- コミット前に必ず上記チェックリストを実行
-- コミットメッセージは日本語で機能追加内容を明確に記載
-- 最後に必ず `🤖 Generated with [Claude Code](https://claude.ai/code)` と `Co-Authored-By: Claude <noreply@anthropic.com>` を追加
-- pushは最後に実行（明示的な指示がある場合のみ）
+### 📤 **Git Operations Rules / Git操作のルール**
+- **Pre-commit / コミット前**: Always run above checklist / 必ず上記チェックリストを実行
+- **Commit messages / コミットメッセージ**: Japanese description of functional changes / 日本語で機能追加内容を明確に記載
+- **AI signature / AI署名**: Always add `🤖 Generated with [Claude Code](https://claude.ai/code)` and `Co-Authored-By: Claude <noreply@anthropic.com>`
+- **Push timing / Push実行**: Only when explicitly requested / 明示的な指示がある場合のみ
+- **README updates / README更新**: **MUST update README.md and README.ja.md before every push** / **Push前に必ずREADME.mdとREADME.ja.mdを最新に更新**
 
 ## 🎯 **テスト品質基準**
 

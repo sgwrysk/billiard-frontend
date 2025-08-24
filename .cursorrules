@@ -1,4 +1,4 @@
-# Cursor Rules for Billiard Frontend Project
+# Cursor Rules for Billiard Frontend Project / ビリヤード・フロントエンドプロジェクト Cursorルール
 
 ## Code Quality & Testing
 - Always run `npm test` before any code changes
@@ -12,6 +12,7 @@
 - Commit messages in Japanese describing functional changes
 - Always include: `🤖 Generated with [Claude Code](https://claude.ai/code)` and `Co-Authored-By: Claude <noreply@anthropic.com>`
 - Only push when explicitly requested
+- **CRITICAL: Update README.md and README.ja.md before every push**
 
 ## Architecture & Patterns
 - Follow existing Material-UI and TypeScript patterns

@@ -2,6 +2,8 @@
 
 A modern billiard score management application built with React + TypeScript + Material-UI.
 
+[🌐 日本語版 README](README.ja.md)
+
 ## 🌐 Live Demo
 
 🚀 **[Try it now!](https://billiard-frontend.onrender.com)**
@@ -57,7 +59,7 @@ A modern billiard score management application built with React + TypeScript + M
 - **State Management**: React Hooks + Context API
 - **Charts**: Chart.js + react-chartjs-2
 - **Internationalization**: Custom i18n context
-- **Testing**: Vitest + React Testing Library (380+ tests, 95%+ coverage)
+- **Testing**: Vitest + React Testing Library (380+ tests, 90%+ coverage)
 - **Deployment**: Render (Static Site)
 
 ## 📦 Installation & Setup
@@ -206,7 +208,7 @@ This project includes comprehensive test coverage:
 
 ### Coverage
 - **380+ Tests**: Comprehensive test suite
-- **95%+ Coverage**: High code coverage across components, hooks, and utilities
+- **90%+ Coverage**: High code coverage across components, hooks, and utilities
 - **Component Tests**: All UI components thoroughly tested
 - **Utility Tests**: Complete coverage of utility functions
 - **Integration Tests**: Game flow and user interaction tests

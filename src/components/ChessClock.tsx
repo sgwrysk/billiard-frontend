@@ -124,9 +124,9 @@ const ChessClock: React.FC<ChessClockProps> = ({
         backgroundColor: ChessClockColors.player.timeUp.background,
         color: ChessClockColors.player.timeUp.text,
         border: ChessClockColors.player.timeUp.border,
-        cursor: 'pointer', // 時間切れでも選択可能であることを示す
+        cursor: 'pointer', // Indicate selectable even when time is up
         '&:hover': {
-          backgroundColor: '#b71c1c', // より濃い赤色
+          backgroundColor: '#b71c1c', // Darker red color
         },
       };
     } else if (playerTime.isWarning) {
@@ -135,7 +135,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
         color: ChessClockColors.player.warning.text,
         border: ChessClockColors.player.warning.border,
         '&:hover': {
-          backgroundColor: '#f57c00', // より濃いオレンジ色
+          backgroundColor: '#f57c00', // Darker orange color
         },
       };
     } else if (playerIndex === currentPlayerIndex) {
@@ -154,7 +154,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
       color: ChessClockColors.player.default.text,
       border: ChessClockColors.player.default.border,
       '&:hover': {
-        backgroundColor: '#e0e0e0', // より濃いグレー
+        backgroundColor: '#e0e0e0', // Darker gray
       },
     };
   };
@@ -167,7 +167,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
       }
       // Don't reset lastUpdateTime here - let the timer continue naturally
       
-      // チェスクロックの正しい動作：自分のボタンを押すと相手がアクティブになる
+      // Correct chess clock behavior: pressing your button makes opponent active
       const nextPlayerIndex = playerIndex === 0 ? 1 : 0;
       onPlayerSelect(nextPlayerIndex);
     }
@@ -180,8 +180,8 @@ const ChessClock: React.FC<ChessClockProps> = ({
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'space-between',
-      gap: { xs: 1, sm: 2 }, // 小画面ではギャップを小さく
-      minHeight: { xs: 60, sm: 65 }, // より小さい高さに調整
+      gap: { xs: 1, sm: 2 }, // Smaller gap on small screens
+      minHeight: { xs: 60, sm: 65 }, // Adjust to smaller height
       width: '100%',
     }}>
       {/* Player 1 Button */}
@@ -191,12 +191,12 @@ const ChessClock: React.FC<ChessClockProps> = ({
         onClick={() => handlePlayerSelect(0)}
         sx={{
           flex: 1,
-          minHeight: { xs: 40, sm: 45 }, // より小さいサイズに調整
+          minHeight: { xs: 40, sm: 45 }, // Adjust to smaller size
           fontSize: '1rem',
           fontWeight: 'bold',
-          ml: { xs: 4.5, sm: 6 }, // 左側の余白をさらに大きく
+          ml: { xs: 4.5, sm: 6 }, // Increase left margin further
           ...getPlayerButtonStyle(0),
-          // フォーカス・選択エフェクトを無効化
+          // Disable focus/selection effects
           '&:focus': { outline: 'none', boxShadow: 'none' },
           '&:active': { outline: 'none', boxShadow: 'none' },
         }}
@@ -207,13 +207,13 @@ const ChessClock: React.FC<ChessClockProps> = ({
             fontWeight: 'bold', 
             mb: 0.5, 
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
-            display: { xs: 'block', sm: 'none' }  // スマホのみ表示
+            display: { xs: 'block', sm: 'none' }  // Show only on mobile
           }}>
             {players[0]?.name || t('setup.playerName') + ' 1'}
           </Typography>
           <Typography variant="h5" sx={{ 
             fontWeight: 'bold', 
-            fontSize: { xs: '1.25rem', sm: '2rem', md: '2.5rem' }, // より大きく表示
+            fontSize: { xs: '1.25rem', sm: '2rem', md: '2.5rem' }, // Display larger
             ...AppStyles.monoFont
           }}>
             {formatTime(playerTimes[0]?.remainingTime || 0)}
@@ -252,12 +252,12 @@ const ChessClock: React.FC<ChessClockProps> = ({
         onClick={() => handlePlayerSelect(1)}
         sx={{
           flex: 1,
-          minHeight: { xs: 40, sm: 45 }, // より小さいサイズに調整
+          minHeight: { xs: 40, sm: 45 }, // Adjust to smaller size
           fontSize: '1rem',
           fontWeight: 'bold',
-          mr: { xs: 4.5, sm: 6 }, // 右側の余白をさらに大きく
+          mr: { xs: 4.5, sm: 6 }, // Increase right margin further
           ...getPlayerButtonStyle(1),
-          // フォーカス・選択エフェクトを無効化
+          // Disable focus/selection effects
           '&:focus': { outline: 'none', boxShadow: 'none' },
           '&:active': { outline: 'none', boxShadow: 'none' },
         }}
@@ -268,13 +268,13 @@ const ChessClock: React.FC<ChessClockProps> = ({
             fontWeight: 'bold', 
             mb: 0.5, 
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
-            display: { xs: 'block', sm: 'none' }  // スマホのみ表示
+            display: { xs: 'block', sm: 'none' }  // Show only on mobile
           }}>
             {players[1]?.name || t('setup.playerName') + ' 2'}
           </Typography>
           <Typography variant="h5" sx={{ 
             fontWeight: 'bold', 
-            fontSize: { xs: '1.25rem', sm: '2rem', md: '2.5rem' }, // より大きく表示
+            fontSize: { xs: '1.25rem', sm: '2rem', md: '2.5rem' }, // Display larger
             ...AppStyles.monoFont
           }}>
             {formatTime(playerTimes[1]?.remainingTime || 0)}

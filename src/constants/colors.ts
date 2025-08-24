@@ -1,67 +1,67 @@
 /**
- * アプリ全体で使用する色の定数とスタイル設定
- * 統一感のあるデザインを実現するための共通色・フォント設定
+ * Application-wide color constants and style settings
+ * Common colors and font settings to achieve consistent design
  */
 
 /**
- * アプリ全体で使用する共通スタイル設定
+ * Common style settings used throughout the app
  */
 export const AppStyles = {
-  // 数字表示用のモノスペースフォント設定
-  // 時間、スコア、ピン数など、数字の横幅を統一したい箇所で使用
+  // Monospace font settings for number display
+  // Used for times, scores, pin counts, etc. where uniform number width is desired
   monoFont: {
     fontFamily: '"Courier New", Courier, "Lucida Console", Monaco, monospace',
   },
 } as const;
 
 export const AppColors = {
-  // ニュートラル（中立）色
+  // Neutral colors
   neutral: {
-    // 基本的な背景色（数字ボタン、スコア表背景など）
+    // Basic background color (number buttons, score table background, etc.)
     background: '#f5f5f5',
-    // 基本的なテキスト色
+    // Basic text color
     text: '#333333',
-    // 境界線色
+    // Border color
     border: '#ddd',
   },
 
-  // 残念・失敗を表現する色
+  // Colors expressing disappointment/failure
   disappointment: {
-    // 背景色（ガーター、ミスなど）
+    // Background color (gutter, miss, etc.)
     background: '#e0e0e0',
-    // テキスト色
+    // Text color
     text: '#666666',
   },
 
-  // 成功・強調を表現する色（段階的）
+  // Colors expressing success/emphasis (gradual)
   success: {
-    // 軽い成功（スペアなど）
+    // Mild success (spare, etc.)
     mild: {
-      background: '#f0f4f8', // 数字のグレーに少しだけ青みを加えた色
-      text: '#1976d2',       // タイトルベースの青色
+      background: '#f0f4f8', // Gray with a slight blue tint added
+      text: '#1976d2',       // Title-based blue color
     },
-    // 強い成功（ストライクなど）
+    // Strong success (strike, etc.)
     strong: {
-      background: '#e8f2fd', // スペアより少し青みが強い色
-      text: '#1565c0',       // より濃い青色
+      background: '#e8f2fd', // Stronger blue tint than spare
+      text: '#1565c0',       // Darker blue color
     },
   },
 
-  // アプリのテーマ色（既存のテーマから）
+  // App theme colors (from existing theme)
   theme: {
-    primary: '#1976d2',      // メインの青色
-    primaryLight: '#42a5f5', // 明るい青色
-    primaryDark: '#1565c0',  // 濃い青色
-    secondary: '#ffc107',    // ゴールドアクセント
+    primary: '#1976d2',      // Main blue color
+    primaryLight: '#42a5f5', // Light blue color
+    primaryDark: '#1565c0',  // Dark blue color
+    secondary: '#ffc107',    // Gold accent
   },
 
-  // チェスクロック用の色
+  // Chess clock colors
   chessClock: {
-    activePlayer: '#d4e4f7',      // アクティブプレイヤー用の輝度が低い青
-    activePlayerHover: '#e8f2fd', // ボーラードのストライク色（マウスオン時）
+    activePlayer: '#d4e4f7',      // Low-brightness blue for active player
+    activePlayerHover: '#e8f2fd', // Bowlard strike color (on mouse over)
   },
 
-  // 影・エフェクト用
+  // Shadow/effects
   effects: {
     shadow: {
       light: 'rgba(0,0,0,0.1)',
@@ -72,26 +72,26 @@ export const AppColors = {
 } as const;
 
 /**
- * ボーラードゲーム用の色設定
- * AppColorsを使用してボーラード特有の色を定義
+ * Color settings for Bowlard game
+ * Define Bowlard-specific colors using AppColors
  */
 export const BowlardColors = {
-  // 数字ボタン
+  // Number buttons
   number: {
     background: AppColors.neutral.background,
     text: AppColors.neutral.text,
   },
-  // ガーター・ミス
+  // Gutter/miss
   gutter: {
     background: AppColors.disappointment.background,
     text: AppColors.disappointment.text,
   },
-  // スペア
+  // Spare
   spare: {
     background: AppColors.success.mild.background,
     text: AppColors.success.mild.text,
   },
-  // ストライク
+  // Strike
   strike: {
     background: AppColors.success.strong.background,
     text: AppColors.success.strong.text,
@@ -99,78 +99,78 @@ export const BowlardColors = {
 } as const;
 
 /**
- * ビリヤードボールの色設定
- * ローテーション等のゲームで使用
+ * Billiard ball color settings
+ * Used for Rotation and other games
  */
 export const BallColors = {
-  // ソリッドボール（1-8番）とストライプボール（9-15番）の色定義
-  // 1番と9番、2番と10番...のように同色ペアで定義
+  // Color definitions for solid balls (1-8) and striped balls (9-15)
+  // Defined as same-color pairs: 1&9, 2&10, etc.
   colors: {
-    1: '#FFD700',  // Yellow (1番ソリッド = 9番ストライプ)
-    2: '#6495ED',  // Blue (2番ソリッド = 10番ストライプ)
-    3: '#FF6B6B',  // Red (3番ソリッド = 11番ストライプ)
-    4: '#9370DB',  // Purple (4番ソリッド = 12番ストライプ)
-    5: '#FF8C00',  // Orange (5番ソリッド = 13番ストライプ)
-    6: '#32CD32',  // Green (6番ソリッド = 14番ストライプ)
-    7: '#CD853F',  // Maroon (7番ソリッド = 15番ストライプ)
-    8: '#000000',  // Black (8番は特別な黒)
-    9: '#FFD700',  // Yellow stripe (1番と同色)
-    10: '#6495ED', // Blue stripe (2番と同色)
-    11: '#FF6B6B', // Red stripe (3番と同色)
-    12: '#9370DB', // Purple stripe (4番と同色)
-    13: '#FF8C00', // Orange stripe (5番と同色)
-    14: '#32CD32', // Green stripe (6番と同色)
-    15: '#CD853F', // Maroon stripe (7番と同色)
+    1: '#FFD700',  // Yellow (solid 1 = striped 9)
+    2: '#6495ED',  // Blue (solid 2 = striped 10)
+    3: '#FF6B6B',  // Red (solid 3 = striped 11)
+    4: '#9370DB',  // Purple (solid 4 = striped 12)
+    5: '#FF8C00',  // Orange (solid 5 = striped 13)
+    6: '#32CD32',  // Green (solid 6 = striped 14)
+    7: '#CD853F',  // Maroon (solid 7 = striped 15)
+    8: '#000000',  // Black (special black 8 ball)
+    9: '#FFD700',  // Yellow stripe (same as 1)
+    10: '#6495ED', // Blue stripe (same as 2)
+    11: '#FF6B6B', // Red stripe (same as 3)
+    12: '#9370DB', // Purple stripe (same as 4)
+    13: '#FF8C00', // Orange stripe (same as 5)
+    14: '#32CD32', // Green stripe (same as 6)
+    15: '#CD853F', // Maroon stripe (same as 7)
   },
   
-  // ボールのテキスト色（数字の色）
+  // Ball text color (number color)
   text: {
-    // 明るい色のボールには黒文字
+    // Black text for bright colored balls
     light: '#000000',
-    // 暗い色のボールには白文字  
+    // White text for dark colored balls
     dark: '#FFFFFF',
   },
   
-  // ボールの境界線・影の色
+  // Ball border and shadow color
   border: '#333333',
   
-  // ポケット済みボールの色
+  // Pocketed ball color
   pocketed: {
     background: 'linear-gradient(145deg, #e6e6e6, #cccccc)',
     shadow: 'inset 2px 2px 4px rgba(0,0,0,0.2)',
   },
   
-  // 通常のボールの影効果
+  // Normal ball shadow effect
   shadow: {
     normal: '0 4px 12px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.3)',
   },
   
-  // デフォルト色（定義されていないボール番号の場合）
+  // Default color (for undefined ball numbers)
   default: '#CCCCCC',
 } as const;
 
 /**
- * UI要素の共通色設定
- * 境界線、影、ホバー効果など
+ * Common color settings for UI elements
+ * Borders, shadows, hover effects, etc.
  */
 export const UIColors = {
-  // 境界線・枠線
+  // Borders and frames
   border: {
-    light: '#e0e0e0',    // 薄いグレーの境界線
-    medium: '#ddd',      // 中程度のグレーの境界線  
-    dark: '#333',        // 濃いグレーの境界線
+    light: '#e0e0e0',    // Light gray border
+    medium: '#ddd',      // Medium gray border
+    dark: '#333',        // Dark gray border
   },
   
-  // 背景色
+  // Background colors
   background: {
     white: 'white',
     lightGray: '#f5f5f5',
     mediumGray: '#ddd',
     disabled: '#999',
-    success: '#e8f5e8',  // 成功・完了状態の背景色
+    success: '#e8f5e8',  // Success/completion state background color
   },
   
-  // テキスト色
+  // Text colors
   text: {
     black: '#000',
     darkGray: '#333',
@@ -179,13 +179,13 @@ export const UIColors = {
     white: 'white',
   },
   
-  // ホバー効果
+  // Hover effects
   hover: {
     lightBackground: '#f5f5f5',
     shadow: '0 8px 16px rgba(0,0,0,0.15)',
   },
   
-  // 影効果
+  // Shadow effects
   shadow: {
     light: '0 2px 4px rgba(0,0,0,0.1)',
     medium: '0 2px 8px rgba(0,0,0,0.1)',
@@ -193,7 +193,7 @@ export const UIColors = {
     inset: 'inset 0 1px 3px rgba(0,0,0,0.2)',
   },
   
-  // チャート・グラフ用の色
+  // Chart/graph colors
   chart: {
     playerColors: ['#2196F3', '#F44336', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4'],
     primary: '#2196F3',
@@ -202,80 +202,80 @@ export const UIColors = {
 } as const;
 
 /**
- * 他のゲーム用の色設定も同様に定義可能
- * 例：セットマッチ、ローテーション用の色設定
+ * Color settings for other games can be defined similarly
+ * Example: Color settings for Set Match, Rotation
  */
 export const GameColors = {
-  // プレイヤー選択状態
+  // Player selected state
   playerSelected: {
     background: AppColors.theme.primary,
     text: 'white',
     border: `3px solid ${AppColors.theme.primary}`,
   },
-  // プレイヤー非選択状態
+  // Player unselected state
   playerUnselected: {
     background: UIColors.background.white,
     text: AppColors.neutral.text,
     border: `1px solid ${UIColors.border.light}`,
   },
-  // 勝利・成功状態
+  // Victory/success state
   victory: {
     background: AppColors.success.strong.background,
     text: AppColors.success.strong.text,
   },
-  // リーチ状態（あと1セットで勝利）
+  // Reach state (one set away from victory)
   reach: {
-    background: '#ffebee', // 薄い赤の背景
-    text: '#d32f2f',       // 濃い赤のテキスト
-    border: '#d32f2f',     // 濃い赤のボーダー
+    background: '#ffebee', // Light red background
+    text: '#d32f2f',       // Dark red text
+    border: '#d32f2f',     // Dark red border
   },
 } as const;
 
 /**
- * チェスクロック用の色設定
- * 時間管理の状態を視覚的に表現する色
+ * Chess clock color settings
+ * Colors to visually represent time management states
  */
 export const ChessClockColors = {
-  // チェスクロック全体の背景色（ボーラードのイニング数表と同様の薄いグレー）
+  // Chess clock overall background color (light gray like Bowlard inning table)
   background: UIColors.background.lightGray,
   
-  // プレイヤーボタンの色
+  // Player button colors
   player: {
-    // デフォルト状態（非アクティブ）- グレーな感じ
+    // Default state (inactive) - grayish feel
     default: {
       background: UIColors.background.lightGray,
       text: UIColors.text.mediumGray,
       border: `1px solid ${UIColors.border.medium}`,
     },
-    // アクティブプレイヤー（選択中）- 輝度が低い青を使用
+    // Active player (selected) - using low-brightness blue
     active: {
       background: AppColors.chessClock.activePlayer,
       text: AppColors.success.strong.text,
       border: `1px solid ${AppColors.chessClock.activePlayer}`,
     },
-    // 警告状態（警告時間を超えた場合）
+    // Warning state (when warning time is exceeded)
     warning: {
-      background: AppColors.theme.secondary, // ゴールドアクセント
+      background: AppColors.theme.secondary, // Gold accent
       text: 'white',
       border: `1px solid ${AppColors.theme.secondary}`,
     },
-    // 時間切れ状態
+    // Time up state
     timeUp: {
-      background: '#d32f2f', // 赤色（時間切れ）
+      background: '#d32f2f', // Red color (time up)
       text: 'white',
       border: `1px solid #d32f2f`,
     },
   },
   
-  // スタート/ストップボタンの色
+  // Start/stop button colors
   control: {
     start: {
-      background: '#4caf50', // 緑色（開始）
+      background: '#4caf50', // Green color (start)
       text: 'white',
       hover: '#388e3c',
     },
     stop: {
-      background: '#f44336', // 赤色（停止）
+      background: '#f44336', // Red color (stop)
       text: 'white',
       hover: '#d32f2f',
     },

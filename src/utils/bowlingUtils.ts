@@ -20,7 +20,7 @@ export const calculateBowlingScores = (frames: BowlingFrame[]): BowlingFrame[] =
     // Frame 10 special calculation
     if (i === 9) {
       // For frame 10, just sum all rolls (no bonus calculation needed)
-      // 10フレーム目は投球した分だけが得点になる
+      // Frame 10 scores only the rolls made
       const frameScore = frame.rolls.reduce((sum, roll) => sum + roll, 0);
       const previousScore = i > 0 ? (calculatedFrames[i - 1].score || 0) : 0;
       calculatedFrames[i] = {

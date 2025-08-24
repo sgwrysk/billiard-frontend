@@ -2,27 +2,27 @@ import type { Game } from '../types/index';
 import { GameType } from '../types/index';
 
 /**
- * ゲームが進行中かどうかを判定する
- * @param game ゲームオブジェクト
- * @returns ゲームが進行中の場合true
+ * Determines if a game is in progress
+ * @param game Game object
+ * @returns true if the game is in progress
  */
 export const isGameInProgress = (game: Game): boolean => {
   if (!game) return false;
 
   switch (game.type) {
     case GameType.SET_MATCH:
-      // セットマッチ: いずれかのプレイヤーがセットを獲得している
+      // Set Match: any player has won sets
       return game.players.some(player => (player.setsWon || 0) > 0);
       
     case GameType.ROTATION:
-      // ローテーション: いずれかのプレイヤーがボールをポケットしている、またはスコアがある
+      // Rotation: any player has pocketed balls or has a score
       return game.players.some(player => 
         player.score > 0 || 
         (player.ballsPocketed && player.ballsPocketed.length > 0)
       );
       
     case GameType.BOWLARD:
-      // ボーラード: ボーリングフレームが存在し、いずれかのフレームでロールが記録されている
+      // Bowlard: bowling frames exist and any frame has recorded rolls
       const player = game.players[0];
       if (!player.bowlingFrames || player.bowlingFrames.length === 0) {
         return false;

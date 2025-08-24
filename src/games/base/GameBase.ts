@@ -1,34 +1,34 @@
 import type { Game, Player, Shot, GameType } from '../../types/index';
 
 export interface IGameEngine {
-  /** ゲームタイプ */
+  /** Game type */
   getGameType(): GameType;
   
-  /** プレイヤーを初期化 */
+  /** Initialize players */
   initializePlayers(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Player[];
   
-  /** ゲームを初期化 */
+  /** Initialize game */
   initializeGame(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Game;
   
-  /** ボールポケット処理 */
+  /** Handle ball pocket */
   handlePocketBall(game: Game, ballNumber: number): Game;
   
-  /** プレイヤー交代処理 */
+  /** Handle player switch */
   handleSwitchPlayer(game: Game): Game;
   
-  /** 勝利条件チェック */
+  /** Check victory condition */
   checkVictoryCondition(game: Game): { isGameOver: boolean; winnerId?: string };
   
-  /** ゲーム固有の処理があるかチェック */
+  /** Check if game has custom logic */
   hasCustomLogic(): boolean;
   
-  /** ゲーム固有処理 */
+  /** Handle custom game action */
   handleCustomAction?(game: Game, action: string, data?: any): Game;
   
-  /** 使用するボール番号を取得 */
+  /** Get ball numbers used in the game */
   getBallNumbers(): number[];
   
-  /** アクション取り消し処理 */
+  /** Handle action undo */
   handleUndo(game: Game): Game;
 }
 
@@ -79,19 +79,19 @@ export abstract class GameBase implements IGameEngine {
   }
   
   handleUndo(game: Game): Game {
-    // デフォルトのUndo処理（最後のshotHistoryを削除）
+    // Default undo processing (remove last shotHistory entry)
     if (game.shotHistory.length === 0) return game;
     
     const lastShot = game.shotHistory[game.shotHistory.length - 1];
     const updatedGame = { ...game };
     
-    // shotHistoryから最後のエントリを削除
+    // Remove last entry from shotHistory
     updatedGame.shotHistory = updatedGame.shotHistory.slice(0, -1);
     
-    // scoreHistoryから対応するエントリも削除（ROTATIONのグラフ表示のため）
+    // Also remove corresponding entry from scoreHistory (for ROTATION graph display)
     const scoreToRemove = this.getBallScore(lastShot.ballNumber);
     if (updatedGame.scoreHistory.length > 0) {
-      // 最後のスコアエントリを確認して、一致するものを削除
+      // Check last score entry and remove if it matches
       const lastScoreIndex = updatedGame.scoreHistory.length - 1;
       const lastScoreEntry = updatedGame.scoreHistory[lastScoreIndex];
       if (lastScoreEntry.playerId === lastShot.playerId && lastScoreEntry.score === scoreToRemove) {
@@ -99,7 +99,7 @@ export abstract class GameBase implements IGameEngine {
       }
     }
     
-    // プレイヤーから最後にポケットしたボールを削除
+    // Remove last pocketed ball from player
     updatedGame.players = updatedGame.players.map(player => {
       if (player.id === lastShot.playerId && lastShot.isSunk) {
         return {
@@ -115,7 +115,7 @@ export abstract class GameBase implements IGameEngine {
   }
   
   protected getBallScore(_ballNumber: number): number {
-    // デフォルトは1点、必要に応じてオーバーライド
+    // Default is 1 point, override as needed
     return 1;
   }
   

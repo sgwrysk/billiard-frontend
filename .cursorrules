@@ -20,6 +20,14 @@
 - Minimize use of `any` type
 - Prefer editing existing files over creating new ones
 
+## UI/UX Guidelines
+- Keep UI/UX and interactions extremely simple
+- NO hardcoded text strings - always use `useLanguage()` hook for i18n
+- Implement as reusable common components when possible
+- NO hardcoded colors - use `src/constants/colors.ts` color system
+- Maintain unified design system and color format across app
+- Propose file splitting when files exceed 500 lines, mandatory at 1000+ lines
+
 ## Game-Specific Rules
 - SetMatch: Set history and player swapping functionality
 - Rotation: Ball pocketing history and score calculation
@@ -38,7 +46,8 @@
 - Use factory functions from testHelpers.tsx
 - Mock external dependencies properly
 - Test both happy path and edge cases
-- Maintain test file size under 1000 lines
+- Maintain test file size under 1000 lines (split if larger)
+- Create tests for all new common components
 
 ## Debugging Commands
 - Specific test: `npm test -- --run path/to/test.tsx`
@@ -48,5 +57,8 @@
 ## Remember
 - Mobile-first responsive design
 - Existing code patterns over new implementations
-- User experience and accessibility
+- User experience and accessibility - keep it SIMPLE
 - Gradual improvements over major refactors
+- NO hardcoded strings or colors - use proper systems
+- Common components over duplicated code
+- File size discipline - split early and often

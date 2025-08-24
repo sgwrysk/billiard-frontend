@@ -34,7 +34,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import type { Game } from '../types/index';
 import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
-import { UIColors, BowlardColors, AppStyles } from '../constants/colors';
+import { UIColors, BowlardColors, AppStyles, AppColors } from '../constants/colors';
 import SetHistory from './SetHistory';
 
 ChartJS.register(
@@ -878,7 +878,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                             ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ball)} 20%, ${getBallColor(ball)} 80%, white 80%, white 100%)`
                             : `radial-gradient(circle at 30% 30%, ${getBallColor(ball)}dd, ${getBallColor(ball)} 70%)`,
                           
-                          boxShadow: '0 3px 8px rgba(0,0,0,0.3), inset -1px -1px 2px rgba(0,0,0,0.1), inset 1px 1px 2px rgba(255,255,255,0.3)',
+                          boxShadow: `0 3px 8px ${AppColors.effects.shadow.dark}, inset -1px -1px 2px ${AppColors.effects.shadow.light}, inset 1px 1px 2px rgba(255,255,255,0.3)`,
                           
                           // White circle background for number
                           '&::before': {
@@ -891,7 +891,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                             height: '20px',
                             backgroundColor: 'white',
                             borderRadius: '50%',
-                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
+                            boxShadow: UIColors.shadow.inset,
                             zIndex: 1,
                           },
                           

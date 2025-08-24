@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { PlayArrow, Pause } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ChessClockColors, AppColors, AppStyles } from '../constants/colors';
+import { ChessClockColors, AppColors, AppStyles, UIColors } from '../constants/colors';
 import type { ChessClockSettings, Player } from '../types/index';
 
 interface ChessClockProps {
@@ -126,7 +126,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
         border: ChessClockColors.player.timeUp.border,
         cursor: 'pointer', // Indicate selectable even when time is up
         '&:hover': {
-          backgroundColor: '#b71c1c', // Darker red color
+          backgroundColor: ChessClockColors.player.timeUp.hover,
         },
       };
     } else if (playerTime.isWarning) {
@@ -135,7 +135,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
         color: ChessClockColors.player.warning.text,
         border: ChessClockColors.player.warning.border,
         '&:hover': {
-          backgroundColor: '#f57c00', // Darker orange color
+          backgroundColor: ChessClockColors.player.warning.hover,
         },
       };
     } else if (playerIndex === currentPlayerIndex) {
@@ -154,7 +154,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
       color: ChessClockColors.player.default.text,
       border: ChessClockColors.player.default.border,
       '&:hover': {
-        backgroundColor: '#e0e0e0', // Darker gray
+        backgroundColor: ChessClockColors.player.default.hover,
       },
     };
   };
@@ -296,7 +296,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
           zIndex: 1050,
           p: { xs: 1.5, sm: 2 },
           backgroundColor: ChessClockColors.background,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          boxShadow: UIColors.shadow.medium,
         }}
       >
         <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>

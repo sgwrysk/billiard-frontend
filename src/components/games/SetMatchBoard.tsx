@@ -79,7 +79,7 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 '&:hover': {
                   backgroundColor: UIColors.hover.lightBackground,
                   transform: 'scale(1.05)',
-                  boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                  boxShadow: UIColors.hover.shadow,
                 },
                 '&:active': {
                   transform: 'scale(0.98)',
@@ -202,11 +202,11 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
           sx={{ 
             height: '48px',
             minHeight: '48px',
-            borderColor: '#e0e0e0',
-            color: '#666666',
+            borderColor: UIColors.border.light,
+            color: UIColors.text.mediumGray,
             '&:hover': {
-              backgroundColor: '#e0e0e0',
-              color: '#666666',
+              backgroundColor: UIColors.border.light,
+              color: UIColors.text.mediumGray,
               borderColor: '#e0e0e0',
             },
             '&:disabled': {

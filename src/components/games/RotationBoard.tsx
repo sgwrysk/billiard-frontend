@@ -12,7 +12,7 @@ import {
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index';
 import { getBallColor } from '../../utils/ballUtils';
-import { BallColors, UIColors, GameColors, AppStyles } from '../../constants/colors';
+import { BallColors, UIColors, GameColors, AppStyles, AppColors } from '../../constants/colors';
 import ChessClock from '../ChessClock';
 
 interface RotationBoardProps {
@@ -138,7 +138,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                 transition: 'all 0.2s ease-in-out',
                 cursor: onSelectPlayer ? 'pointer' : 'default',
                 boxShadow: player.isActive 
-                  ? '0 8px 24px rgba(25, 118, 210, 0.15)' 
+                  ? `0 8px 24px ${AppColors.theme.primary}26` 
                   : UIColors.shadow.medium,
                 '&:hover': onSelectPlayer ? {
                   backgroundColor: UIColors.hover.lightBackground,
@@ -199,7 +199,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                               : `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%)`,
                             
                             // Use same shadow as the main ball selection
-                            boxShadow: '0 4px 8px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.4)',
+                            boxShadow: BallColors.shadow.normal,
                             
                             // Add the white circle background for number (smaller size for 32px balls)
                             '&::before': {
@@ -212,7 +212,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                               height: '18px',
                               backgroundColor: 'white',
                               borderRadius: '50%',
-                              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
+                              boxShadow: UIColors.shadow.inset,
                               zIndex: 1,
                             },
                           }}
@@ -296,7 +296,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                           : `radial-gradient(circle at 30% 30%, ${getBallColor(ballNumber)}dd, ${getBallColor(ballNumber)} 70%) !important`,
                       boxShadow: isBallPocketed(ballNumber)
                         ? BallColors.pocketed.shadow
-                        : '0 6px 16px rgba(0,0,0,0.4), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.4)',
+                        : BallColors.shadow.normal,
                       '& span': {
                         transform: 'scale(1.15)',
                         color: isBallPocketed(ballNumber) ? `${UIColors.text.lightGray} !important` : `${UIColors.text.black} !important`,
@@ -355,15 +355,15 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
             sx={{ 
               height: '48px',
               minHeight: '48px',
-              borderColor: '#e0e0e0',
+              borderColor: UIColors.border.light,
               color: '#666666',
               '&:hover': {
                 backgroundColor: '#e0e0e0',
                 color: '#666666',
-                borderColor: '#e0e0e0',
+                borderColor: UIColors.border.light,
               },
               '&:disabled': {
-                borderColor: '#e0e0e0',
+                borderColor: UIColors.border.light,
                 color: '#666666',
                 opacity: 0.6,
               },

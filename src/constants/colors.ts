@@ -53,6 +53,8 @@ export const AppColors = {
     primaryLight: '#42a5f5', // Light blue color
     primaryDark: '#1565c0',  // Dark blue color
     secondary: '#ffc107',    // Gold accent
+    secondaryLight: '#fff350', // Light gold
+    secondaryDark: '#c79100',  // Dark gold
   },
 
   // Chess clock colors
@@ -168,6 +170,8 @@ export const UIColors = {
     mediumGray: '#ddd',
     disabled: '#999',
     success: '#e8f5e8',  // Success/completion state background color
+    default: '#f8fafc',  // App default background
+    paper: '#ffffff',    // Paper/card background
   },
   
   // Text colors
@@ -246,6 +250,7 @@ export const ChessClockColors = {
       background: UIColors.background.lightGray,
       text: UIColors.text.mediumGray,
       border: `1px solid ${UIColors.border.medium}`,
+      hover: '#e0e0e0', // Darker gray
     },
     // Active player (selected) - using low-brightness blue
     active: {
@@ -258,12 +263,14 @@ export const ChessClockColors = {
       background: AppColors.theme.secondary, // Gold accent
       text: 'white',
       border: `1px solid ${AppColors.theme.secondary}`,
+      hover: '#f57c00', // Darker orange color
     },
     // Time up state
     timeUp: {
       background: '#d32f2f', // Red color (time up)
       text: 'white',
       border: `1px solid #d32f2f`,
+      hover: '#b71c1c', // Darker red color
     },
   },
   

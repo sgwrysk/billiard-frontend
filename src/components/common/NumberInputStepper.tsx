@@ -6,7 +6,7 @@ import {
   TextField,
 } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
-import { AppStyles } from '../../constants/colors';
+import { AppStyles, UIColors } from '../../constants/colors';
 
 interface NumberInputStepperProps {
   value: number;
@@ -115,8 +115,8 @@ const NumberInputStepper: React.FC<NumberInputStepperProps> = ({
           inputProps={{
             style: {
               textAlign: 'center',
-              color: '#000000',
-              WebkitTextFillColor: '#000000',
+              color: UIColors.text.black,
+              WebkitTextFillColor: UIColors.text.black,
               fontWeight: 600,
               ...AppStyles.monoFont,
             }
@@ -124,16 +124,16 @@ const NumberInputStepper: React.FC<NumberInputStepperProps> = ({
           sx={{
             width: 60,
             '& .MuiInputBase-input': {
-              color: '#000000 !important',
-              WebkitTextFillColor: '#000000 !important',
+              color: `${UIColors.text.black} !important`,
+              WebkitTextFillColor: `${UIColors.text.black} !important`,
             },
             '& .MuiOutlinedInput-input': {
-              color: '#000000 !important',
-              WebkitTextFillColor: '#000000 !important',
+              color: `${UIColors.text.black} !important`,
+              WebkitTextFillColor: `${UIColors.text.black} !important`,
             },
             '& input': {
-              color: '#000000 !important',
-              WebkitTextFillColor: '#000000 !important',
+              color: `${UIColors.text.black} !important`,
+              WebkitTextFillColor: `${UIColors.text.black} !important`,
             }
           }}
         />

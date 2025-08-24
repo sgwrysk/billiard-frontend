@@ -31,7 +31,7 @@ interface ToggleSwitchProps {
   /**
    * Custom styles
    */
-  sx?: any;
+  sx?: Record<string, unknown>;
 }
 
 /**

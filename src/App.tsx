@@ -20,6 +20,7 @@ import { Menu as MenuIcon, Home as HomeIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
 import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
+import { AppColors, UIColors } from './constants/colors';
 import GameSetup from './components/GameSetup';
 import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
@@ -31,18 +32,18 @@ import type { ChessClockSettings } from './types/index';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2', // Deep Blue
-      light: '#42a5f5',
-      dark: '#1565c0',
+      main: AppColors.theme.primary,
+      light: AppColors.theme.primaryLight,
+      dark: AppColors.theme.primaryDark,
     },
     secondary: {
-      main: '#ffc107', // Gold accent
-      light: '#fff350',
-      dark: '#c79100',
+      main: AppColors.theme.secondary, // Gold accent
+      light: AppColors.theme.secondaryLight,
+      dark: AppColors.theme.secondaryDark,
     },
     background: {
-      default: '#f8fafc',
-      paper: '#ffffff',
+      default: UIColors.background.default,
+      paper: UIColors.background.paper,
     },
   },
   typography: {
@@ -87,9 +88,9 @@ const theme = createTheme({
           },
         },
         contained: {
-          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+          background: `linear-gradient(135deg, ${AppColors.theme.primary} 0%, ${AppColors.theme.primaryLight} 100%)`,
           '&:hover': {
-            background: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+            background: `linear-gradient(135deg, ${AppColors.theme.primaryDark} 0%, ${AppColors.theme.primary} 100%)`,
           },
         },
       },
@@ -114,7 +115,7 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+          background: `linear-gradient(135deg, ${AppColors.theme.primary} 0%, ${AppColors.theme.primaryLight} 100%)`,
           boxShadow: '0 2px 10px rgba(25, 118, 210, 0.3)',
         },
       },

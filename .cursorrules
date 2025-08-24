@@ -49,6 +49,12 @@
 - Maintain test file size under 1000 lines (split if larger)
 - Create tests for all new common components
 
+## Refactoring Rules
+- BEFORE refactoring: Verify existing tests cover the target code
+- NO tests = NO refactoring: Add tests first, then refactor
+- AFTER refactoring: Always run `npm test` to verify no behavior changes
+- Large refactors: Break into small, testable increments
+
 ## Debugging Commands
 - Specific test: `npm test -- --run path/to/test.tsx`
 - Coverage details: `npm test -- --coverage --reporter=verbose`

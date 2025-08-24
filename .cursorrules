@@ -9,7 +9,7 @@
 
 ## Git & Deployment
 - Run full test suite before any commit
-- Commit messages in Japanese describing functional changes
+- **Commit messages in English describing functional changes**
 - Always include: `🤖 Generated with [Claude Code](https://claude.ai/code)` and `Co-Authored-By: Claude <noreply@anthropic.com>`
 - Only push when explicitly requested
 - **CRITICAL: Update README.md and README.ja.md before every push**

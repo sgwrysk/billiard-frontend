@@ -200,6 +200,11 @@ MIT License
 
 Bug reports and feature requests are welcome! Please use GitHub Issues.
 
+### Development Guidelines
+- **Code Comments**: All code comments must be written in **English only**
+- **Commit Messages**: All commit messages must be written in **English only**
+- **Testing**: Maintain 90%+ test coverage with comprehensive test suites
+
 ## 🧪 Testing
 
 This project includes comprehensive test coverage:

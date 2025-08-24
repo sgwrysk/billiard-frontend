@@ -13,7 +13,7 @@ This file contains project-specific guidelines and instructions for Claude Code,
 
 ### 📤 **Git Operations Rules / Git操作のルール**
 - **Pre-commit / コミット前**: Always run above checklist / 必ず上記チェックリストを実行
-- **Commit messages / コミットメッセージ**: Japanese description of functional changes / 日本語で機能追加内容を明確に記載
+- **Commit messages / コミットメッセージ**: **English description of functional changes** / **機能追加内容を英語で明確に記載**
 - **AI signature / AI署名**: Always add `🤖 Generated with [Claude Code](https://claude.ai/code)` and `Co-Authored-By: Claude <noreply@anthropic.com>`
 - **Push timing / Push実行**: Only when explicitly requested / 明示的な指示がある場合のみ
 - **README updates / README更新**: **MUST update README.md and README.ja.md before every push** / **Push前に必ずREADME.mdとREADME.ja.mdを最新に更新**

@@ -17,52 +17,52 @@ const getPinButtonText = (pins: number, frameInfo: FrameInfo | null) => {
   
   if (rollIndex === 0) {
     // 1投目
-    if (pins === 0) return 'G'; // ガーター
-    if (pins === 10) return 'X'; // ストライク
+    if (pins === 0) return 'G'; // Gutter
+    if (pins === 10) return 'X'; // Strike
     return pins.toString();
   } else {
     // 2投目以降
     if (frameIndex < 9) {
       // 1-9フレーム
-      if (pins === 0) return '-'; // ミス
-      if (frame.rolls[0] + pins === 10) return '/'; // スペア
+      if (pins === 0) return '-'; // Miss
+      if (frame.rolls[0] + pins === 10) return '/'; // Spare
       return pins.toString();
     } else {
-      // 10フレーム目
+      // 10th frame
       if (rollIndex === 1) {
         if (frame.rolls[0] === 10) {
-          // 1投目がストライクの場合、2投目は新しいフレーム扱い
-          if (pins === 0) return 'G'; // ガーター
-          if (pins === 10) return 'X'; // ストライク
+          // If first roll is a strike, second roll is treated as new frame
+          if (pins === 0) return 'G'; // Gutter
+          if (pins === 10) return 'X'; // Strike
           return pins.toString();
         } else {
-          // 1投目がストライクでない場合
-          if (pins === 0) return '-'; // ミス
+          // If first roll is not a strike
+          if (pins === 0) return '-'; // Miss
           if (frame.rolls[0] + pins === 10) return '/';
           return pins.toString();
         }
       } else {
-        // 3投目
+        // 3rd roll
         const firstRoll = frame.rolls[0];
         const secondRoll = frame.rolls[1];
         
         if (firstRoll === 10) {
-          // 1投目がストライクの場合
+          // If first roll is a strike
           if (secondRoll === 10) {
-            // 2投目もストライクの場合、3投目は新しいフレーム扱い
-            if (pins === 0) return 'G'; // ガーター
-            if (pins === 10) return 'X'; // ストライク
+            // If second roll is also a strike, third roll is treated as new frame
+            if (pins === 0) return 'G'; // Gutter
+            if (pins === 10) return 'X'; // Strike
             return pins.toString();
           } else {
-            // 2投目がストライクでない場合
-            if (pins === 0) return '-'; // ミス
+            // If second roll is not a strike
+            if (pins === 0) return '-'; // Miss
             if (secondRoll + pins === 10) return '/';
             return pins.toString();
           }
         } else {
-          // 1投目がストライクでない場合（スペアの場合のみ3投目がある）
-          if (pins === 0) return 'G'; // ガーター
-          if (pins === 10) return 'X'; // ストライク
+          // If first roll is not a strike (third roll only exists for spares)
+          if (pins === 0) return 'G'; // Gutter
+          if (pins === 10) return 'X'; // Strike
           return pins.toString();
         }
       }
@@ -253,11 +253,11 @@ describe('Bowlard Pin Button Display', () => {
         case '-':
           return BowlardColors.gutter.background; // 残念感を表現
         case '/':
-          return BowlardColors.spare.background; // 穏やかな成功を表現
+          return BowlardColors.spare.background; // Express modest success
         case 'X':
-          return BowlardColors.strike.background; // 華やかな成功を表現
+          return BowlardColors.strike.background; // Express brilliant success
         default:
-          return BowlardColors.number.background; // ニュートラルな数字ボタン
+          return BowlardColors.number.background; // Neutral number button
       }
     };
 
@@ -267,11 +267,11 @@ describe('Bowlard Pin Button Display', () => {
         case '-':
           return BowlardColors.gutter.text; // 残念感を表現
         case '/':
-          return BowlardColors.spare.text; // 穏やかな成功を表現
+          return BowlardColors.spare.text; // Express modest success
         case 'X':
-          return BowlardColors.strike.text; // 華やかな成功を表現
+          return BowlardColors.strike.text; // Express brilliant success
         default:
-          return BowlardColors.number.text; // ニュートラルな数字ボタン
+          return BowlardColors.number.text; // Neutral number button
       }
     };
 

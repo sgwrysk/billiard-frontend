@@ -7,45 +7,45 @@ const renderRollResult = (frame: BowlingFrame, rollIndex: number) => {
   if (roll === undefined) return '';
   
   if (frame.frameNumber === 10) {
-    // 10フレーム目
+    // 10th frame
     if (rollIndex === 0) {
-      // 1投目: 0はガーター（G）
+      // 1st roll: 0 is gutter (G)
       return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
     } else if (rollIndex === 1) {
       if (frame.rolls[0] === 10) {
-        // 1投目がストライクの場合、2投目は新しいフレーム扱い
+        // If first roll is a strike, second roll is treated as new frame
         return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
       } else {
-        // 1投目がストライクでない場合、2投目は0をミス（-）で表示
+        // If first roll is not a strike, second roll shows 0 as miss (-)
         return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
       }
     } else {
-      // 3投目
+      // 3rd roll
       const firstRoll = frame.rolls[0];
       const secondRoll = frame.rolls[1];
       
       if (firstRoll === 10) {
-        // 1投目がストライクの場合
+        // If first roll is a strike
         if (secondRoll === 10) {
-          // 2投目もストライクの場合、3投目は新しいフレーム扱い
+          // If second roll is also a strike, third roll is treated as new frame
           return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
         } else {
-          // 2投目がストライクでない場合、3投目は0をミス（-）で表示
+          // If second roll is not a strike, third roll shows 0 as miss (-)
           return (secondRoll + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
         }
       } else {
-        // 1投目がストライクでない場合（スペアの場合のみ3投目がある）
-        // 3投目は新しいフレーム扱い
+        // If first roll is not a strike (third roll only exists for spares)
+        // Third roll is treated as new frame
         return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
       }
     }
   } else {
-    // 1-9フレーム
+    // Frames 1-9
     if (rollIndex === 0) {
-      // 1投目: 0はガーター（G）
+      // 1st roll: 0 is gutter (G)
       return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
     } else {
-      // 2投目: 0はミス（-）
+      // 2nd roll: 0 is miss (-)
       return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
     }
   }
@@ -103,7 +103,7 @@ describe('Bowlard Score Display', () => {
         const frame = createFrame(10, [0, 5], 5, false, false, true);
         
         expect(renderRollResult(frame, 0)).toBe('G');
-        expect(renderRollResult(frame, 1)).toBe('5'); // 2投目は通常の数字表示
+        expect(renderRollResult(frame, 1)).toBe('5'); // Second roll shows normal number
       });
 
       it('should display "-" for miss on second roll (no strike)', () => {
@@ -118,7 +118,7 @@ describe('Bowlard Score Display', () => {
         
         expect(renderRollResult(frame, 0)).toBe('X');
         expect(renderRollResult(frame, 1)).toBe('G'); // New frame after strike
-        expect(renderRollResult(frame, 2)).toBe('5'); // 3投目は通常の数字表示
+        expect(renderRollResult(frame, 2)).toBe('5'); // Third roll shows normal number
       });
 
       it('should display "/" for spare and then handle third roll', () => {

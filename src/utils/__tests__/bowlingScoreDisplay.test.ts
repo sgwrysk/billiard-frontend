@@ -8,54 +8,54 @@ const isScoreFinalized = (frameIndex: number, frames: BowlingFrame[]): boolean =
     return false;
   }
 
-  // 10フレーム目は常に確定
+  // 10th frame is always finalized
   if (frameIndex === 9) {
     return true;
   }
 
-  // ストライクの場合、次の2投が必要
+  // For strikes, next 2 rolls are needed
   if (frame.isStrike) {
     if (frameIndex === 8) {
-      // 9フレーム目がストライクの場合、10フレーム目の2投が必要
+      // If 9th frame is a strike, 2 rolls in 10th frame are needed
       const frame10 = frames[9];
       return frame10 && frame10.rolls.length >= 2;
     } else {
-      // 1-8フレーム目のストライクの場合
+      // For strikes in frames 1-8
       const nextFrame = frames[frameIndex + 1];
       if (!nextFrame) return false;
       
       if (nextFrame.isStrike) {
-        // 次のフレームもストライクの場合、その次のフレームの1投目が必要
+        // If next frame is also a strike, 1st roll of frame after that is needed
         if (frameIndex + 1 === 8) {
-          // 次が9フレーム目の場合、10フレーム目の1投目が必要
+          // If next is 9th frame, 1st roll of 10th frame is needed
           const frame10 = frames[9];
           return frame10 && frame10.rolls.length >= 1;
         } else {
-          // その他の場合、その次のフレームの1投目が必要
+          // In other cases, 1st roll of next-next frame is needed
           const frameAfterNext = frames[frameIndex + 2];
           return frameAfterNext && frameAfterNext.rolls.length >= 1;
         }
       } else {
-        // 次のフレームがストライクでない場合、次のフレームの2投が必要
+        // If next frame is not a strike, 2 rolls in next frame are needed
         return nextFrame.rolls.length >= 2;
       }
     }
   }
 
-  // スペアの場合、次の1投が必要
+  // For spares, next 1 roll is needed
   if (frame.isSpare) {
     if (frameIndex === 8) {
-      // 9フレーム目がスペアの場合、10フレーム目の1投目が必要
+      // If 9th frame is a spare, 1st roll of 10th frame is needed
       const frame10 = frames[9];
       return frame10 && frame10.rolls.length >= 1;
     } else {
-      // 1-8フレーム目のスペアの場合、次のフレームの1投目が必要
+      // For spares in frames 1-8, 1st roll of next frame is needed
       const nextFrame = frames[frameIndex + 1];
       return nextFrame && nextFrame.rolls.length >= 1;
     }
   }
 
-  // 通常のフレーム（ストライクでもスペアでもない）は即座に確定
+  // Regular frames (neither strike nor spare) are immediately finalized
   return true;
 };
 

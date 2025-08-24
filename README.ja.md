@@ -125,6 +125,9 @@ npm test -- --coverage
 ### 国際化
 `src/contexts/LanguageContext.tsx`で翻訳を追加
 
+### コードコメントルール
+国際的な開発者との協力とコードの一貫性を保つため、すべてのコード内コメントは**英語のみ**で記述する必要があります。
+
 ## 📄 ライセンス
 
 MIT License

@@ -36,6 +36,7 @@ This file contains project-specific guidelines and instructions for Claude Code,
 - TypeScriptの厳密な型定義を維持
 - ESLintエラーは必ず修正（警告は許可）
 - 既存のコード規約とパターンに従う
+- **コメント言語**: すべてのコード内コメントは英語で記述
 
 ### **UIコンポーネント**
 - Material-UIの使用を継続
@@ -82,6 +83,7 @@ src/
 - **文言のハードコード禁止** - 必ず言語設定対応
 - **色のハードコード禁止** - `src/constants/colors.ts` を使用
 - **巨大ファイルの放置禁止** - 500行超で分割検討、1000行超で必須分割
+- **日本語コメント禁止** - コード内コメントは必ず英語で記述
 
 ### **推奨事項**
 - 既存パターンとコード規約の継承

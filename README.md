@@ -178,6 +178,9 @@ Add translations in `src/contexts/LanguageContext.tsx`
 ### Ball Design
 Customize ball colors and styling in `getBallColor()` functions
 
+### Code Comments
+All code comments must be written in **English only** to maintain consistency and readability for international contributors.
+
 ## 🌐 Deployment
 
 This app is deployed as a static site on Render with automatic deployments from the main branch.

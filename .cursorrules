@@ -20,6 +20,7 @@
 - Use Japanese as primary UI language
 - Minimize use of `any` type
 - Prefer editing existing files over creating new ones
+- **ALL code comments must be written in English only**
 
 ## UI/UX Guidelines
 - Keep UI/UX and interactions extremely simple
@@ -69,3 +70,4 @@
 - NO hardcoded strings or colors - use proper systems
 - Common components over duplicated code
 - File size discipline - split early and often
+- English-only code comments - no Japanese in code

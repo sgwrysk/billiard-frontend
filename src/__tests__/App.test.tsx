@@ -35,7 +35,9 @@ describe('App', () => {
   it('should render language selector with Japanese text', () => {
     render(<App />);
     
-    expect(screen.getByText('🇯🇵 日本語')).toBeInTheDocument();
+    // 言語セレクターに日本国旗と日本語テキストが存在することを確認
+    expect(screen.getByText('🇯🇵')).toBeInTheDocument();
+    expect(screen.getByText('日本語')).toBeInTheDocument();
   });
 
   it('should start on setup screen', () => {
@@ -345,12 +347,12 @@ describe('App', () => {
     it('should show Buy Me Coffee in English when language is switched', async () => {
       render(<App />);
       
-      // Switch to English - find the select element and click it
-      const languageSelect = screen.getByText('🇯🇵 日本語').closest('[role="combobox"]');
+      // Switch to English - find the language select element specifically
+      const languageSelect = screen.getByText('🇯🇵').closest('[role="combobox"]');
       fireEvent.mouseDown(languageSelect!);
       
       await waitFor(() => {
-        const englishOption = screen.getByText(/🇺🇸 English/);
+        const englishOption = screen.getByText(/English/);
         fireEvent.click(englishOption);
       });
 

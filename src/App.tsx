@@ -356,7 +356,7 @@ const AppContent: React.FC = () => {
           )}
           
           {/* Language selector */}
-          <FormControl size="small" sx={{ mr: 2, minWidth: 120 }}>
+          <FormControl size="small" sx={{ mr: 2, minWidth: { xs: 60, sm: 120 } }}>
             <Select
               value={language}
               onChange={(e) => handleLanguageChange(e.target.value as LanguageType)}
@@ -370,12 +370,12 @@ const AppContent: React.FC = () => {
             >
               <MenuItem value="ja">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🇯🇵 {t('language.japanese')}
+                  🇯🇵 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>{t('language.japanese')}</Box>
                 </Box>
               </MenuItem>
               <MenuItem value="en">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🇺🇸 {t('language.english')}
+                  🇺🇸 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>{t('language.english')}</Box>
                 </Box>
               </MenuItem>
             </Select>

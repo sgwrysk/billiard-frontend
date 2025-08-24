@@ -48,7 +48,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
       if (rollIndex === 0) {
         return 10; // 1投目は最大10本
       } else {
-        return 10 - frame.rolls[0]; // 2投目は残りピン数
+        return 10 - frame.rolls[0]; // Second roll is remaining pins
       }
     } else {
       // 10フレーム目
@@ -56,7 +56,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
         return 10;
       } else if (rollIndex === 1) {
         if (frame.rolls[0] === 10) {
-          return 10; // 1投目がストライクなら2投目も10本
+          return 10; // If first roll is strike, second roll can also be 10
         } else {
           return 10 - frame.rolls[0];
         }
@@ -68,10 +68,10 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
         if (firstRoll === 10) {
           // 1投目がストライクの場合
           if (secondRoll === 10) {
-            // 2投目もストライクなら3投目も10本可能
+            // If second roll is also strike, third roll can be 10
             return 10;
           } else {
-            // 2投目がストライクでないなら残りピン数
+            // If second roll is not strike, remaining pins
             return 10 - secondRoll;
           }
         } else {
@@ -80,7 +80,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
             // スペアの場合、3投目は10本可能
             return 10;
           } else {
-            // この場合は3投目は存在しないはずなので、-1を返してボタンを非表示にする
+            // Third roll should not exist in this case, return -1 to hide button
             return -1;
           }
         }

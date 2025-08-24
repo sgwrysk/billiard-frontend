@@ -70,7 +70,7 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
               elevation={player.isActive ? 6 : 2}
               onClick={() => onWinSet(player.id)}
               sx={{
-                position: 'relative', // 絶対配置の基準点を設定
+                position: 'relative', // Set reference point for absolute positioning
                 border: player.isActive ? `2px solid ${GameColors.playerSelected.background}` : GameColors.playerUnselected.border,
                 transform: player.isActive ? 'scale(1.02)' : 'scale(1)',
                 transition: 'all 0.2s ease-in-out',
@@ -111,7 +111,7 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 
                 {/* Break Icon - only show on the player who breaks */}
                 {alternatingBreak && (() => {
-                  // 現在のラック数に基づいて、どちらのプレイヤーがブレイクするかを判定
+                  // Determine which player breaks based on current rack number
                   const currentRack = game.totalRacks + 1; // 次のラック番号
                   const isOddRack = currentRack % 2 === 0;
                   const isBreakPlayer = (game.players.indexOf(player) === 0 && isOddRack) || 

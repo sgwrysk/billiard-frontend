@@ -101,7 +101,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
         <Paper
           sx={{
             position: 'fixed',
-            top: game.chessClock?.enabled ? 144 : 64, // チェスクロック有効時は下にずらす
+            top: game.chessClock?.enabled ? 144 : 64, // Shift down when chess clock is enabled
             left: 0,
             right: 0,
             zIndex: 1040,
@@ -288,7 +288,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
                     color: isBallPocketed(ballNumber) ? UIColors.text.lightGray : UIColors.text.black,
                     '&:hover': {
                       transform: 'scale(1.08)',
-                      // ホバー時も元の背景色を保持
+                      // Maintain original background color on hover
                       background: isBallPocketed(ballNumber)
                         ? `${BallColors.pocketed.background} !important`
                         : ballNumber > 8

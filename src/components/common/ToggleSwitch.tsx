@@ -9,27 +9,27 @@ import {
 
 interface ToggleSwitchProps {
   /**
-   * トグルスイッチの状態
+   * Toggle switch state
    */
   checked: boolean;
   /**
-   * 状態が変更された時のコールバック
+   * Callback when state changes
    */
   onChange: (checked: boolean) => void;
   /**
-   * トグルスイッチのラベル
+   * Toggle switch label
    */
   label: string;
   /**
-   * 説明文（オプション）
+   * Description text (optional)
    */
   description?: string;
   /**
-   * 無効化するかどうか
+   * Whether to disable
    */
   disabled?: boolean;
   /**
-   * カスタムスタイル
+   * Custom styles
    */
   sx?: any;
 }

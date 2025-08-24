@@ -114,7 +114,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
     <Box sx={{ maxWidth: 600, mx: 'auto', p: 2 }}>
       <Card>
         <CardContent>
-          {/* ゲームタイプ選択 */}
+          {/* Game type selection */}
           <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel>{t('setup.gameType')}</InputLabel>
             <Select
@@ -248,7 +248,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
             </Box>
           )}
 
-          {/* ゲーム開始ボタン */}
+          {/* Game start button */}
           <Button
             fullWidth
             variant="contained"

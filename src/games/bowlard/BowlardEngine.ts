@@ -9,12 +9,12 @@ export class BowlardEngine extends GameBase {
   }
   
   getBallNumbers(): number[] {
-    // Bowlardではボールは使用しない
+    // Bowlard doesn't use balls
     return [];
   }
   
   initializePlayers(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Player[] {
-    // 単一プレイヤーのみ
+    // Single player only
     const setup = playerSetups[0];
     return [{
       id: 'player-1',
@@ -27,12 +27,12 @@ export class BowlardEngine extends GameBase {
   }
   
   handlePocketBall(game: Game, _ballNumber: number): Game {
-    // Bowlardではボールポケットは使用しない
+    // Bowlard doesn't use ball pockets
     return game;
   }
   
   handleSwitchPlayer(game: Game): Game {
-    // Bowlardは単一プレイヤーのみなので交代なし
+    // Bowlard is single player only, no switching
     return game;
   }
   
@@ -40,7 +40,7 @@ export class BowlardEngine extends GameBase {
     const player = game.players[0];
     if (!player.bowlingFrames) return { isGameOver: false };
     
-    // 10フレーム目が完了しているかチェック
+    // Check if 10th frame is completed
     const tenthFrame = player.bowlingFrames[9];
     if (tenthFrame && tenthFrame.isComplete) {
       return { isGameOver: true, winnerId: player.id };
@@ -70,23 +70,23 @@ export class BowlardEngine extends GameBase {
     
     const frames = [...player.bowlingFrames];
     
-    // 現在のフレームを見つける
+    // Find current frame
     const currentFrameIndex = frames.findIndex(frame => !frame.isComplete);
-    if (currentFrameIndex === -1) return game; // 全て完了している場合
+    if (currentFrameIndex === -1) return game; // All completed
     
     const currentFrame = { 
       ...frames[currentFrameIndex],
       rolls: [...frames[currentFrameIndex].rolls]
     };
     
-    // 投球数を追加
+    // Add pin count
     currentFrame.rolls.push(pins);
     
-    // フレーム状態を更新
+    // Update frame status
     const updatedFrame = updateFrameStatus(currentFrame, currentFrameIndex);
     frames[currentFrameIndex] = updatedFrame;
     
-    // スコア計算
+    // Calculate scores
     const calculatedFrames = calculateBowlingScores(frames);
     
     const updatedPlayer = {
@@ -107,7 +107,7 @@ export class BowlardEngine extends GameBase {
     
     const frames = [...player.bowlingFrames];
     
-    // 最後に投球したフレームを見つける
+    // Find the last frame with rolls
     let lastFrameWithRolls: BowlingFrame | null = null;
     let lastFrameIndex = -1;
     
@@ -121,11 +121,11 @@ export class BowlardEngine extends GameBase {
     
     if (!lastFrameWithRolls || lastFrameIndex === -1) return game;
     
-    // 最後の投球を削除
+    // Remove last roll
     const updatedFrame = { ...lastFrameWithRolls };
     updatedFrame.rolls = updatedFrame.rolls.slice(0, -1);
     
-    // フレーム状態をリセット
+    // Reset frame status
     updatedFrame.isComplete = false;
     updatedFrame.isStrike = false;
     updatedFrame.isSpare = false;
@@ -133,12 +133,12 @@ export class BowlardEngine extends GameBase {
     
     frames[lastFrameIndex] = updatedFrame;
     
-    // その後のフレームのスコアもリセット
+    // Reset scores for subsequent frames too
     for (let i = lastFrameIndex; i < frames.length; i++) {
       frames[i].score = undefined;
     }
     
-    // スコア再計算
+    // Recalculate scores
     const recalculatedFrames = calculateBowlingScores(frames);
     
     const updatedPlayer = {
@@ -154,7 +154,7 @@ export class BowlardEngine extends GameBase {
   }
   
   handleUndo(game: Game): Game {
-    // BowlardではhandleUndoBowlingRollを使用
+    // Use handleUndoBowlingRoll for Bowlard
     return this.handleUndoBowlingRoll(game);
   }
 }

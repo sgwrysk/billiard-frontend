@@ -96,7 +96,7 @@ export const useGame = () => {
   const endGame = useCallback(() => {
     if (!currentGame) return;
 
-    setCurrentGame(null); // ゲーム終了後はnullにする
+    setCurrentGame(null); // Set to null after game ends
   }, [currentGame]);
 
   // Reset game
@@ -110,15 +110,15 @@ export const useGame = () => {
 
     switch (currentGame.type) {
       case GameType.SET_MATCH:
-        // セットマッチ: まだセットを獲得していない状態
+        // Set Match: state where no sets have been won yet
         return currentGame.players.reduce((sum, p) => sum + (p.setsWon || 0), 0) === 0;
       
       case GameType.ROTATION:
-        // ローテーション: 両方のプレイヤーがまだ得点していない状態
+        // Rotation: state where both players haven't scored yet
         return currentGame.players.every(p => p.score === 0);
       
       case GameType.BOWLARD:
-        // ボーラード: 最初の投球が行われるまでを初期状態とする
+        // Bowlard: consider initial state until first roll is made
         return currentGame.players.every(p => 
           !p.bowlingFrames || 
           p.bowlingFrames.every(frame => frame.rolls.length === 0)
@@ -186,11 +186,11 @@ export const useGame = () => {
     const engine = GameEngineFactory.getEngine(currentGame.type);
     
     if (engine.hasCustomLogic() && engine.handleCustomAction) {
-      // カスタムアクションとしてアンドゥを処理
+      // Handle undo as custom action
       const updatedGame = engine.handleCustomAction(currentGame, 'UNDO_LAST_SHOT');
       setCurrentGame(updatedGame);
     } else {
-      // デフォルトのアンドゥ処理を使用
+      // Use default undo processing
       const updatedGame = engine.handleUndo(currentGame);
       setCurrentGame(updatedGame);
     }
@@ -212,7 +212,7 @@ export const useGame = () => {
   const checkAllBallsPocketed = useCallback((): boolean => {
     if (!currentGame) return false;
     
-    // エンジンから直接ボール番号を取得
+    // Get ball numbers directly from engine
     const engine = GameEngineFactory.getEngine(currentGame.type);
     const totalBalls = engine.getBallNumbers();
     const pocketedBalls = currentGame.players.reduce((acc, player) => {

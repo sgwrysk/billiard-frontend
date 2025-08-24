@@ -15,14 +15,14 @@ export class RotationEngine extends GameBase {
   handlePocketBall(game: Game, ballNumber: number): Game {
     const activePlayer = game.players[game.currentPlayerIndex];
     
-    // ボールが既にポケットされているかチェック
+    // Check if ball is already pocketed
     if (this.isBallPocketed(game, ballNumber)) {
       return game;
     }
     
     const score = getBallScore(ballNumber, this.getGameType());
     
-    // プレイヤーの状態を更新
+    // Update player state
     const updatedPlayers = game.players.map(player => {
       if (player.id === activePlayer.id) {
         return {
@@ -34,7 +34,7 @@ export class RotationEngine extends GameBase {
       return player;
     });
     
-    // ショット履歴を追加
+    // Add shot history
     const gameWithShotHistory = this.addShotToHistory(
       { ...game, players: updatedPlayers },
       activePlayer.id,
@@ -42,10 +42,10 @@ export class RotationEngine extends GameBase {
       true
     );
     
-    // スコア履歴も追加（グラフ表示のため）
+    // Also add score history (for graph display)
     const scoreEntry = {
       playerId: activePlayer.id,
-      score: score, // このボールで獲得したスコア
+      score: score, // Score gained from this ball
       timestamp: new Date(),
     };
     
@@ -91,10 +91,10 @@ export class RotationEngine extends GameBase {
       case 'RESET_RACK':
         return this.handleResetRack(game);
       case 'CHECK_ALL_BALLS_POCKETED':
-        // booleanを返すため、ゲーム状態は変更しない
+        // Don't change game state as this returns boolean
         return game;
       case 'UNDO_LAST_SHOT':
-        // ROTATIONではデフォルトのアンドゥ処理を使用
+        // Use default undo processing for ROTATION
         return this.handleUndo(game);
       default:
         return game;

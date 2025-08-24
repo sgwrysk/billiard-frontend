@@ -18,10 +18,10 @@ export class SetMatchEngine extends GameBase {
       name: setup.name,
       score: 0,
       ballsPocketed: [],
-      isActive: false, // セットマッチでは最初は誰も選択されていない
+      isActive: false, // In Set Match, no one is initially selected
       targetScore: setup.targetScore,
       targetSets: setup.targetSets,
-      setsWon: 0, // セットマッチ専用
+      setsWon: 0, // Set Match specific
     }));
   }
   
@@ -39,21 +39,21 @@ export class SetMatchEngine extends GameBase {
       currentRack: 1,
       rackInProgress: true,
       shotHistory: [],
-      scoreHistory: [], // SET_MATCHでは初期のscoreHistoryは空
+      scoreHistory: [], // Initial scoreHistory is empty for SET_MATCH
     };
   }
   
   handlePocketBall(game: Game, ballNumber: number): Game {
     const activePlayer = game.players[game.currentPlayerIndex];
     
-    // ボールが既にポケットされているかチェック
+    // Check if ball is already pocketed
     if (this.isBallPocketed(game, ballNumber)) {
       return game;
     }
     
     const score = getBallScore(ballNumber, this.getGameType());
     
-    // プレイヤーの状態を更新
+    // Update player state
     const updatedPlayers = game.players.map(player => {
       if (player.id === activePlayer.id) {
         return {
@@ -65,7 +65,7 @@ export class SetMatchEngine extends GameBase {
       return player;
     });
     
-    // ショット履歴を追加
+    // Add shot history
     const updatedGame = this.addShotToHistory(
       { ...game, players: updatedPlayers },
       activePlayer.id,
@@ -125,8 +125,8 @@ export class SetMatchEngine extends GameBase {
         return {
           ...player,
           setsWon: currentSets + 1,
-          score: 1, // テストでは勝利後にスコア1が期待されている
-          ballsPocketed: [], // ポケットボールもリセット
+          score: 1, // Tests expect score of 1 after victory
+          ballsPocketed: [], // Reset pocketed balls too
         };
       }
       return {
@@ -140,7 +140,7 @@ export class SetMatchEngine extends GameBase {
       ...game,
       players: updatedPlayers,
       currentRack: game.currentRack + 1,
-      totalRacks: game.totalRacks + 1, // セット完了時にtotalRacksを更新
+      totalRacks: game.totalRacks + 1, // Update totalRacks when set is completed
       scoreHistory: [
         ...game.scoreHistory,
         {
@@ -151,7 +151,7 @@ export class SetMatchEngine extends GameBase {
       ],
     };
     
-    // 勝利条件をチェックして、必要に応じてゲームを終了
+    // Check victory condition and end game if necessary
     const victoryCheck = this.checkVictoryCondition(updatedGame);
     if (victoryCheck.isGameOver) {
       return {
@@ -188,21 +188,21 @@ export class SetMatchEngine extends GameBase {
   }
   
   private handleUndoLastShot(game: Game): Game {
-    // セットマッチでは、最後のセット勝利を取り消す
+    // In Set Match, undo the last set victory
     if (game.scoreHistory.length === 0) {
-      return game; // 何も取り消すものがない
+      return game; // Nothing to undo
     }
     
     const lastEntry = game.scoreHistory[game.scoreHistory.length - 1];
     const winnerId = lastEntry.playerId;
     
-    // 最後のセット勝利を取り消し
+    // Undo the last set victory
     const updatedPlayers = game.players.map(player => {
       if (player.id === winnerId) {
         const currentSets = player.setsWon || 0;
         return {
           ...player,
-          setsWon: Math.max(0, currentSets - 1), // 0未満にはならない
+          setsWon: Math.max(0, currentSets - 1), // Don't go below 0
         };
       }
       return player;
@@ -211,9 +211,9 @@ export class SetMatchEngine extends GameBase {
     return {
       ...game,
       players: updatedPlayers,
-      scoreHistory: game.scoreHistory.slice(0, -1), // 最後のエントリを削除
-      currentRack: Math.max(1, game.currentRack - 1), // 1未満にはならない
-      totalRacks: Math.max(0, game.totalRacks - 1), // セット取り消し時にtotalRacksも更新
+      scoreHistory: game.scoreHistory.slice(0, -1), // Remove last entry
+      currentRack: Math.max(1, game.currentRack - 1), // Don't go below 1
+      totalRacks: Math.max(0, game.totalRacks - 1), // Update totalRacks when undoing set
     };
   }
 }

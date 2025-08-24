@@ -355,7 +355,7 @@ describe('RotationBoard', () => {
     expect(screen.getAllByText('5').length).toBeGreaterThan(0); // Ball 5
   });
 
-  it('should show "なし" when player has not pocketed any balls', () => {
+  it('should show "None" when player has not pocketed any balls', () => {
     const gameWithNoBalls = createMockGame();
     // Clear shot history to simulate no pocketed balls
     gameWithNoBalls.shotHistory = [];
@@ -374,7 +374,7 @@ describe('RotationBoard', () => {
       </TestWrapper>
     );
 
-    // Both players should show "なし" when no balls are pocketed
+    // Both players should show "None" when no balls are pocketed
     expect(screen.getAllByText('なし')).toHaveLength(2);
   });
 
@@ -442,7 +442,7 @@ describe('RotationBoard', () => {
     expect(player2Section).toBeInTheDocument();
 
     // Verify pocketed balls are displayed in player cards
-    // Player 1 should show pocketed balls, Player 2 should show "なし"
+    // Player 1 should show pocketed balls, Player 2 should show "None"
     expect(screen.getAllByText('1').length).toBeGreaterThan(1); // Once in selection, once in player card
     expect(screen.getAllByText('2').length).toBeGreaterThan(1); // Once in selection, once in player card
     expect(screen.getAllByText('3').length).toBeGreaterThan(1); // Once in selection, once in player card
@@ -795,7 +795,7 @@ describe('RotationBoard', () => {
       
       fireEvent.click(player2ChessClockButton!);
       
-      // チェスクロックの正しい動作：プレイヤー2のボタンを押すとプレイヤー1がアクティブになる
+      // Correct chess clock behavior: pressing Player 2's button makes Player 1 active
       expect(mockOnSwitchToPlayer).toHaveBeenCalledWith(0);
     });
 

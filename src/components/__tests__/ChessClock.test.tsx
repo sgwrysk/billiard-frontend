@@ -332,7 +332,7 @@ describe('ChessClock', () => {
       const player1Button = screen.getByText('Alice').closest('button');
       fireEvent.click(player1Button!);
       
-      // チェスクロックの正しい動作：プレイヤー1のボタンを押すとプレイヤー2がアクティブになる
+      // Correct chess clock behavior: pressing Player 1's button makes Player 2 active
       expect(mockOnPlayerSelect).toHaveBeenCalledWith(1);
     });
 
@@ -343,7 +343,7 @@ describe('ChessClock', () => {
       const player2Button = screen.getByText('Bob').closest('button');
       fireEvent.click(player2Button!);
       
-      // チェスクロックの正しい動作：プレイヤー2のボタンを押すとプレイヤー1がアクティブになる
+      // Correct chess clock behavior: pressing Player 2's button makes Player 1 active
       expect(mockOnPlayerSelect).toHaveBeenCalledWith(0);
     });
 
@@ -365,7 +365,7 @@ describe('ChessClock', () => {
       
       // Should still call onPlayerSelect when clicked
       fireEvent.click(player1Button!);
-      // チェスクロックの正しい動作：プレイヤー1のボタンを押すとプレイヤー2がアクティブになる
+      // Correct chess clock behavior: pressing Player 1's button makes Player 2 active
       expect(mockOnPlayerSelect).toHaveBeenCalledWith(1);
     });
 
@@ -392,7 +392,7 @@ describe('ChessClock', () => {
       expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
       
       // onPlayerSelect should be called
-      // チェスクロックの正しい動作：プレイヤー1のボタンを押すとプレイヤー2がアクティブになる
+      // Correct chess clock behavior: pressing Player 1's button makes Player 2 active
       expect(mockOnPlayerSelect).toHaveBeenCalledWith(1);
     });
   });

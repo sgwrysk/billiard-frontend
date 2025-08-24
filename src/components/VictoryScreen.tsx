@@ -278,7 +278,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     }));
 
     // Create labels (inning numbers)
-    const labels = ['Start', ...Array.from({ length: innings.length }, (_, i) => `イニング${i + 1}`)];
+    const labels = ['Start', ...Array.from({ length: innings.length }, (_, i) => `Inning ${i + 1}`)];
 
     return {
       labels,
@@ -353,7 +353,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       x: {
         title: {
           display: true,
-          text: game.type === GameType.BOWLARD ? 'フレーム' : game.type === GameType.ROTATION ? 'イニング' : 'ショット数',
+          text: game.type === GameType.BOWLARD ? 'Frame' : game.type === GameType.ROTATION ? 'Inning' : 'Shot',
         },
       },
     },
@@ -361,7 +361,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
-      {/* 勝利アナウンス（ボーラード以外のみ） */}
+      {/* Victory announcement (for non-Bowlard games only) */}
       {game.type !== GameType.BOWLARD && (
         <Card sx={{ mb: 3, bgcolor: 'success.50', border: '2px solid', borderColor: 'success.main' }}>
           <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -750,14 +750,14 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h5" gutterBottom>
-            ゲーム詳細
+ゲーム詳細
           </Typography>
           
           <Grid container spacing={3}>
             <Grid item xs={12} md={game.type === GameType.BOWLARD ? 12 : 6}>
               <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                 <Typography variant="h6" gutterBottom>
-                  ゲーム情報
+ゲーム情報
                 </Typography>
                 <Stack spacing={1}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -780,7 +780,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                   <Typography variant="h6" gutterBottom>
-                    最終スコア
+  最終スコア
                   </Typography>
                   <Stack spacing={2}>
                     {game.players.map(player => (
@@ -845,7 +845,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                ポケットしたボール
+ポケットしたボール
               </Typography>
               {rackData.map(rack => (
                 <Box key={rack.rackNumber} sx={{ mb: 4 }}>
@@ -932,7 +932,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         );
       })()}
 
-      {/* アクションボタン */}
+      {/* Action buttons */}
       <Paper sx={{ p: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>

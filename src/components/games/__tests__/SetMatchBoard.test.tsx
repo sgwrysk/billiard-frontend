@@ -1145,7 +1145,7 @@ describe('SetMatchBoard', () => {
       
       fireEvent.click(bobChessClockButton!);
       
-      // チェスクロックの正しい動作：プレイヤー2(Bob)のボタンを押すとプレイヤー1がアクティブになる
+      // Correct chess clock behavior: pressing Player 2's (Bob's) button makes Player 1 active
       expect(mockOnSwitchToPlayer).toHaveBeenCalledWith(0);
     });
 

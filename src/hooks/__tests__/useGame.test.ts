@@ -42,10 +42,10 @@ describe('useGame', () => {
       expect(result.current.currentGame?.type).toBe(GameType.SET_MATCH);
       expect(result.current.currentGame?.players).toHaveLength(2);
       expect(result.current.currentGame?.players[0].name).toBe('Player 1');
-      // SET_MATCHでは最初は誰も選択されていない
+      // In SET_MATCH, no one is selected initially
       expect(result.current.currentGame?.players[0].isActive).toBe(false);
       expect(result.current.currentGame?.players[1].isActive).toBe(false);
-      // setsWonが初期化されている
+      // setsWon is initialized
       expect(result.current.currentGame?.players[0].setsWon).toBe(0);
       expect(result.current.currentGame?.players[1].setsWon).toBe(0);
     });
@@ -95,7 +95,7 @@ describe('useGame', () => {
         result.current.pocketBall(5);
       });
 
-      // SET_MATCHでは現在のプレイヤー（currentPlayerIndex）のスコアが更新される
+      // In SET_MATCH, the current player's (currentPlayerIndex) score is updated
       const currentPlayer = result.current.currentGame?.players[result.current.currentGame.currentPlayerIndex];
       expect(currentPlayer?.ballsPocketed).toContain(5);
       expect(currentPlayer?.score).toBe(1); // SET_MATCH: all balls except 9-ball are 1 point
@@ -327,15 +327,15 @@ describe('useGame', () => {
         );
       });
 
-      // 初期状態を記録（現在は使用しないが、将来的なテスト拡張のため残す）
+      // Record initial state (not used currently, but kept for future test expansion)
       // const initialState = result.current.currentGame;
 
-      // 何もセットを勝っていない状態でアンドゥ
+      // Undo when no sets have been won
       act(() => {
         result.current.undoLastShot();
       });
 
-      // 何も変わらない
+      // Nothing changes
       expect(result.current.currentGame?.scoreHistory).toHaveLength(0);
       expect(result.current.currentGame?.players[0].setsWon).toBe(0);
       expect(result.current.currentGame?.players[1].setsWon).toBe(0);
@@ -351,7 +351,7 @@ describe('useGame', () => {
         );
       });
 
-      // SET_MATCHでは最初は誰もアクティブでない
+      // In SET_MATCH, no one is active initially
       const players = result.current.currentGame?.players;
       expect(players?.every(p => !p.isActive)).toBe(true);
       expect(players?.[0].setsWon).toBe(0);

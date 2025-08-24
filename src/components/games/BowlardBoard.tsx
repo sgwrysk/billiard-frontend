@@ -44,14 +44,14 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
     const { frameIndex, rollIndex, frame } = frameInfo;
     
     if (frameIndex < 9) {
-      // 1-9フレーム
+      // Frames 1-9
       if (rollIndex === 0) {
         return 10; // 1投目は最大10本
       } else {
         return 10 - frame.rolls[0]; // Second roll is remaining pins
       }
     } else {
-      // 10フレーム目
+      // 10th frame
       if (rollIndex === 0) {
         return 10;
       } else if (rollIndex === 1) {
@@ -61,12 +61,12 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
           return 10 - frame.rolls[0];
         }
       } else {
-        // 3投目
+        // 3rd roll
         const firstRoll = frame.rolls[0];
         const secondRoll = frame.rolls[1];
         
         if (firstRoll === 10) {
-          // 1投目がストライクの場合
+          // If first roll is a strike
           if (secondRoll === 10) {
             // If second roll is also strike, third roll can be 10
             return 10;
@@ -75,7 +75,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
             return 10 - secondRoll;
           }
         } else {
-          // 1投目がストライクでない場合
+          // If first roll is not a strike
           if (firstRoll + secondRoll === 10) {
             // スペアの場合、3投目は10本可能
             return 10;
@@ -90,7 +90,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
 
   // 投球可能かどうかを判定する関数
   const canRoll = () => {
-    // ゲームが完了している場合は投球不可
+    // Cannot roll if game is completed
     if (frames[9]?.isComplete) {
       return false;
     }
@@ -98,41 +98,41 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
     return getMaxPins() >= 0;
   };
 
-  // ピン入力ボタンの色を取得する関数
+  // Function to get pin input button color
   const getPinButtonColor = (pins: number) => {
     const buttonText = getPinButtonText(pins);
     
     switch (buttonText) {
       case 'G':
       case '-':
-        return BowlardColors.gutter.background; // 残念感を表現
+        return BowlardColors.gutter.background; // Express disappointment
       case '/':
-        return BowlardColors.spare.background; // 穏やかな成功を表現
+        return BowlardColors.spare.background; // Express modest success
       case 'X':
-        return BowlardColors.strike.background; // 華やかな成功を表現
+        return BowlardColors.strike.background; // Express brilliant success
       default:
-        return BowlardColors.number.background; // ニュートラルな数字ボタン
+        return BowlardColors.number.background; // Neutral number button
     }
   };
 
-  // ピン入力ボタンの文字色を取得する関数
+  // Function to get pin input button text color
   const getPinButtonTextColor = (pins: number) => {
     const buttonText = getPinButtonText(pins);
     
     switch (buttonText) {
       case 'G':
       case '-':
-        return BowlardColors.gutter.text; // 残念感を表現
+        return BowlardColors.gutter.text; // Express disappointment
       case '/':
-        return BowlardColors.spare.text; // 穏やかな成功を表現
+        return BowlardColors.spare.text; // Express modest success
       case 'X':
-        return BowlardColors.strike.text; // 華やかな成功を表現
+        return BowlardColors.strike.text; // Express brilliant success
       default:
-        return BowlardColors.number.text; // ニュートラルな数字ボタン
+        return BowlardColors.number.text; // Neutral number button
     }
   };
 
-  // ピン入力ボタンの表示テキストを取得する関数
+  // Function to get pin input button display text
   const getPinButtonText = (pins: number) => {
     const frameInfo = getCurrentFrameInfo();
     if (!frameInfo) return pins.toString();
@@ -141,52 +141,52 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
     
     if (rollIndex === 0) {
       // 1投目
-      if (pins === 0) return 'G'; // ガーター
+      if (pins === 0) return 'G'; // Gutter
       if (pins === 10) return 'X'; // ストライク
       return pins.toString();
     } else {
       // 2投目以降
       if (frameIndex < 9) {
-        // 1-9フレーム
+        // Frames 1-9
         if (pins === 0) return '-'; // ミス
         if (frame.rolls[0] + pins === 10) return '/'; // スペア
         return pins.toString();
       } else {
-        // 10フレーム目
+        // 10th frame
         if (rollIndex === 1) {
           if (frame.rolls[0] === 10) {
-            // 1投目がストライクの場合、2投目は新しいフレーム扱い
-            if (pins === 0) return 'G'; // ガーター
-            if (pins === 10) return 'X'; // ストライク
+            // If first roll is a strike, second roll is treated as new frame
+            if (pins === 0) return 'G'; // Gutter
+            if (pins === 10) return 'X'; // Strike
             return pins.toString();
           } else {
-            // 1投目がストライクでない場合
-            if (pins === 0) return '-'; // ミス
+            // If first roll is not a strike
+            if (pins === 0) return '-'; // Miss
             if (frame.rolls[0] + pins === 10) return '/';
             return pins.toString();
           }
         } else {
-          // 3投目
+          // 3rd roll
           const firstRoll = frame.rolls[0];
           const secondRoll = frame.rolls[1];
           
           if (firstRoll === 10) {
-            // 1投目がストライクの場合
+            // If first roll is a strike
             if (secondRoll === 10) {
-              // 2投目もストライクの場合、3投目は新しいフレーム扱い
-              if (pins === 0) return 'G'; // ガーター
-              if (pins === 10) return 'X'; // ストライク
+              // If second roll is also a strike, third roll is treated as new frame
+              if (pins === 0) return 'G'; // Gutter
+              if (pins === 10) return 'X'; // Strike
               return pins.toString();
             } else {
-              // 2投目がストライクでない場合
-              if (pins === 0) return '-'; // ミス
+              // If second roll is not a strike
+              if (pins === 0) return '-'; // Miss
               if (secondRoll + pins === 10) return '/';
               return pins.toString();
             }
           } else {
-            // 1投目がストライクでない場合（スペアの場合のみ3投目がある）
-            if (pins === 0) return 'G'; // ガーター
-            if (pins === 10) return 'X'; // ストライク
+            // If first roll is not a strike (third roll only exists for spares)
+            if (pins === 0) return 'G'; // Gutter
+            if (pins === 10) return 'X'; // Strike
             return pins.toString();
           }
         }
@@ -199,105 +199,105 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
     if (roll === undefined) return '';
     
     if (frame.frameNumber === 10) {
-      // 10フレーム目
+      // 10th frame
       if (rollIndex === 0) {
-        // 1投目: 0はガーター（G）
+        // 1st roll: 0 is gutter (G)
         return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
       } else if (rollIndex === 1) {
         if (frame.rolls[0] === 10) {
-          // 1投目がストライクの場合、2投目は新しいフレーム扱い
+          // If first roll is a strike、2投目は新しいフレーム扱い
           return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
         } else {
-          // 1投目がストライクでない場合、2投目は0をミス（-）で表示
+          // If first roll is not a strike、2投目は0をミス（-）で表示
           return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
         }
       } else {
-        // 3投目
+        // 3rd roll
         const firstRoll = frame.rolls[0];
         const secondRoll = frame.rolls[1];
         
         if (firstRoll === 10) {
-          // 1投目がストライクの場合
+          // If first roll is a strike
           if (secondRoll === 10) {
             // 2投目もストライクの場合、3投目は新しいフレーム扱い
             return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
           } else {
-            // 2投目がストライクでない場合、3投目は0をミス（-）で表示
+            // If 2nd roll is not a strike, 3rd roll shows 0 as miss (-)
             return (secondRoll + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
           }
         } else {
-          // 1投目がストライクでない場合（スペアの場合のみ3投目がある）
-          // 3投目は新しいフレーム扱い
+          // If first roll is not a strike (3rd roll only exists for spares)
+          // 3rd rollは新しいフレーム扱い
           return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
         }
       }
     } else {
-      // 1-9フレーム
+      // Frames 1-9
       if (rollIndex === 0) {
-        // 1投目: 0はガーター（G）
+        // 1st roll: 0 is gutter (G)
         return roll === 10 ? 'X' : roll === 0 ? 'G' : roll.toString();
       } else {
-        // 2投目: 0はミス（-）
+        // 2nd roll: 0 is miss (-)
         return (frame.rolls[0] + roll) === 10 ? '/' : roll === 0 ? '-' : roll.toString();
       }
     }
   };
 
-  // スコアが確定しているかどうかを判定する関数
+  // Function to determine if score is finalized
   const isScoreFinalized = (frameIndex: number, frames: BowlingFrame[]): boolean => {
     const frame = frames[frameIndex];
     if (!frame || !frame.isComplete || frame.score === undefined) {
       return false;
     }
 
-    // 10フレーム目は常に確定
+    // 10th frame is always finalized
     if (frameIndex === 9) {
       return true;
     }
 
-    // ストライクの場合、次の2投が必要
+    // For strikes, next 2 rolls are needed
     if (frame.isStrike) {
       if (frameIndex === 8) {
-        // 9フレーム目がストライクの場合、10フレーム目の2投が必要
+        // If 9th frame is a strike, 2 rolls in 10th frame are needed
         const frame10 = frames[9];
         return frame10 && frame10.rolls.length >= 2;
       } else {
-        // 1-8フレーム目のストライクの場合
+        // For strikes in frames 1-8
         const nextFrame = frames[frameIndex + 1];
         if (!nextFrame) return false;
         
         if (nextFrame.isStrike) {
-          // 次のフレームもストライクの場合、その次のフレームの1投目が必要
+          // If next frame is also a strike, 1st roll of frame after that is needed
           if (frameIndex + 1 === 8) {
-            // 次が9フレーム目の場合、10フレーム目の1投目が必要
+            // If next is 9th frame, 1st roll of 10th frame is needed
             const frame10 = frames[9];
             return frame10 && frame10.rolls.length >= 1;
           } else {
-            // その他の場合、その次のフレームの1投目が必要
+            // In other cases, 1st roll of next-next frame is needed
             const frameAfterNext = frames[frameIndex + 2];
             return frameAfterNext && frameAfterNext.rolls.length >= 1;
           }
         } else {
-          // 次のフレームがストライクでない場合、次のフレームの2投が必要
+          // If next frame is not a strike, 2 rolls in next frame are needed
           return nextFrame.rolls.length >= 2;
         }
       }
     }
 
-    // スペアの場合、次の1投が必要
+    // For spares, next 1 roll is needed
     if (frame.isSpare) {
       if (frameIndex === 8) {
-        // 9フレーム目がスペアの場合、10フレーム目の1投目が必要
+        // If 9th frame is a spare, 1st roll of 10th frame is needed
         const frame10 = frames[9];
         return frame10 && frame10.rolls.length >= 1;
       } else {
-        // 1-8フレーム目のスペアの場合、次のフレームの1投目が必要
+        // For spares in frames 1-8, 1st roll of next frame is needed
         const nextFrame = frames[frameIndex + 1];
         return nextFrame && nextFrame.rolls.length >= 1;
       }
     }
 
-    // 通常のフレーム（ストライクでもスペアでもない）は即座に確定
+    // Regular frames (neither strike nor spare) are immediately finalized
     return true;
   };
 
@@ -344,7 +344,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
                     }}
                   >
                     {frameIndex === 9 ? (
-                      // 10フレーム目 (3投分)
+                      // 10th frame (3投分)
                       <>
                         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
                           {frame ? renderRollResult(frame, 0) : ''}
@@ -357,7 +357,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
                         </Box>
                       </>
                     ) : (
-                      // 1-9フレーム目 (2投分)
+                      // Frames 1-9目 (2投分)
                       <>
                         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
                           {frame ? renderRollResult(frame, 0) : ''}
@@ -507,7 +507,7 @@ export const BowlardBoard: React.FC<BowlardBoardProps> = ({
                       }}
                     >
                       {frameIndex === 9 ? (
-                        // 10フレーム目 (3投分)
+                        // 10th frame (3投分)
                         <>
                           <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: `1px solid ${UIColors.border.dark}` }}>
                             {frame ? renderRollResult(frame, 0) : ''}

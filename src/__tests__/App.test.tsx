@@ -35,7 +35,7 @@ describe('App', () => {
   it('should render language selector with Japanese text', () => {
     render(<App />);
     
-    // 言語セレクターに日本国旗と日本語テキストが存在することを確認
+    // Confirm that Japanese flag and Japanese text exist in language selector
     expect(screen.getByText('🇯🇵')).toBeInTheDocument();
     expect(screen.getByText('日本語')).toBeInTheDocument();
   });
@@ -124,7 +124,7 @@ describe('App', () => {
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      // AppBar should show "セットマッチ" instead of "ビリヤードスコア"
+      // AppBar should show "Set Match" instead of "Billiard Score"
       expect(screen.getByText('セットマッチ')).toBeInTheDocument();
       expect(screen.queryByText('ビリヤードスコア')).not.toBeInTheDocument();
     });
@@ -140,7 +140,7 @@ describe('App', () => {
 
     // Change game type to Rotation by clicking on the select and then the option
     const gameTypeSelects = screen.getAllByRole('combobox');
-    const gameTypeSelect = gameTypeSelects[1]; // 2番目のcombobox（ゲームタイプ選択）
+    const gameTypeSelect = gameTypeSelects[1]; // Second combobox (game type selection)
     fireEvent.mouseDown(gameTypeSelect);
     const rotationOption = screen.getByText('ローテーション');
     fireEvent.click(rotationOption);
@@ -149,7 +149,7 @@ describe('App', () => {
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      // AppBar should show "ローテーション"
+      // AppBar should show "Rotation"
       expect(screen.getByText('ローテーション')).toBeInTheDocument();
     });
   });
@@ -214,7 +214,7 @@ describe('App', () => {
 
     // Change game type to Bowlard by clicking on the select and then the option
     const gameTypeSelects = screen.getAllByRole('combobox');
-    const gameTypeSelect = gameTypeSelects[1]; // 2番目のcombobox（ゲームタイプ選択）
+    const gameTypeSelect = gameTypeSelects[1]; // Second combobox (game type selection)
     fireEvent.mouseDown(gameTypeSelect);
     const bowlardOption = screen.getByText('ボーラード');
     fireEvent.click(bowlardOption);
@@ -223,7 +223,7 @@ describe('App', () => {
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      // AppBar should show "ボーラード"
+      // AppBar should show "Bowlard"
       expect(screen.getByText('ボーラード')).toBeInTheDocument();
     });
   });
@@ -237,7 +237,7 @@ describe('App', () => {
 
     // Change game type to Bowlard by clicking on the select and then the option
     const gameTypeSelects = screen.getAllByRole('combobox');
-    const gameTypeSelect = gameTypeSelects[1]; // 2番目のcombobox（ゲームタイプ選択）
+    const gameTypeSelect = gameTypeSelects[1]; // Second combobox (game type selection)
     fireEvent.mouseDown(gameTypeSelect);
     const bowlardOption = screen.getByText('ボーラード');
     fireEvent.click(bowlardOption);

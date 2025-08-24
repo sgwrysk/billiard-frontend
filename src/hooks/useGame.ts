@@ -231,7 +231,7 @@ export const useGame = () => {
       const updatedGame = engine.handleCustomAction(currentGame, 'WIN_SET', { playerId });
       setCurrentGame(updatedGame);
       
-      // ゲームが終了したかチェック
+      // Check if game has ended
       if (updatedGame.status === GameStatus.COMPLETED) {
 
         

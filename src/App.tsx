@@ -167,10 +167,10 @@ const AppContent: React.FC = () => {
   const [finishedGame, setFinishedGame] = useState<any>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  // ゲーム終了を監視して自動的に勝利画面に遷移
+  // Monitor game completion and automatically transition to victory screen
   useEffect(() => {
     if (currentGame && currentGame.status === GameStatus.COMPLETED) {
-      // 勝者を見つける
+      // Find the winner
       let winnerId: string | undefined;
       for (const player of currentGame.players) {
         if (currentGame.type === GameType.SET_MATCH) {
@@ -269,12 +269,12 @@ const AppContent: React.FC = () => {
 
   const handleHomeButtonClick = () => {
     if (currentScreen === AppScreen.GAME && currentGame) {
-      // ゲームが初期状態の場合は直接ホームに戻る
+      // Go directly to home if game is in initial state
       if (canSwapPlayers()) {
         resetGame();
         setCurrentScreen(AppScreen.HOME);
       } else {
-        // ゲームが進行中の場合は確認ダイアログを表示
+        // Show confirmation dialog if game is in progress
         setShowExitConfirm(true);
       }
     } else {

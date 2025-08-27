@@ -36,6 +36,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   onSelectPlayer,
   onSwapPlayers,
   canSwapPlayers = false,
+  canUndoLastShot = false,
   onTimeUp,
   onSwitchToPlayer,
 }) => {
@@ -60,6 +61,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   }, []);
   
   const isBallPocketed = (ballNumber: number) => {
+    // Check if any player has this ball in their ballsPocketed array
     return game.players.some(player => 
       player.ballsPocketed.includes(ballNumber)
     );
@@ -70,8 +72,9 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
     return Math.max(0, player.targetScore - player.score);
   };
 
-  // Get balls pocketed by a player in chronological order
+  // Get balls pocketed by a player in current rack (chronological order)
   const getPlayerBallsInOrder = (playerId: string) => {
+    // Show only balls pocketed in current rack (from shotHistory)
     if (!game.shotHistory) return [];
     
     return game.shotHistory
@@ -351,7 +354,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           <Button 
             variant="outlined" 
             onClick={onUndoLastShot}
-            disabled={game.shotHistory.length === 0}
+            disabled={!canUndoLastShot}
             sx={{ 
               height: '48px',
               minHeight: '48px',

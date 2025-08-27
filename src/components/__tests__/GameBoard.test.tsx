@@ -55,7 +55,7 @@ const defaultProps = {
   alternatingBreak: false,
   onSwapPlayers: vi.fn(),
   canSwapPlayers: vi.fn().mockReturnValue(false),
-  canUndoLastShot: vi.fn().mockReturnValue(false),
+  canUndoLastShot: false,
 };
 
 describe('GameBoard', () => {
@@ -82,7 +82,7 @@ describe('GameBoard', () => {
       const onWinSet = vi.fn();
       const onUndoLastShot = vi.fn();
       const canSwapPlayers = vi.fn().mockReturnValue(true);
-      const canUndoLastShot = vi.fn().mockReturnValue(true);
+      const canUndoLastShot = true;
 
       render(
         <MockLanguageProvider>
@@ -234,7 +234,7 @@ describe('GameBoard', () => {
         ...defaultProps,
         alternatingBreak: true,
         canSwapPlayers: vi.fn().mockReturnValue(true),
-        canUndoLastShot: vi.fn().mockReturnValue(true),
+        canUndoLastShot: true,
       };
 
       render(

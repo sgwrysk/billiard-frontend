@@ -141,10 +141,35 @@ export const useGame = () => {
     return isGameInInitialState();
   }, [isGameInInitialState]);
 
-  // Check if undo is available (opposite of isGameInInitialState)
+  // Check if undo is available
   const canUndoLastShot = useCallback(() => {
-    return !isGameInInitialState();
-  }, [isGameInInitialState]);
+    if (!currentGame) return false;
+
+    // For undo to be available, there must be actual game actions taken
+    // Shot history is the most reliable indicator of actions taken
+    const hasShotHistory = currentGame.shotHistory && currentGame.shotHistory.length > 0;
+    
+    // For games that don't use shotHistory (like SET_MATCH), check if score history
+    // has more entries than the initial player entries, or if any player has non-zero score
+    const hasNonInitialScoreHistory = currentGame.scoreHistory && 
+      currentGame.scoreHistory.length > currentGame.players.length;
+    
+    // Also check if any player has made progress (non-zero score)
+    const hasPlayerProgress = currentGame.players.some(player => 
+      player.score > 0 || 
+      (player.ballsPocketed && player.ballsPocketed.length > 0) ||
+      (player.setsWon && player.setsWon > 0)
+    );
+
+    // For ROTATION game, if we're on rack 2 or higher, there must have been previous actions
+    // even if current shotHistory is empty due to rack reset
+    const isAdvancedRack = currentGame.type === GameType.ROTATION && 
+      currentGame.currentRack > 1;
+
+
+
+    return hasShotHistory || hasNonInitialScoreHistory || hasPlayerProgress || isAdvancedRack;
+  }, [currentGame]);
 
   // Swap players (only before game starts)
   const swapPlayers = useCallback(() => {
@@ -190,14 +215,13 @@ export const useGame = () => {
   const undoLastShot = useCallback(() => {
     if (!currentGame) return;
 
+
     const engine = GameEngineFactory.getEngine(currentGame.type);
     
     if (engine.hasCustomLogic() && engine.handleCustomAction) {
-      // Handle undo as custom action
       const updatedGame = engine.handleCustomAction(currentGame, 'UNDO_LAST_SHOT');
       setCurrentGame(updatedGame);
     } else {
-      // Use default undo processing
       const updatedGame = engine.handleUndo(currentGame);
       setCurrentGame(updatedGame);
     }

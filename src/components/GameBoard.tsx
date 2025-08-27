@@ -28,7 +28,7 @@ interface GameBoardProps {
   alternatingBreak?: boolean;
   onSwapPlayers?: () => void;
   canSwapPlayers?: () => boolean;
-  canUndoLastShot?: () => boolean;
+  canUndoLastShot?: boolean;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -72,7 +72,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
               alternatingBreak={alternatingBreak}
               onSwapPlayers={onSwapPlayers}
               canSwapPlayers={canSwapPlayers ? canSwapPlayers() : false}
-              canUndoLastShot={canUndoLastShot ? canUndoLastShot() : false}
+              canUndoLastShot={canUndoLastShot || false}
               onTimeUp={(playerIndex) => {
                 // Handle time up - could trigger automatic player switch or just show warning
                 console.log(`Player ${playerIndex} time is up!`);
@@ -97,7 +97,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             }}
             onSwapPlayers={onSwapPlayers}
             canSwapPlayers={canSwapPlayers ? canSwapPlayers() : false}
-            canUndoLastShot={canUndoLastShot ? canUndoLastShot() : false}
+            canUndoLastShot={canUndoLastShot || false}
             onTimeUp={(playerIndex) => {
               // Handle time up - could trigger automatic player switch or just show warning
               console.log(`Player ${playerIndex} time is up!`);

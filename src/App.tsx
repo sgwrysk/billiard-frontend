@@ -461,7 +461,7 @@ const AppContent: React.FC = () => {
             alternatingBreak={alternatingBreak}
             onSwapPlayers={handleSwapPlayers}
             canSwapPlayers={canSwapPlayers}
-            canUndoLastShot={canUndoLastShot}
+            canUndoLastShot={canUndoLastShot()}
           />
         )}
         

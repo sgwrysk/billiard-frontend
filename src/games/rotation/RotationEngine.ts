@@ -94,26 +94,30 @@ export class RotationEngine extends GameBase {
         // Don't change game state as this returns boolean
         return game;
       case 'UNDO_LAST_SHOT':
-        // Use default undo processing for ROTATION
-        return this.handleUndo(game);
+        return this.handleRotationUndo(game);
       default:
         return game;
     }
   }
   
   private handleResetRack(game: Game): Game {
+    
+    // Clear ballsPocketed for new rack (so all balls appear available)
+    // But keep the undo capability through scoreHistory
     const updatedPlayers = game.players.map(player => ({
       ...player,
-      ballsPocketed: [],
+      ballsPocketed: [], // Clear for new rack display
     }));
     
-    return {
+    const updatedGame = {
       ...game,
       players: updatedPlayers,
-      shotHistory: [],
+      shotHistory: [], // Clear shot history for new rack
       currentRack: game.currentRack + 1,
       totalRacks: game.totalRacks + 1,
     };
+    
+    return updatedGame;
   }
   
   checkAllBallsPocketed(game: Game): boolean {
@@ -130,6 +134,154 @@ export class RotationEngine extends GameBase {
     return Math.max(0, player.targetScore - player.score);
   }
   
+  private handleRotationUndo(game: Game): Game {
+
+    // If we have shot history in current rack, use default undo
+    if (game.shotHistory && game.shotHistory.length > 0) {
+      return this.handleUndo(game);
+    }
+
+    // For advanced racks (rack 2+) with no shot history, undo from score history
+    if (game.currentRack > 1 && game.scoreHistory && game.scoreHistory.length > game.players.length) {
+      return this.handleAdvancedRackUndo(game);
+    }
+
+    return game;
+  }
+
+  private handleAdvancedRackUndo(game: Game): Game {
+    // Find the last score entry (most recent action)
+    if (!game.scoreHistory || game.scoreHistory.length <= game.players.length) {
+      return game;
+    }
+
+    const lastScoreEntry = game.scoreHistory[game.scoreHistory.length - 1];
+
+    // Remove the last score entry
+    const updatedScoreHistory = game.scoreHistory.slice(0, -1);
+
+    // Determine which ball to remove based on the score
+    const ballToRemove = this.findBallNumberForScore(lastScoreEntry.score);
+
+    // Update the player's score and remove the ball
+    const updatedPlayers = game.players.map(player => {
+      if (player.id === lastScoreEntry.playerId) {
+        const newScore = Math.max(0, player.score - lastScoreEntry.score);
+        const newBallsPocketed = ballToRemove > 0 
+          ? player.ballsPocketed.filter(ball => ball !== ballToRemove)
+          : player.ballsPocketed;
+        
+        
+        return {
+          ...player,
+          score: newScore,
+          ballsPocketed: newBallsPocketed,
+        };
+      }
+      return player;
+    });
+
+    // If this undo brings us back to previous rack state, we need to restore rack
+    const shouldRestorePreviousRack = this.shouldRestorePreviousRack(updatedScoreHistory, game.players.length);
+    
+    if (shouldRestorePreviousRack && game.currentRack > 1) {
+      
+      // Reconstruct the exact state from score history
+      const playersWithCorrectBalls = this.reconstructPlayersFromScoreHistory(updatedScoreHistory, game.players);
+
+      return {
+        ...game,
+        players: playersWithCorrectBalls,
+        scoreHistory: updatedScoreHistory,
+        currentRack: game.currentRack - 1,
+        totalRacks: Math.max(1, game.totalRacks - 1),
+        // Reconstruct shot history from the previous rack
+        shotHistory: this.reconstructShotHistory(updatedScoreHistory, game.players.length),
+      };
+    } else {
+      return {
+        ...game,
+        players: updatedPlayers,
+        scoreHistory: updatedScoreHistory,
+      };
+    }
+  }
+
+  private shouldRestorePreviousRack(scoreHistory: {playerId: string; score: number; timestamp: Date}[], initialPlayerEntries: number): boolean {
+    // Check if we should restore to previous rack:
+    // - If we just undid the last ball (15) that completed a rack
+    // - The condition is: we have exactly 14 action entries (balls 1-14) remaining
+    const actionEntries = scoreHistory.length - initialPlayerEntries;
+    const shouldRestore = actionEntries === 14; // We have balls 1-14, but not 15
+    
+    
+    return shouldRestore;
+  }
+
+  private reconstructShotHistory(scoreHistory: {playerId: string; score: number; timestamp: Date}[], playerCount: number): {playerId: string; ballNumber: number; isSunk: boolean; isFoul: boolean; timestamp: Date}[] {
+    // Skip initial player entries and reconstruct shot history
+    const actionEntries = scoreHistory.slice(playerCount);
+    const shotHistory = [];
+
+    for (let i = 0; i < actionEntries.length; i++) {
+      const entry = actionEntries[i];
+      // Try to find which ball corresponds to this score
+      const ballNumber = this.findBallNumberForScore(entry.score);
+      
+      if (ballNumber > 0) {
+        shotHistory.push({
+          playerId: entry.playerId,
+          ballNumber: ballNumber,
+          isSunk: true,
+          isFoul: false,
+          timestamp: entry.timestamp,
+        });
+      }
+    }
+
+    return shotHistory;
+  }
+
+  private findBallNumberForScore(score: number): number {
+    // In rotation, ball number equals score for balls 1-15
+    if (score >= 1 && score <= 15) {
+      return score;
+    }
+    return 0; // Unknown ball
+  }
+
+  private reconstructPlayersFromScoreHistory(scoreHistory: {playerId: string; score: number; timestamp: Date}[], originalPlayers: Player[]): Player[] {
+    
+    // Get all action entries (skip initial player entries with score 0)
+    const initialPlayerEntries = originalPlayers.length;
+    const actionEntries = scoreHistory.slice(initialPlayerEntries);
+    
+    
+    // Start with empty ballsPocketed for all players
+    const playersWithBalls = originalPlayers.map(player => {
+      // Calculate final score from score history
+      const playerScoreEntries = scoreHistory.filter(entry => entry.playerId === player.id && entry.score > 0);
+      const finalScore = playerScoreEntries.reduce((sum, entry) => sum + entry.score, 0);
+      
+      // Collect all balls this player has pocketed from action entries only
+      const ballsPocketed = actionEntries
+        .filter(entry => entry.playerId === player.id)
+        .map(entry => this.findBallNumberForScore(entry.score))
+        .filter(ball => ball > 0);
+      
+      
+      return {
+        ...player,
+        score: finalScore,
+        ballsPocketed: ballsPocketed,
+      };
+    });
+
+    
+
+    return playersWithBalls;
+  }
+
   private isBallPocketed(game: Game, ballNumber: number): boolean {
     return game.players.some(player => 
       player.ballsPocketed.includes(ballNumber)

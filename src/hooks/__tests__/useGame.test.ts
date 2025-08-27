@@ -1037,6 +1037,40 @@ describe('useGame', () => {
       });
       expect(result.current.canUndoLastShot()).toBe(true);
     });
+
+    it('should allow undo after rack reset in ROTATION game', () => {
+      const { result } = renderHook(() => useGame());
+
+      // Start a ROTATION game
+      act(() => {
+        result.current.startGame(
+          [{ name: 'Player 1', targetScore: 120 }, { name: 'Player 2', targetScore: 120 }],
+          GameType.ROTATION
+        );
+      });
+
+      // Initially, undo is not available
+      expect(result.current.canUndoLastShot()).toBe(false);
+
+      // Pocket some balls first
+      act(() => {
+        result.current.pocketBall(1);
+        result.current.pocketBall(2);
+        result.current.pocketBall(3);
+      });
+
+      // Now undo should be available
+      expect(result.current.canUndoLastShot()).toBe(true);
+
+      // Manually trigger reset rack to simulate the scenario
+      act(() => {
+        result.current.handleGameAction('RESET_RACK');
+      });
+
+      // After rack reset, undo should still be available due to advanced rack
+      expect(result.current.canUndoLastShot()).toBe(true);
+      expect(result.current.currentGame?.currentRack).toBe(2); // Should be on second rack
+    });
   });
 });
 

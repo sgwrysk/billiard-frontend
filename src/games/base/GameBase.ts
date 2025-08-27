@@ -79,10 +79,14 @@ export abstract class GameBase implements IGameEngine {
   }
   
   handleUndo(game: Game): Game {
+    
     // Default undo processing (remove last shotHistory entry)
-    if (game.shotHistory.length === 0) return game;
+    if (game.shotHistory.length === 0) {
+      return game;
+    }
     
     const lastShot = game.shotHistory[game.shotHistory.length - 1];
+    
     const updatedGame = { ...game };
     
     // Remove last entry from shotHistory
@@ -102,10 +106,12 @@ export abstract class GameBase implements IGameEngine {
     // Remove last pocketed ball from player
     updatedGame.players = updatedGame.players.map(player => {
       if (player.id === lastShot.playerId && lastShot.isSunk) {
+        const newScore = Math.max(0, player.score - this.getBallScore(lastShot.ballNumber));
+        const newBallsPocketed = player.ballsPocketed.filter(ball => ball !== lastShot.ballNumber);
         return {
           ...player,
-          ballsPocketed: player.ballsPocketed.filter(ball => ball !== lastShot.ballNumber),
-          score: Math.max(0, player.score - this.getBallScore(lastShot.ballNumber)),
+          ballsPocketed: newBallsPocketed,
+          score: newScore,
         };
       }
       return player;

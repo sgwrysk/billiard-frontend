@@ -244,7 +244,7 @@ describe('RotationBoard', () => {
     expect(mockOnSwitchPlayer).toHaveBeenCalledTimes(1);
   });
 
-  it('should enable undo button when shotHistory has entries', () => {
+  it('should enable undo button when canUndoLastShot is true', () => {
     const game = createMockGame();
 
     render(
@@ -255,6 +255,7 @@ describe('RotationBoard', () => {
           onSwitchPlayer={mockOnSwitchPlayer}
           onUndoLastShot={mockOnUndoLastShot}
           onSelectPlayer={mockOnSelectPlayer}
+          canUndoLastShot={true}
         />
       </TestWrapper>
     );
@@ -266,9 +267,8 @@ describe('RotationBoard', () => {
     expect(mockOnUndoLastShot).toHaveBeenCalledTimes(1);
   });
 
-  it('should disable undo button when shotHistory is empty', () => {
+  it('should disable undo button when canUndoLastShot is false', () => {
     const game = createMockGame();
-    game.shotHistory = []; // Empty shot history
 
     render(
       <TestWrapper>
@@ -278,6 +278,7 @@ describe('RotationBoard', () => {
           onSwitchPlayer={mockOnSwitchPlayer}
           onUndoLastShot={mockOnUndoLastShot}
           onSelectPlayer={mockOnSelectPlayer}
+          canUndoLastShot={false}
         />
       </TestWrapper>
     );
@@ -648,7 +649,7 @@ describe('RotationBoard', () => {
             onUndoLastShot={mockOnUndoLastShot}
             onSelectPlayer={mockOnSelectPlayer}
             onSwapPlayers={mockOnSwapPlayers}
-            canUndoLastShot={true}
+            canUndoLastShot={false}
           />
         </TestWrapper>
       );

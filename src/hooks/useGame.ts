@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { Game, ChessClockSettings } from '../types/index';
+import type { Game, ChessClockSettings, ChessClockState } from '../types/index';
 import { GameType, GameStatus } from '../types/index';
 import { GameEngineFactory } from '../games/GameEngineFactory';
 
@@ -279,6 +279,17 @@ export const useGame = () => {
     handleGameAction('UNDO_BOWLING_ROLL');
   }, [handleGameAction]);
 
+  // Update chess clock state
+  const updateChessClockState = useCallback((chessClockState: ChessClockState) => {
+    if (!currentGame) return;
+
+    const updatedGame = {
+      ...currentGame,
+      chessClockState,
+    };
+    setCurrentGame(updatedGame);
+  }, [currentGame]);
+
   return {
     // State
     currentGame,
@@ -309,5 +320,6 @@ export const useGame = () => {
     // Utilities
     getBallNumbers,
     handleGameAction,
+    updateChessClockState,
   };
 };

@@ -6,7 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useLanguage } from '../contexts/LanguageContext';
-import type { Game } from '../types/index';
+import type { Game, ChessClockState } from '../types/index';
 import { GameType } from '../types/index';
 import { SetMatchBoard } from './games/SetMatchBoard';
 import { RotationBoard } from './games/RotationBoard';
@@ -29,6 +29,7 @@ interface GameBoardProps {
   onSwapPlayers?: () => void;
   canSwapPlayers?: () => boolean;
   canUndoLastShot?: boolean;
+  onChessClockStateChange?: (state: ChessClockState) => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -46,6 +47,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onSwapPlayers,
   canSwapPlayers,
   canUndoLastShot,
+  onChessClockStateChange,
 }) => {
   const { t } = useLanguage();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -78,6 +80,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 console.log(`Player ${playerIndex} time is up!`);
               }}
               onSwitchToPlayer={onSwitchToPlayer}
+              onChessClockStateChange={onChessClockStateChange}
             />
           </>
         );
@@ -103,6 +106,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
               console.log(`Player ${playerIndex} time is up!`);
             }}
             onSwitchToPlayer={onSwitchToPlayer}
+            onChessClockStateChange={onChessClockStateChange}
           />
         );
       

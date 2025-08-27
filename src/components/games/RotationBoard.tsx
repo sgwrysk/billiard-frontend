@@ -10,7 +10,7 @@ import {
   Slide,
 } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
-import type { Game, Player } from '../../types/index';
+import type { Game, Player, ChessClockState } from '../../types/index';
 import { getBallColor } from '../../utils/ballUtils';
 import { BallColors, UIColors, GameColors, AppStyles, AppColors } from '../../constants/colors';
 import ChessClock from '../ChessClock';
@@ -26,6 +26,7 @@ interface RotationBoardProps {
   canUndoLastShot?: boolean;
   onTimeUp?: (playerIndex: number) => void;
   onSwitchToPlayer?: (playerIndex: number) => void;
+  onChessClockStateChange?: (state: ChessClockState) => void;
 }
 
 export const RotationBoard: React.FC<RotationBoardProps> = ({
@@ -39,6 +40,7 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
   canUndoLastShot = false,
   onTimeUp,
   onSwitchToPlayer,
+  onChessClockStateChange,
 }) => {
   const { t } = useLanguage();
   const currentPlayer = game.players[game.currentPlayerIndex];
@@ -93,6 +95,8 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
           currentPlayerIndex={game.currentPlayerIndex}
           onTimeUp={onTimeUp}
           onPlayerSelect={onSwitchToPlayer}
+          savedState={game.chessClockState}
+          onStateChange={onChessClockStateChange}
         />
       )}
 

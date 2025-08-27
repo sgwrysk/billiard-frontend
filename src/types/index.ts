@@ -32,6 +32,17 @@ export interface ChessClockSettings {
   player2TimeLimit?: number; // Individual time limit for player 2 (minutes)
 }
 
+// Chess clock time state for preserving remaining time
+export interface ChessClockState {
+  playerTimes: {
+    remainingTime: number; // Remaining time in seconds
+    isWarning: boolean;
+    isTimeUp: boolean;
+  }[];
+  isRunning: boolean; // Whether timer is currently running
+  lastUpdateTime: number; // Timestamp of last update
+}
+
 
 // Game type enumeration
 export const GameType = {
@@ -68,6 +79,7 @@ export interface Game {
   shotHistory: Shot[]; // Shot history
   scoreHistory: ScoreHistory[]; // Score progression history
   chessClock?: ChessClockSettings; // Chess clock settings
+  chessClockState?: ChessClockState; // Chess clock time state for preservation
 }
 
 // Shot information type definition

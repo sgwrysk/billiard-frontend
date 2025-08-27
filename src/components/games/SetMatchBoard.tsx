@@ -8,7 +8,7 @@ import {
   Grid,
 } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
-import type { Game } from '../../types/index';
+import type { Game, ChessClockState } from '../../types/index';
 import { UIColors, GameColors, AppStyles } from '../../constants/colors';
 import ChessClock from '../ChessClock';
 import SetHistory from '../SetHistory';
@@ -23,6 +23,7 @@ interface SetMatchBoardProps {
   canUndoLastShot?: boolean;
   onTimeUp?: (playerIndex: number) => void;
   onSwitchToPlayer?: (playerIndex: number) => void;
+  onChessClockStateChange?: (state: ChessClockState) => void;
 }
 
 export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
@@ -34,6 +35,7 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
   canSwapPlayers = false,
   onTimeUp,
   onSwitchToPlayer,
+  onChessClockStateChange,
 }) => {
   const { t } = useLanguage();
 
@@ -56,6 +58,8 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
           currentPlayerIndex={game.currentPlayerIndex}
           onTimeUp={onTimeUp}
           onPlayerSelect={onSwitchToPlayer}
+          savedState={game.chessClockState}
+          onStateChange={onChessClockStateChange}
         />
       )}
 

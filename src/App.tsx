@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { 
   CssBaseline, 
@@ -27,7 +27,7 @@ import VictoryScreen from './components/VictoryScreen';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
 import type { Game } from './types/index';
-import type { ChessClockSettings } from './types/index';
+import type { ChessClockSettings, ChessClockState } from './types/index';
 import { GameEngineFactory } from './games/GameEngineFactory';
 
 // Create Material-UI theme - Deep Blue + Outfit
@@ -166,10 +166,38 @@ const AppContent: React.FC = () => {
     swapPlayers,
     canSwapPlayers,
     canUndoLastShot,
+    updateChessClockState,
   } = useGame();
   
   const [finishedGame, setFinishedGame] = useState<Game | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
+
+  // Helper function to reset scroll position to top
+  const resetScrollPosition = () => {
+    window.scrollTo(0, 0);
+  };
+
+  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean, chessClock?: ChessClockSettings) => {
+    setAlternatingBreak(alternatingBreakSetting || false);
+    startGame(players, gameType, chessClock);
+    setCurrentScreen(AppScreen.GAME);
+    resetScrollPosition();
+  };
+
+  const handleEndGame = useCallback((winnerId?: string) => {
+    if (currentGame) {
+      const gameWithWinner = {
+        ...currentGame,
+        winner: winnerId,
+        endTime: new Date(),
+      };
+      setFinishedGame(gameWithWinner);
+      endGame();
+      setCurrentScreen(AppScreen.VICTORY);
+      resetScrollPosition();
+    }
+  }, [currentGame, endGame]);
 
   // Monitor game completion and automatically transition to victory screen
   useEffect(() => {
@@ -192,36 +220,7 @@ const AppContent: React.FC = () => {
       
       handleEndGame(winnerId);
     }
-  }, [currentGame]);
-
-
-  const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
-
-  // Helper function to reset scroll position to top
-  const resetScrollPosition = () => {
-    window.scrollTo(0, 0);
-  };
-
-  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean, chessClock?: ChessClockSettings) => {
-    setAlternatingBreak(alternatingBreakSetting || false);
-    startGame(players, gameType, chessClock);
-    setCurrentScreen(AppScreen.GAME);
-    resetScrollPosition();
-  };
-
-  const handleEndGame = (winnerId?: string) => {
-    if (currentGame) {
-      const gameWithWinner = {
-        ...currentGame,
-        winner: winnerId,
-        endTime: new Date(),
-      };
-      setFinishedGame(gameWithWinner);
-      endGame();
-      setCurrentScreen(AppScreen.VICTORY);
-      resetScrollPosition();
-    }
-  };
+  }, [currentGame, handleEndGame]);
 
   const handleResetGame = () => {
     resetGame();
@@ -232,6 +231,10 @@ const AppContent: React.FC = () => {
 
   const handleSwapPlayers = () => {
     swapPlayers();
+  };
+
+  const handleChessClockStateChange = (state: ChessClockState) => {
+    updateChessClockState(state);
   };
 
 
@@ -477,6 +480,7 @@ const AppContent: React.FC = () => {
             onSwapPlayers={handleSwapPlayers}
             canSwapPlayers={canSwapPlayers}
             canUndoLastShot={canUndoLastShot()}
+            onChessClockStateChange={handleChessClockStateChange}
           />
         )}
         

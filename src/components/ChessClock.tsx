@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Button,
@@ -8,7 +8,7 @@ import {
 import { PlayArrow, Pause } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ChessClockColors, AppColors, AppStyles, UIColors } from '../constants/colors';
-import type { ChessClockSettings, Player } from '../types/index';
+import type { ChessClockSettings, Player, ChessClockState } from '../types/index';
 
 interface ChessClockProps {
   chessClock: ChessClockSettings;
@@ -16,6 +16,8 @@ interface ChessClockProps {
   currentPlayerIndex: number;
   onTimeUp?: (playerIndex: number) => void;
   onPlayerSelect?: (playerIndex: number) => void;
+  savedState?: ChessClockState; // Saved chess clock state for restoration
+  onStateChange?: (state: ChessClockState) => void; // Callback to save chess clock state
 }
 
 interface PlayerTimeState {
@@ -30,32 +32,43 @@ const ChessClock: React.FC<ChessClockProps> = ({
   currentPlayerIndex,
   onTimeUp,
   onPlayerSelect,
+  savedState,
+  onStateChange,
 }) => {
   const { t } = useLanguage();
   const [isRunning, setIsRunning] = useState(false);
   const [playerTimes, setPlayerTimes] = useState<PlayerTimeState[]>([]);
-  const [lastUpdateTime, setLastUpdateTime] = useState<number>(Date.now());
-  // Always show fixed version
+  const lastUpdateTimeRef = useRef<number>(Date.now());
 
-  // Initialize player times only once when component mounts or chess clock is enabled
+  // Initialize player times from saved state or default values
   useEffect(() => {
     if (chessClock.enabled && playerTimes.length === 0) {
-      const initialTimes: PlayerTimeState[] = players.map((_, index) => {
-        let timeLimit: number;
-        if (chessClock.individualTime) {
-          timeLimit = chessClock[`player${index + 1}TimeLimit` as keyof ChessClockSettings] as number || chessClock.timeLimit;
-        } else {
-          timeLimit = chessClock.timeLimit;
-        }
-        return {
-          remainingTime: timeLimit * 60, // Convert minutes to seconds
-          isWarning: false,
-          isTimeUp: false,
-        };
-      });
-      setPlayerTimes(initialTimes);
+      if (savedState && savedState.playerTimes.length > 0) {
+        // Restore from saved state
+        setPlayerTimes(savedState.playerTimes);
+        setIsRunning(savedState.isRunning);
+        lastUpdateTimeRef.current = savedState.lastUpdateTime;
+      } else {
+        // Initialize with default values
+        const initialTimes: PlayerTimeState[] = players.map((_, index) => {
+          let timeLimit: number;
+          if (chessClock.individualTime) {
+            timeLimit = chessClock[`player${index + 1}TimeLimit` as keyof ChessClockSettings] as number || chessClock.timeLimit;
+          } else {
+            timeLimit = chessClock.timeLimit;
+          }
+          return {
+            remainingTime: timeLimit * 60, // Convert minutes to seconds
+            isWarning: false,
+            isTimeUp: false,
+          };
+        });
+        setPlayerTimes(initialTimes);
+        setIsRunning(false);
+        lastUpdateTimeRef.current = Date.now();
+      }
     }
-  }, [chessClock.enabled]); // Only depend on chessClock.enabled
+  }, [chessClock.enabled, savedState, players]); // Depend on saved state and players
 
   // Don't reset timer when current player changes - let it continue naturally
   useEffect(() => {
@@ -66,20 +79,23 @@ const ChessClock: React.FC<ChessClockProps> = ({
 
   // Timer logic
   useEffect(() => {
-    if (!isRunning || !chessClock.enabled) return;
+    if (!isRunning || !chessClock.enabled) {
+      return;
+    }
 
     const interval = setInterval(() => {
       const now = Date.now();
-      const deltaTime = (now - lastUpdateTime) / 1000; // Convert to seconds
-      setLastUpdateTime(now);
+      const deltaTime = (now - lastUpdateTimeRef.current) / 1000; // Convert to seconds
+      lastUpdateTimeRef.current = now;
 
       setPlayerTimes(prevTimes => {
-        return prevTimes.map((playerTime, index) => {
+        const newTimes = prevTimes.map((playerTime, index) => {
           if (index === currentPlayerIndex && !playerTime.isTimeUp) {
             const newRemainingTime = Math.max(0, playerTime.remainingTime - deltaTime);
             // Always show warning when time is below warning threshold, regardless of warningEnabled setting
             const isWarning = newRemainingTime <= chessClock.warningTime * 60;
             const isTimeUp = newRemainingTime <= 0;
+
 
             // Call onTimeUp when time runs out
             if (isTimeUp && !playerTime.isTimeUp && onTimeUp) {
@@ -94,17 +110,31 @@ const ChessClock: React.FC<ChessClockProps> = ({
           }
           return playerTime;
         });
+        
+        return newTimes;
       });
     }, 100); // Update every 100ms for smooth countdown
 
     return () => clearInterval(interval);
-  }, [isRunning, currentPlayerIndex, lastUpdateTime, chessClock, onTimeUp]);
+  }, [isRunning, currentPlayerIndex, chessClock, onTimeUp]);
+
+  // Save chess clock state when it changes
+  useEffect(() => {
+    if (onStateChange && playerTimes.length > 0) {
+      const currentState: ChessClockState = {
+        playerTimes: playerTimes,
+        isRunning: isRunning,
+        lastUpdateTime: lastUpdateTimeRef.current,
+      };
+      onStateChange(currentState);
+    }
+  }, [playerTimes, isRunning]);
 
   const handleStartStop = () => {
     if (isRunning) {
       setIsRunning(false);
     } else {
-      setLastUpdateTime(Date.now());
+      lastUpdateTimeRef.current = Date.now();
       setIsRunning(true);
     }
   };

@@ -17,7 +17,8 @@ import {
   Refresh, 
   Home, 
   AccessTime,
-  SportsEsports
+  SportsEsports,
+  ArrowBack
 } from '@mui/icons-material';
 import {
   Chart as ChartJS,
@@ -51,12 +52,14 @@ interface VictoryScreenProps {
   game: Game;
   onRematch: () => void;
   onBackToMenu: () => void;
+  onReturnToGame: () => void;
 }
 
 const VictoryScreen: React.FC<VictoryScreenProps> = ({
   game,
   onRematch,
   onBackToMenu,
+  onReturnToGame,
 }) => {
   const { t, language } = useLanguage();
   const winner = game.players.find(p => p.id === game.winner);
@@ -208,12 +211,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       // For rotation, each entry represents a pocketed ball
       if (!currentInning || currentInning.playerId !== entry.playerId) {
         // Finalize previous inning if exists
-        if (currentInning && (currentInning as any).shots.length > 0) {
-          const inningTotal = (currentInning as any).shots.reduce((sum: number, shot: { score: number }) => sum + shot.score, 0);
+        if (currentInning && currentInning.shots.length > 0) {
+          const inningTotal = currentInning.shots.reduce((sum: number, shot: { score: number }) => sum + shot.score, 0);
           innings.push({
-            playerId: (currentInning as any).playerId,
+            playerId: currentInning.playerId,
             totalScore: inningTotal,
-            timestamp: (currentInning as any).startTime,
+            timestamp: currentInning.startTime,
           });
         }
         
@@ -230,13 +233,16 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     });
 
     // Add the last inning if exists
-    if (currentInning && (currentInning as any).shots.length > 0) {
-      const inningTotal = (currentInning as any).shots.reduce((sum: number, shot: { score: number }) => sum + shot.score, 0);
-      innings.push({
-        playerId: (currentInning as any).playerId,
-        totalScore: inningTotal,
-        timestamp: (currentInning as any).startTime,
-      });
+    if (currentInning) {
+      const finalInning = currentInning as InningType;
+      if (finalInning.shots.length > 0) {
+        const inningTotal = finalInning.shots.reduce((sum: number, shot: { score: number }) => sum + shot.score, 0);
+        innings.push({
+          playerId: finalInning.playerId,
+          totalScore: inningTotal,
+          timestamp: finalInning.startTime,
+        });
+      }
     }
 
     if (innings.length === 0) {
@@ -936,7 +942,19 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       {/* Action buttons */}
       <Paper sx={{ p: 3 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={4}>
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              size="large"
+              startIcon={<ArrowBack />}
+              onClick={onReturnToGame}
+            >
+              {t('victory.returnToGame')}
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={4}>
             <Button
               fullWidth
               variant="contained"
@@ -948,7 +966,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
               再戦する
             </Button>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={4}>
             <Button
               fullWidth
               variant="outlined"

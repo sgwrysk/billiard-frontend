@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import VictoryScreen from '../VictoryScreen';
 import { LanguageProvider } from '../../contexts/LanguageContext';
@@ -23,6 +23,7 @@ describe('VictoryScreen', () => {
 
   const mockOnRematch = vi.fn();
   const mockOnBackToMenu = vi.fn();
+  const mockOnReturnToGame = vi.fn();
 
   it('should render victory screen for SET_MATCH with set history', () => {
     const setMatchGame: Game = {
@@ -87,6 +88,7 @@ describe('VictoryScreen', () => {
           game={setMatchGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -192,6 +194,7 @@ describe('VictoryScreen', () => {
           game={rotationGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -250,6 +253,7 @@ describe('VictoryScreen', () => {
           game={emptySetMatchGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -323,6 +327,7 @@ describe('VictoryScreen', () => {
           game={mixedScoreHistoryGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -436,6 +441,7 @@ describe('VictoryScreen', () => {
           game={rotationGameWithShots}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -577,6 +583,7 @@ describe('VictoryScreen', () => {
           game={rotationGameWithInnings}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -712,6 +719,7 @@ describe('VictoryScreen', () => {
           game={multiRackRotationGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -803,6 +811,7 @@ describe('VictoryScreen', () => {
           game={setMatchGameWithScoreHistory}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -865,6 +874,7 @@ describe('VictoryScreen', () => {
           game={setMatchGameNoHistory}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -925,6 +935,7 @@ describe('VictoryScreen', () => {
           game={bowlardGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -966,6 +977,7 @@ describe('VictoryScreen', () => {
           game={bowlardGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -1025,6 +1037,7 @@ describe('VictoryScreen', () => {
           game={rotationGame}
           onRematch={mockOnRematch}
           onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
         />
       </TestWrapper>
     );
@@ -1035,6 +1048,124 @@ describe('VictoryScreen', () => {
     
     // Should display rack information in game details
     expect(screen.getByText('ラック数:')).toBeInTheDocument();
+  });
+
+  it('should render "Return to Game" button and call onReturnToGame when clicked', () => {
+    const setMatchGame: Game = {
+      id: 'test-return-game',
+      type: GameType.SET_MATCH,
+      status: GameStatus.COMPLETED,
+      players: [
+        {
+          id: 'player-1',
+          name: 'Player 1',
+          score: 1,
+          ballsPocketed: [],
+          isActive: false,
+          targetSets: 3,
+          setsWon: 3,
+        },
+        {
+          id: 'player-2',
+          name: 'Player 2',
+          score: 0,
+          ballsPocketed: [],
+          isActive: false,
+          targetSets: 3,
+          setsWon: 0,
+        }
+      ],
+      currentPlayerIndex: 0,
+      startTime: new Date(),
+      endTime: new Date(),
+      winner: 'player-1',
+      totalRacks: 1,
+      currentRack: 1,
+      rackInProgress: false,
+      scoreHistory: [
+        { playerId: 'player-1', score: 1, timestamp: new Date() },
+        { playerId: 'player-1', score: 1, timestamp: new Date() },
+        { playerId: 'player-1', score: 1, timestamp: new Date() }
+      ],
+      shotHistory: []
+    };
+
+    render(
+      <TestWrapper>
+        <VictoryScreen
+          game={setMatchGame}
+          onRematch={mockOnRematch}
+          onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
+        />
+      </TestWrapper>
+    );
+
+    // Should display all three buttons
+    const returnButton = screen.getByText('ゲームに戻る');
+    const rematchButton = screen.getByText('再戦する');
+    const backToMenuButton = screen.getByText('メニューに戻る');
+
+    expect(returnButton).toBeInTheDocument();
+    expect(rematchButton).toBeInTheDocument();
+    expect(backToMenuButton).toBeInTheDocument();
+
+    // Should call onReturnToGame when "Return to Game" button is clicked
+    fireEvent.click(returnButton);
+    expect(mockOnReturnToGame).toHaveBeenCalledTimes(1);
+  });
+
+  it('should render three buttons in correct order', () => {
+    const game: Game = {
+      id: 'test-game',
+      type: GameType.SET_MATCH,
+      status: GameStatus.COMPLETED,
+      players: [
+        { id: 'p1', name: 'Player 1', score: 0, ballsPocketed: [], isActive: false, targetSets: 3, setsWon: 3 },
+        { id: 'p2', name: 'Player 2', score: 0, ballsPocketed: [], isActive: false, targetSets: 3, setsWon: 1 }
+      ],
+      currentPlayerIndex: 0,
+      startTime: new Date(),
+      endTime: new Date(),
+      winner: 'p1',
+      totalRacks: 1,
+      currentRack: 1,
+      rackInProgress: false,
+      scoreHistory: [
+        { playerId: 'p1', score: 1, timestamp: new Date() },
+        { playerId: 'p2', score: 1, timestamp: new Date() },
+        { playerId: 'p1', score: 1, timestamp: new Date() },
+        { playerId: 'p1', score: 1, timestamp: new Date() }
+      ],
+      shotHistory: []
+    };
+
+    render(
+      <TestWrapper>
+        <VictoryScreen
+          game={game}
+          onRematch={mockOnRematch}
+          onBackToMenu={mockOnBackToMenu}
+          onReturnToGame={mockOnReturnToGame}
+        />
+      </TestWrapper>
+    );
+
+    // Find all buttons in the action section
+    const buttons = screen.getAllByRole('button');
+    const actionButtons = buttons.filter(button => 
+      button.textContent?.includes('ゲームに戻る') ||
+      button.textContent?.includes('再戦する') ||
+      button.textContent?.includes('メニューに戻る')
+    );
+
+    // Should have exactly 3 action buttons
+    expect(actionButtons).toHaveLength(3);
+    
+    // Verify button order (left to right): Return, Rematch, Back to Menu
+    expect(actionButtons[0]).toHaveTextContent('ゲームに戻る');
+    expect(actionButtons[1]).toHaveTextContent('再戦する');
+    expect(actionButtons[2]).toHaveTextContent('メニューに戻る');
   });
 
 });

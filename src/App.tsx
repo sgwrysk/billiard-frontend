@@ -28,6 +28,7 @@ import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
 import type { Game } from './types/index';
 import type { ChessClockSettings } from './types/index';
+import { GameEngineFactory } from './games/GameEngineFactory';
 
 // Create Material-UI theme - Deep Blue + Outfit
 const theme = createTheme({
@@ -156,6 +157,7 @@ const AppContent: React.FC = () => {
     switchToPlayer,
     endGame,
     resetGame,
+    restoreGame,
     checkAllBallsPocketed,
     undoLastShot,
     winSet,
@@ -249,6 +251,35 @@ const AppContent: React.FC = () => {
   const handleBackToMenu = () => {
     setFinishedGame(null);
     setCurrentScreen(AppScreen.HOME);
+  };
+
+  const handleReturnToGame = () => {
+    if (finishedGame) {
+      // Manually undo the last score from the finished game first
+      const engine = GameEngineFactory.getEngine(finishedGame.type);
+      
+      let gameAfterUndo: Game;
+      if (engine.hasCustomLogic() && engine.handleCustomAction) {
+        gameAfterUndo = engine.handleCustomAction(finishedGame, 'UNDO_LAST_SHOT');
+      } else {
+        gameAfterUndo = engine.handleUndo(finishedGame);
+      }
+      
+      // Now restore the undone game with status reset to IN_PROGRESS
+      const restoredGame = {
+        ...gameAfterUndo,
+        status: GameStatus.IN_PROGRESS,
+        winner: undefined,
+        endTime: undefined,
+      };
+      
+      // Restore the game state
+      restoreGame(restoredGame);
+      
+      // Clear finished game and go to game screen
+      setFinishedGame(null);
+      setCurrentScreen(AppScreen.GAME);
+    }
   };
 
   const handleLanguageChange = (newLanguage: LanguageType) => {
@@ -439,6 +470,7 @@ const AppContent: React.FC = () => {
             game={finishedGame}
             onRematch={handleRematch}
             onBackToMenu={handleBackToMenu}
+            onReturnToGame={handleReturnToGame}
           />
         )}
       </Container>

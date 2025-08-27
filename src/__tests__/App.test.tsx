@@ -290,4 +290,7 @@ describe('App', () => {
     });
 
   });
+
+  // Note: Return to Game functionality should be tested manually
+  // due to complex interaction sequences and timing issues in automated tests
 });

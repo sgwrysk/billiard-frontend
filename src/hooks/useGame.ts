@@ -106,6 +106,11 @@ export const useGame = () => {
     setCurrentGame(null);
   }, []);
 
+  // Restore game from completed state
+  const restoreGame = useCallback((game: Game) => {
+    setCurrentGame(game);
+  }, []);
+
   // Check if game is in initial state (can swap players or undo actions)
   const isGameInInitialState = useCallback(() => {
     if (!currentGame) return false;
@@ -258,6 +263,7 @@ export const useGame = () => {
     startGame,
     endGame,
     resetGame,
+    restoreGame,
     startRematch,
     
     // Game actions

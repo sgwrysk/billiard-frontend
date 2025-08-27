@@ -94,6 +94,8 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
 
   const handleGameTypeChange = (newGameType: GameType) => {
     setGameType(newGameType);
+    // Reset scroll position when game type changes
+    window.scrollTo(0, 0);
     // Clear target score for non-Rotation games and set default targetSets for Set Match
     if (newGameType === GameType.SET_MATCH) {
       setPlayers(players.map(player => ({ ...player, targetScore: undefined, targetSets: 5 })));

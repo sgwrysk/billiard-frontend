@@ -197,10 +197,16 @@ const AppContent: React.FC = () => {
 
   const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
 
+  // Helper function to reset scroll position to top
+  const resetScrollPosition = () => {
+    window.scrollTo(0, 0);
+  };
+
   const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean, chessClock?: ChessClockSettings) => {
     setAlternatingBreak(alternatingBreakSetting || false);
     startGame(players, gameType, chessClock);
     setCurrentScreen(AppScreen.GAME);
+    resetScrollPosition();
   };
 
   const handleEndGame = (winnerId?: string) => {
@@ -213,6 +219,7 @@ const AppContent: React.FC = () => {
       setFinishedGame(gameWithWinner);
       endGame();
       setCurrentScreen(AppScreen.VICTORY);
+      resetScrollPosition();
     }
   };
 
@@ -220,6 +227,7 @@ const AppContent: React.FC = () => {
     resetGame();
     setAlternatingBreak(false);
     setCurrentScreen(AppScreen.SETUP);
+    resetScrollPosition();
   };
 
   const handleSwapPlayers = () => {
@@ -246,11 +254,13 @@ const AppContent: React.FC = () => {
     // Start new game directly
     startGame(rematchPlayers, finishedGame.type);
     setCurrentScreen(AppScreen.GAME);
+    resetScrollPosition();
   };
 
   const handleBackToMenu = () => {
     setFinishedGame(null);
     setCurrentScreen(AppScreen.HOME);
+    resetScrollPosition();
   };
 
   const handleReturnToGame = () => {
@@ -279,6 +289,7 @@ const AppContent: React.FC = () => {
       // Clear finished game and go to game screen
       setFinishedGame(null);
       setCurrentScreen(AppScreen.GAME);
+      resetScrollPosition();
     }
   };
 
@@ -296,6 +307,7 @@ const AppContent: React.FC = () => {
 
   const handleMenuItemClick = (screen: string) => {
     setCurrentScreen(screen);
+    resetScrollPosition();
     handleMenuClose();
   };
 
@@ -306,12 +318,14 @@ const AppContent: React.FC = () => {
       if (canSwapPlayers()) {
         resetGame();
         setCurrentScreen(AppScreen.HOME);
+        resetScrollPosition();
       } else {
         // Show confirmation dialog if game is in progress
         setShowExitConfirm(true);
       }
     } else {
       setCurrentScreen(AppScreen.HOME);
+      resetScrollPosition();
     }
   };
 
@@ -319,6 +333,7 @@ const AppContent: React.FC = () => {
     setShowExitConfirm(false);
     resetGame();
     setCurrentScreen(AppScreen.HOME);
+    resetScrollPosition();
   };
 
   const handleCancelExit = () => {

@@ -6,10 +6,11 @@ This file contains project-specific guidelines and instructions for Claude Code,
 ## 📋 Required Workflow / 必須のワークフロー
 
 ### 🔧 **Pre-Code Change & Deploy Checklist / コードの変更・デプロイ前チェックリスト**
-1. **Run Tests / テスト実行**: `npm test` - Ensure all tests pass / 全テストがパスすることを確認
-2. **Build Check / ビルド確認**: `npm run build` - Verify no TypeScript errors / TypeScriptエラーがないことを確認
-3. **Lint Check / リントチェック**: `npm run lint` (warnings OK, fix errors / 警告は許可、エラーは修正)
-4. **Coverage Check / カバレッジ確認**: `npm test -- --coverage` (maintain 90%+ / 90%以上を維持)
+1. **TDD Verification / TDD確認**: Confirm tests were written before implementation / 実装前にテストが書かれていることを確認
+2. **Run Tests / テスト実行**: `npm test` - Ensure all tests pass / 全テストがパスすることを確認
+3. **Build Check / ビルド確認**: `npm run build` - Verify no TypeScript errors / TypeScriptエラーがないことを確認
+4. **Lint Check / リントチェック**: `npm run lint` (warnings OK, fix errors / 警告は許可、エラーは修正)
+5. **Coverage Check / カバレッジ確認**: `npm test -- --coverage` (maintain 90%+ / 90%以上を維持)
 
 ### 📤 **Git Operations Rules / Git操作のルール**
 - **Pre-commit / コミット前**: Always run above checklist / 必ず上記チェックリストを実行
@@ -30,6 +31,70 @@ This file contains project-specific guidelines and instructions for Claude Code,
 - 共通テストユーティリティ: `src/__tests__/utils/testHelpers.tsx` を活用
 - 大きなテストファイル（1000行超）は機能別分割を検討
 - モック設定は各テストファイル内で適切に管理
+
+## 🔬 **TDD (テスト駆動開発) 必須ルール**
+
+### **基本原則**
+- **新機能・バグ修正はTDD必須**: 例外なくテストファーストで開発
+- **Red-Green-Refactor サイクル**: 必ずこの順序で実装
+- **小さな単位での開発**: 一度に大きな機能を作らず、小刻みに進める
+
+### **TDD実装手順 (必須)**
+
+#### **1. Red Phase (失敗するテストを書く)**
+```bash
+# 1. テストファイルを作成
+touch src/path/to/__tests__/YourComponent.test.tsx
+
+# 2. 失敗するテストを書く（実装前）
+# - 期待する動作を明確に定義
+# - 実装が存在しないため必ずテストが失敗することを確認
+
+# 3. テスト実行して失敗を確認
+npm test -- --run path/to/test.tsx
+```
+
+#### **2. Green Phase (最小限の実装でテストを通す)**
+```bash
+# 1. テストが通る最小限のコードを実装
+# - 余計な機能は追加しない
+# - とにかくテストを通すことだけに集中
+
+# 2. テスト実行して成功を確認
+npm test -- --run path/to/test.tsx
+```
+
+#### **3. Refactor Phase (コードの改善)**
+```bash
+# 1. テストが通る状態を保ちながらコードを改善
+# - コードの重複を除去
+# - 可読性の向上
+# - パフォーマンスの最適化
+
+# 2. 各変更後にテストを実行
+npm test -- --run path/to/test.tsx
+
+# 3. 全体テストで回帰がないことを確認
+npm test
+```
+
+### **TDD適用対象**
+- **新機能開発**: 全ての新機能はTDD必須
+- **バグ修正**: バグを再現するテストを先に書く
+- **リファクタリング**: 既存テストで動作保証、必要に応じて新テスト追加
+- **UIコンポーネント**: レンダリング、イベント処理、状態変更をテスト
+- **ビジネスロジック**: ゲームエンジン、計算ロジック、状態管理
+
+### **TDD品質チェック**
+- **テストが先**: 実装前に必ずテストが存在する
+- **テスト網羅性**: エッジケース、エラーケースも含む
+- **テスト可読性**: テスト名と内容から期待動作が明確
+- **テスト速度**: 高速実行可能（重いテストは分離）
+
+### **TDD例外ケース（事前承認必要）**
+- **プロトタイプ検証**: 技術検証目的の一時的実装
+- **外部ライブラリ統合**: サードパーティAPIの動作確認
+- **緊急バグ修正**: 本番障害時の一時対応（後で必ずテスト追加）
 
 ## 🏗️ **開発規約**
 
@@ -77,6 +142,8 @@ src/
 ## 🚨 **注意事項**
 
 ### **禁止事項**
+- **テストなし実装禁止** - TDDサイクルを無視した実装は一切禁止
+- **実装先行禁止** - テストを書く前にプロダクションコードを書くことは禁止
 - `any` 型の使用は最小限に抑制
 - 新規ファイル作成は必要最小限
 - 既存テストを壊さない
@@ -87,12 +154,13 @@ src/
 - **日本語コメント禁止** - コード内コメントは必ず英語で記述
 
 ### **推奨事項**
+- **TDD厳守** - Red-Green-Refactor サイクルを必ず実践
 - 既存パターンとコード規約の継承
-- 段階的改善アプローチ
+- 段階的改善アプローチ (小刻みなTDDサイクル)
 - ユーザビリティを重視した実装
 - モバイルファーストの設計
 - **共通コンポーネント優先** - 再利用可能な設計
-- **テスト駆動開発** - コンポーネント作成時は対応テストも作成
+- **テストファースト原則** - 実装前に必ずテストを作成
 
 ### **リファクタリングルール**
 - **リファクタ前の必須確認**: 対象コードに自動テストが存在することを確認
@@ -138,5 +206,5 @@ npm test                    # リファクタ後の動作確認
 
 ---
 
-**最終更新**: 2025-08-24
+**最終更新**: 2025-08-27
 **対象AIツール**: Claude Code, Cursor, GitHub Copilot, その他

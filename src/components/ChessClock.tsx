@@ -305,7 +305,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
       </Paper>
 
       {/* Spacer to avoid overlap with fixed header */}
-      <Box sx={{ height: { xs: 96, sm: 112 }, mb: 2 }} />
+      <Box sx={{ height: { xs: 80, sm: 90 } }} />
     </Box>
   );
 };

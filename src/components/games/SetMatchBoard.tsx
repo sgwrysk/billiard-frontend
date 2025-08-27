@@ -47,8 +47,6 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
       display: 'flex', 
       flexDirection: 'column', 
       minHeight: 'calc(100vh - 64px)',
-      // Add top padding when chess clock is enabled to prevent overlap
-      pt: game.chessClock?.enabled ? { xs: 10, sm: 12 } : 0
     }}>
       {/* Chess Clock */}
       {game.chessClock?.enabled && onTimeUp && onSwitchToPlayer && (

@@ -30,6 +30,7 @@ const translations: Translations = {
     // Menu
     'menu.scoreInput': 'スコア入力',
     'menu.settings': '設定',
+    'menu.playerManagement': 'プレイヤー管理',
 
     // Game setup
     'setup.title': '新しいゲーム',
@@ -139,6 +140,37 @@ const translations: Translations = {
     'confirm.exitGame.message': 'ゲームが進行中です。ゲームを中断してホームに戻りますか？\n※進行中のデータは失われます。',
     'confirm.exitGame.confirm': 'ホームに戻る',
     'confirm.exitGame.cancel': 'ゲームを続ける',
+
+    // Player management
+    'playerManagement.title': 'プレイヤー管理',
+    'playerManagement.description': 'プレイヤーとデフォルト設定を管理します',
+    'playerManagement.defaultSettings': 'デフォルトプレイヤー設定',
+    'playerManagement.player1Default': 'プレイヤー1デフォルト',
+    'playerManagement.player2Default': 'プレイヤー2デフォルト',
+    'playerManagement.noDefault': 'なし',
+    'playerManagement.playerList': 'プレイヤー一覧',
+    'playerManagement.showHidden': '非表示を表示',
+    'playerManagement.noPlayers': 'プレイヤーが見つかりません',
+    'playerManagement.hidden': '非表示',
+    'playerManagement.created': '作成日',
+    'playerManagement.editName': '名前を編集',
+    'playerManagement.hide': '非表示にする',
+    'playerManagement.show': '表示する',
+    'playerManagement.editPlayer': 'プレイヤー編集',
+    'playerManagement.playerName': 'プレイヤー名',
+    'playerManagement.playerNotFound': 'プレイヤーが見つかりません',
+
+    // Common
+    'common.save': '保存',
+
+    // Success messages
+    'success.playerUpdated': 'プレイヤーが更新されました',
+    'success.playerHidden': 'プレイヤーを非表示にしました',
+    'success.playerShown': 'プレイヤーを表示しました',
+    'success.defaultPlayerSet': 'デフォルトプレイヤーを設定しました',
+
+    // Error messages
+    'error.playerDataLoad': 'プレイヤーデータの読み込みに失敗しました',
   },
   en: {
     // Home screen
@@ -151,6 +183,7 @@ const translations: Translations = {
     // Menu
     'menu.scoreInput': 'Score Input',
     'menu.settings': 'Settings',
+    'menu.playerManagement': 'Player Management',
 
     // Game setup
     'setup.title': 'New Game',
@@ -259,6 +292,37 @@ const translations: Translations = {
     'confirm.exitGame.message': 'A game is in progress. Do you want to exit the game and return to home?\n※Progress will be lost.',
     'confirm.exitGame.confirm': 'Return to Home',
     'confirm.exitGame.cancel': 'Continue Game',
+
+    // Player management
+    'playerManagement.title': 'Player Management',
+    'playerManagement.description': 'Manage players and default settings',
+    'playerManagement.defaultSettings': 'Default Player Settings',
+    'playerManagement.player1Default': 'Player 1 Default',
+    'playerManagement.player2Default': 'Player 2 Default',
+    'playerManagement.noDefault': 'None',
+    'playerManagement.playerList': 'Player List',
+    'playerManagement.showHidden': 'Show Hidden',
+    'playerManagement.noPlayers': 'No players found',
+    'playerManagement.hidden': 'Hidden',
+    'playerManagement.created': 'Created',
+    'playerManagement.editName': 'Edit Name',
+    'playerManagement.hide': 'Hide',
+    'playerManagement.show': 'Show',
+    'playerManagement.editPlayer': 'Edit Player',
+    'playerManagement.playerName': 'Player Name',
+    'playerManagement.playerNotFound': 'Player not found',
+
+    // Common
+    'common.save': 'Save',
+
+    // Success messages
+    'success.playerUpdated': 'Player updated successfully',
+    'success.playerHidden': 'Player hidden successfully',
+    'success.playerShown': 'Player shown successfully',
+    'success.defaultPlayerSet': 'Default player set successfully',
+
+    // Error messages
+    'error.playerDataLoad': 'Failed to load player data',
   },
 };
 

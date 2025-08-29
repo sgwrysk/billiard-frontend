@@ -16,7 +16,7 @@ import {
   ListItemText,
   Divider
 } from '@mui/material';
-import { Menu as MenuIcon, Home as HomeIcon } from '@mui/icons-material';
+import { Menu as MenuIcon, Home as HomeIcon, People as PeopleIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
 import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
@@ -24,6 +24,7 @@ import { AppColors, UIColors } from './constants/colors';
 import GameSetup from './components/GameSetup';
 import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
+import PlayerManagement from './components/PlayerManagement';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
 import type { Game } from './types/index';
@@ -130,6 +131,7 @@ const AppScreen = {
   SETUP: 'SETUP',
   GAME: 'GAME',
   VICTORY: 'VICTORY',
+  PLAYER_MANAGEMENT: 'PLAYER_MANAGEMENT',
 } as const;
 
 function App() {
@@ -450,6 +452,12 @@ const AppContent: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t('menu.scoreInput')} />
         </MenuItem>
+        <MenuItem onClick={() => handleMenuItemClick(AppScreen.PLAYER_MANAGEMENT)}>
+          <ListItemIcon>
+            <PeopleIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t('menu.playerManagement')} />
+        </MenuItem>
         <Divider />
       </Menu>
 
@@ -491,6 +499,10 @@ const AppContent: React.FC = () => {
             onBackToMenu={handleBackToMenu}
             onReturnToGame={handleReturnToGame}
           />
+        )}
+        
+        {currentScreen === AppScreen.PLAYER_MANAGEMENT && (
+          <PlayerManagement />
         )}
       </Container>
 

@@ -3,7 +3,6 @@ import {
   Box,
   Card,
   CardContent,
-  TextField,
   Button,
   FormControl,
   InputLabel,
@@ -15,8 +14,9 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 import { GameType } from '../types/index';
 import type { ChessClockSettings } from '../types/index';
-import { ToggleSwitch, NumberInputStepper } from './common';
+import { ToggleSwitch, NumberInputStepper, PlayerInputField, useErrorNotification, ErrorNotification } from './common';
 import ChessClockSetup from './ChessClockSetup';
+import { autoSavePlayer } from '../utils/playerStorage';
 
 interface PlayerSetup {
   name: string;
@@ -30,6 +30,7 @@ interface GameSetupProps {
 
 const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   const { t, language } = useLanguage();
+  const { notification, showError, hideNotification } = useErrorNotification();
   const [players, setPlayers] = useState<PlayerSetup[]>([
     { name: '', targetScore: 120, targetSets: 5 },
     { name: '', targetScore: 120, targetSets: 5 }
@@ -88,7 +89,15 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   const handleStartGame = () => {
     const validPlayers = players.filter(player => player.name.trim());
     if (validPlayers.length >= 2) {
-      onStartGame(validPlayers, gameType, gameType === GameType.SET_MATCH ? alternatingBreak : undefined, chessClock.enabled ? chessClock : undefined);
+      // Auto-save players when starting game
+      try {
+        validPlayers.forEach(player => {
+          autoSavePlayer(player.name);
+        });
+        onStartGame(validPlayers, gameType, gameType === GameType.SET_MATCH ? alternatingBreak : undefined, chessClock.enabled ? chessClock : undefined);
+      } catch (error) {
+        showError(error instanceof Error ? error.message : 'Failed to save player data');
+      }
     }
   };
 
@@ -138,24 +147,16 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
               <Grid item xs={12} md={gameType === GameType.BOWLARD ? 12 : 6} key={index}>
                 <Card variant="outlined" sx={{ p: 2 }}>
                   
-                  <TextField
-                    fullWidth
+                  <PlayerInputField
                     label={t('setup.playerName')}
                     value={player.name}
-                    onChange={(e) => handleUpdatePlayerName(index, e.target.value)}
+                    onChange={(name) => handleUpdatePlayerName(index, name)}
                     onFocus={(e) => e.target.select()}
+                    playerPosition={(index + 1) as 1 | 2}
                     variant="outlined"
                     size="small"
-                    sx={{ 
-                      mb: 2,
-                      '& .MuiOutlinedInput-root': {
-                        minHeight: 44
-                      }
-                    }}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCapitalize: 'words'
-                    }}
+                    fullWidth
+                    sx={{ mb: 2 }}
                   />
                 
                 {/* ローテーション用の目標得点設定 */}
@@ -264,6 +265,14 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
 
         </CardContent>
       </Card>
+      
+      {/* Error Notification */}
+      <ErrorNotification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        onClose={hideNotification}
+      />
     </Box>
   );
 };

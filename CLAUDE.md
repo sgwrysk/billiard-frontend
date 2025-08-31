@@ -18,6 +18,7 @@ This file contains project-specific guidelines and instructions for Claude Code,
 - **Commit messages / コミットメッセージ**: **English description of functional changes** / **機能追加内容を英語で明確に記載**
 - **AI signature / AI署名**: Always add `🤖 Generated with [Claude Code](https://claude.ai/code)` and `Co-Authored-By: Claude <noreply@anthropic.com>`
 - **Push timing / Push実行**: Only when explicitly requested / 明示的な指示がある場合のみ
+- **Notification updates / お知らせ更新**: **MUST update notifications.json with changes before every push** / **Push前に必ずnotifications.jsonに変更内容を記載**
 - **README updates / README更新**: **MUST update README.md and README.ja.md before every push** / **Push前に必ずREADME.mdとREADME.ja.mdを最新に更新**
 
 ## 🎯 **テスト品質基準**
@@ -122,6 +123,16 @@ npm test
 - **ローテーション**: ボールポケット履歴とスコア計算
 - **ボーラード**: フレーム管理とスコア表示
 - **チェスクロック**: レスポンシブ対応と正しい操作ロジック
+
+### **メニュー機能**
+- **新メニュー追加時の必須確認項目**:
+  - `requiresGameExitConfirmation`: ゲーム中の画面遷移時に警告ダイアログを表示するか
+  - 基本的に全メニューは `true` に設定（ゲーム状態保護のため）
+  - **確認ダイアログのボタンテキスト**: 遷移先に応じた適切なメッセージ設定が必要
+    - 例: 「ホームに戻る」「お知らせを見る」「プレイヤー管理へ」など
+    - `src/contexts/LanguageContext.tsx` で画面別のconfirmメッセージを追加
+  - 言語設定の追加（`src/contexts/LanguageContext.tsx`）
+  - アイコンのインポートと設定
 
 ## 📁 **ファイル構造規約**
 

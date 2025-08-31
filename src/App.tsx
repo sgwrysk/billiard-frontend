@@ -16,7 +16,7 @@ import {
   ListItemText,
   Divider
 } from '@mui/material';
-import { Menu as MenuIcon, Home as HomeIcon, People as PeopleIcon } from '@mui/icons-material';
+import { Menu as MenuIcon, Home as HomeIcon, People as PeopleIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
 import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
@@ -25,6 +25,7 @@ import GameSetup from './components/GameSetup';
 import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
 import PlayerManagement from './components/PlayerManagement';
+import Notifications from './components/Notifications';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
 import type { Game } from './types/index';
@@ -132,6 +133,7 @@ const AppScreen = {
   GAME: 'GAME',
   VICTORY: 'VICTORY',
   PLAYER_MANAGEMENT: 'PLAYER_MANAGEMENT',
+  NOTIFICATIONS: 'NOTIFICATIONS',
 } as const;
 
 // Menu configuration for extensible menu management
@@ -140,6 +142,12 @@ const MENU_ITEMS = [
     screen: AppScreen.HOME, 
     icon: HomeIcon, 
     labelKey: 'menu.scoreInput',
+    requiresGameExitConfirmation: true 
+  },
+  { 
+    screen: AppScreen.NOTIFICATIONS, 
+    icon: NotificationsIcon, 
+    labelKey: 'menu.notifications',
     requiresGameExitConfirmation: true 
   },
   { 
@@ -359,6 +367,13 @@ const AppContent: React.FC = () => {
           title: t('confirm.exitToPlayerManagement.title'),
           message: t('confirm.exitToPlayerManagement.message'),
           confirmText: t('confirm.exitToPlayerManagement.confirm'),
+          cancelText: t('confirm.exitGame.cancel'),
+        };
+      case AppScreen.NOTIFICATIONS:
+        return {
+          title: t('confirm.exitToNotifications.title'),
+          message: t('confirm.exitToNotifications.message'),
+          confirmText: t('confirm.exitToNotifications.confirm'),
           cancelText: t('confirm.exitGame.cancel'),
         };
       default:
@@ -597,6 +612,10 @@ const AppContent: React.FC = () => {
         
         {currentScreen === AppScreen.PLAYER_MANAGEMENT && (
           <PlayerManagement />
+        )}
+        
+        {currentScreen === AppScreen.NOTIFICATIONS && (
+          <Notifications />
         )}
       </Container>
 

@@ -29,6 +29,7 @@ const translations: Translations = {
     
     // Menu
     'menu.scoreInput': 'スコア入力',
+    'menu.notifications': 'お知らせ',
     'menu.settings': '設定',
     'menu.playerManagement': 'プレイヤー管理',
 
@@ -120,6 +121,13 @@ const translations: Translations = {
     'victory.returnToGame': 'ゲームに戻る',
     'victory.backToHome': 'ホームに戻る',
     'victory.minutes': '分',
+
+    // Notifications screen
+    'notifications.title': 'お知らせ',
+    'notifications.noNotifications': 'お知らせはありません',
+    'notifications.category.feature': '機能追加',
+    'notifications.category.bugfix': '不具合修正', 
+    'notifications.category.upcoming': '今後の予定',
     'victory.points': '点',
     'victory.wins': '勝',
     'victory.gameEnd': 'ゲーム終了',
@@ -149,6 +157,9 @@ const translations: Translations = {
     'confirm.exitToPlayerManagement.title': 'ゲームを中断',
     'confirm.exitToPlayerManagement.message': 'ゲームが進行中です。ゲームを中断してプレイヤー管理に移動しますか？\n※進行中のデータは失われます。',
     'confirm.exitToPlayerManagement.confirm': 'プレイヤー管理へ',
+    'confirm.exitToNotifications.title': 'ゲームを中断',
+    'confirm.exitToNotifications.message': 'ゲームが進行中です。ゲームを中断してお知らせを確認しますか？\n※進行中のデータは失われます。',
+    'confirm.exitToNotifications.confirm': 'お知らせを見る',
 
     // Player management
     'playerManagement.title': 'プレイヤー管理',
@@ -191,6 +202,7 @@ const translations: Translations = {
     
     // Menu
     'menu.scoreInput': 'Score Input',
+    'menu.notifications': 'Notifications',
     'menu.settings': 'Settings',
     'menu.playerManagement': 'Player Management',
 
@@ -281,6 +293,13 @@ const translations: Translations = {
     'victory.returnToGame': 'Return to Game',
     'victory.backToHome': 'Back to Home',
     'victory.minutes': 'min',
+
+    // Notifications screen
+    'notifications.title': 'Notifications',
+    'notifications.noNotifications': 'No notifications',
+    'notifications.category.feature': 'Feature',
+    'notifications.category.bugfix': 'Bug Fix',
+    'notifications.category.upcoming': 'Upcoming',
     'victory.points': 'pts',
     'victory.wins': 'wins',
     'victory.gameEnd': 'Game End',
@@ -310,6 +329,9 @@ const translations: Translations = {
     'confirm.exitToPlayerManagement.title': 'Exit Game',
     'confirm.exitToPlayerManagement.message': 'A game is in progress. Do you want to exit the game and go to Player Management?\n※Progress will be lost.',
     'confirm.exitToPlayerManagement.confirm': 'Go to Player Management',
+    'confirm.exitToNotifications.title': 'Interrupt Game',
+    'confirm.exitToNotifications.message': 'A game is in progress. Do you want to interrupt the game and check notifications?\n※Progress data will be lost.',
+    'confirm.exitToNotifications.confirm': 'Check Notifications',
 
     // Player management
     'playerManagement.title': 'Player Management',

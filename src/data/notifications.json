@@ -1,0 +1,40 @@
+{
+  "notifications": [
+    {
+      "id": "2025-08-31-01",
+      "date": "2025-08-31",
+      "category": "feature",
+      "content": {
+        "ja": "お知らせメニューを追加しました",
+        "en": "Added notifications menu"
+      }
+    },
+    {
+      "id": "2025-08-31-02", 
+      "date": "2025-08-31",
+      "category": "bugfix",
+      "content": {
+        "ja": "チェスクロック設定がリマッチ時に失われる問題を修正しました",
+        "en": "Fixed chess clock settings being lost during rematch"
+      }
+    },
+    {
+      "id": "2025-08-31-03",
+      "date": "2025-08-31", 
+      "category": "bugfix",
+      "content": {
+        "ja": "メニュー操作時の確認ダイアログを追加し、メッセージを動的に変更するよう修正しました",
+        "en": "Added confirmation dialog for menu navigation and implemented dynamic messages"
+      }
+    },
+    {
+      "id": "2025-08-31-04",
+      "date": "2025-08-31",
+      "category": "feature", 
+      "content": {
+        "ja": "結果画面にホームボタンを追加しました",
+        "en": "Added home button to victory screen"
+      }
+    }
+  ]
+}

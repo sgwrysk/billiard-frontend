@@ -99,4 +99,21 @@ export interface ScoreHistory {
   ballNumber?: number;
 }
 
+// Notifications types
+export type NotificationCategory = 'feature' | 'bugfix' | 'upcoming';
+
+export interface Notification {
+  id: string;
+  date: string; // YYYY-MM-DD format
+  category: NotificationCategory;
+  content: {
+    ja: string;
+    en: string;
+  };
+}
+
+export interface NotificationData {
+  notifications: Notification[];
+}
+
 

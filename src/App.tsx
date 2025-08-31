@@ -13,8 +13,7 @@ import {
   IconButton,
   Menu,
   ListItemIcon,
-  ListItemText,
-  Divider
+  ListItemText
 } from '@mui/material';
 import { Menu as MenuIcon, Home as HomeIcon, People as PeopleIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
 
@@ -567,7 +566,6 @@ const AppContent: React.FC = () => {
             </MenuItem>
           );
         })}
-        <Divider />
       </Menu>
 
       {/* Main content */}

@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-08-31-05",
+      "date": "2025-08-31",
+      "category": "bugfix",
+      "content": {
+        "ja": "ハンバーガーメニューの不要な罫線を削除しました",
+        "en": "Removed unnecessary divider from hamburger menu"
+      }
+    },
+    {
       "id": "2025-08-31-01",
       "date": "2025-08-31",
       "category": "feature",

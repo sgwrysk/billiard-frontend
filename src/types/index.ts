@@ -49,6 +49,7 @@ export const GameType = {
   SET_MATCH: 'SET_MATCH',
   ROTATION: 'ROTATION',
   BOWLARD: 'BOWLARD',
+  JAPAN: 'JAPAN',
 } as const;
 
 export type GameType = typeof GameType[keyof typeof GameType];
@@ -80,6 +81,9 @@ export interface Game {
   scoreHistory: ScoreHistory[]; // Score progression history
   chessClock?: ChessClockSettings; // Chess clock settings
   chessClockState?: ChessClockState; // Chess clock time state for preservation
+  japanSettings?: import('./japan').JapanGameSettings; // Japan game settings
+  japanRackHistory?: import('./japan').JapanRackResult[]; // Japan game rack history
+  japanPlayerOrderHistory?: import('./japan').JapanPlayerOrder[]; // Japan player order history for different periods
 }
 
 // Shot information type definition
@@ -89,6 +93,7 @@ export interface Shot {
   isSunk: boolean;
   isFoul: boolean;
   timestamp: Date;
+  customData?: Record<string, unknown>; // For game-specific data
 }
 
 // Score history type definition

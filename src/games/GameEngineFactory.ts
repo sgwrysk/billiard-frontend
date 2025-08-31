@@ -3,6 +3,7 @@ import { GameType } from '../types/index';
 import { SetMatchEngine } from './setmatch/SetMatchEngine';
 import { RotationEngine } from './rotation/RotationEngine';
 import { BowlardEngine } from './bowlard/BowlardEngine';
+import { JapanEngine } from './japan/JapanEngine';
 
 export class GameEngineFactory {
   private static engines: Map<GameType, IGameEngine> = new Map();
@@ -23,13 +24,15 @@ export class GameEngineFactory {
         return new RotationEngine();
       case GameType.BOWLARD:
         return new BowlardEngine();
+      case GameType.JAPAN:
+        return new JapanEngine();
       default:
         throw new Error(`Unsupported game type: ${gameType}`);
     }
   }
   
   static getAllSupportedGameTypes(): GameType[] {
-    return [GameType.SET_MATCH, GameType.ROTATION, GameType.BOWLARD];
+    return [GameType.SET_MATCH, GameType.ROTATION, GameType.BOWLARD, GameType.JAPAN];
   }
   
   static isGameTypeSupported(gameType: GameType): boolean {

@@ -192,6 +192,12 @@ const AppContent: React.FC = () => {
     canSwapPlayers,
     canUndoLastShot,
     updateChessClockState,
+    handleRackComplete,
+    handleApplyMultiplier,
+    handleApplyDeduction,
+    handleApplyMultiplierAll,
+    handleNextRack,
+    handlePlayerOrderChange,
   } = useGame();
   
   const [finishedGame, setFinishedGame] = useState<Game | null>(null);
@@ -204,9 +210,9 @@ const AppContent: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
-  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean, chessClock?: ChessClockSettings) => {
+  const handleStartGame = (players: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, alternatingBreakSetting?: boolean, chessClock?: ChessClockSettings, japanSettings?: import('./types/japan').JapanGameSettings) => {
     setAlternatingBreak(alternatingBreakSetting || false);
-    startGame(players, gameType, chessClock);
+    startGame(players, gameType, chessClock, japanSettings);
     setCurrentScreen(AppScreen.GAME);
     resetScrollPosition();
   };
@@ -596,6 +602,12 @@ const AppContent: React.FC = () => {
             canSwapPlayers={canSwapPlayers}
             canUndoLastShot={canUndoLastShot()}
             onChessClockStateChange={handleChessClockStateChange}
+            onRackComplete={handleRackComplete}
+            onApplyMultiplier={handleApplyMultiplier}
+            onApplyDeduction={handleApplyDeduction}
+            onApplyMultiplierAll={handleApplyMultiplierAll}
+            onNextRack={handleNextRack}
+            onPlayerOrderChange={handlePlayerOrderChange}
           />
         )}
         

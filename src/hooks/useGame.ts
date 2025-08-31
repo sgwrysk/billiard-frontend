@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react';
 import type { Game, ChessClockSettings, ChessClockState } from '../types/index';
 import { GameType, GameStatus } from '../types/index';
 import { GameEngineFactory } from '../games/GameEngineFactory';
+import type { JapanGameSettings } from '../types/japan';
+import { JapanEngine } from '../games/japan/JapanEngine';
 
 
 export const useGame = () => {
@@ -16,9 +18,15 @@ export const useGame = () => {
 
 
   // Start a new game
-  const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, chessClock?: ChessClockSettings) => {
+  const startGame = useCallback((playerSetups: {name: string, targetScore?: number, targetSets?: number}[], gameType: GameType, chessClock?: ChessClockSettings, japanSettings?: JapanGameSettings) => {
     const engine = GameEngineFactory.getEngine(gameType);
-    const newGame = engine.initializeGame(playerSetups);
+    
+    let newGame: Game;
+    if (gameType === GameType.JAPAN && engine instanceof JapanEngine) {
+      newGame = engine.initializeGame(playerSetups, japanSettings);
+    } else {
+      newGame = engine.initializeGame(playerSetups);
+    }
     
     // Add chess clock settings if provided
     if (chessClock) {
@@ -290,6 +298,72 @@ export const useGame = () => {
     setCurrentGame(updatedGame);
   }, [currentGame]);
 
+  // Japan-specific handlers
+  const handleRackComplete = useCallback((rackData: { player1Balls: number; player2Balls: number; rackNumber: number }) => {
+    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
+
+    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
+    const updatedGame = engine.handleCustomAction(currentGame, 'rackComplete', rackData);
+    
+    // Check victory condition
+    const { isGameOver, winnerId } = engine.checkVictoryCondition(updatedGame);
+    
+    if (isGameOver && winnerId) {
+      const finalGame = {
+        ...updatedGame,
+        status: GameStatus.COMPLETED,
+        winner: winnerId,
+        endTime: new Date(),
+      };
+      setCurrentGame(finalGame);
+    } else {
+      setCurrentGame(updatedGame);
+    }
+  }, [currentGame]);
+
+  const handleApplyMultiplier = useCallback((playerId: string, multiplier: number) => {
+    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
+
+    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
+    const updatedGame = engine.handleCustomAction(currentGame, 'multiplier', { playerId, value: multiplier });
+    setCurrentGame(updatedGame);
+  }, [currentGame]);
+
+  const handleApplyDeduction = useCallback((playerId: string, deduction: number) => {
+    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
+
+    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
+    const updatedGame = engine.handleCustomAction(currentGame, 'deduction', { playerId, value: deduction });
+    setCurrentGame(updatedGame);
+  }, [currentGame]);
+
+  const handleApplyMultiplierAll = useCallback((multiplier: number) => {
+    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
+
+    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
+    const updatedGame = engine.handleCustomAction(currentGame, 'multiplier_all', { value: multiplier });
+    setCurrentGame(updatedGame);
+  }, [currentGame]);
+
+  const handleNextRack = useCallback(() => {
+    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
+
+    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
+    const updatedGame = engine.handleCustomAction(currentGame, 'nextRack');
+    setCurrentGame(updatedGame);
+  }, [currentGame]);
+
+  const handlePlayerOrderChange = useCallback((selectedPlayerId: string) => {
+    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
+
+    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
+    let updatedGame = engine.handleCustomAction(currentGame, 'playerOrderChange', { selectedPlayerId });
+    
+    // After order change, proceed to next rack
+    updatedGame = engine.handleCustomAction(updatedGame, 'nextRack');
+    setCurrentGame(updatedGame);
+  }, [currentGame]);
+
   return {
     // State
     currentGame,
@@ -316,6 +390,12 @@ export const useGame = () => {
     winSet,
     addPins,
     undoBowlingRoll,
+    handleRackComplete,
+    handleApplyMultiplier,
+    handleApplyDeduction,
+    handleApplyMultiplierAll,
+    handleNextRack,
+    handlePlayerOrderChange,
     
     // Utilities
     getBallNumbers,

@@ -1,0 +1,215 @@
+import { describe, it, expect } from 'vitest';
+import { JapanEngine } from '../JapanEngine';
+import { GameType } from '../../../types/index';
+import type { JapanGameSettings, JapanBallAction } from '../../../types/japan';
+
+describe('JapanEngine', () => {
+  let engine: JapanEngine;
+  
+  const defaultSettings: JapanGameSettings = {
+    handicapBalls: [5, 9],
+    multipliers: [{ label: 'x2', value: 2 }],
+    deductionEnabled: false,
+    deductions: [],
+    orderChangeInterval: 10,
+    orderChangeEnabled: false,
+    multipliersEnabled: false
+  };
+
+  beforeEach(() => {
+    engine = new JapanEngine();
+  });
+
+  it('should return JAPAN as game type', () => {
+    expect(engine.getGameType()).toBe(GameType.JAPAN);
+  });
+
+  it('should return ball numbers 1-10', () => {
+    expect(engine.getBallNumbers()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  });
+
+  it('should initialize game with Japan settings', () => {
+    const playerSetups = [
+      { name: 'Player 1' },
+      { name: 'Player 2' }
+    ];
+
+    const game = engine.initializeGame(playerSetups, defaultSettings);
+
+    expect(game.type).toBe(GameType.JAPAN);
+    expect(game.japanSettings).toEqual(defaultSettings);
+    expect(game.players).toHaveLength(2);
+    expect(game.players[0].score).toBe(0);
+    expect(game.currentPlayerIndex).toBe(0);
+  });
+
+  it('should handle ball action - regular ball', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    
+    const ballAction: JapanBallAction = {
+      ball: 3, // Use ball 3 which is not a handicap ball
+      type: 'ball',
+      value: 3,
+      label: undefined
+    };
+
+    const updatedGame = engine.handleBallAction(game, ballAction);
+    
+    expect(updatedGame.players[0].score).toBe(3);
+    expect(updatedGame.shotHistory).toHaveLength(1);
+    expect(updatedGame.shotHistory[0].ballNumber).toBe(3);
+  });
+
+  it('should handle ball action - handicap ball gets double points', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    
+    const ballAction: JapanBallAction = {
+      ball: 5, // handicap ball
+      type: 'ball',
+      value: 5,
+      label: undefined
+    };
+
+    const updatedGame = engine.handleBallAction(game, ballAction);
+    
+    // Handicap balls should give double points
+    expect(updatedGame.players[0].score).toBe(10);
+  });
+
+  it('should handle multiplier action', () => {
+    const settingsWithMultiplier = {
+      ...defaultSettings,
+      multipliersEnabled: true
+    };
+    
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], settingsWithMultiplier);
+    // First add some points
+    const gameWithPoints = {
+      ...game,
+      players: game.players.map((p, i) => i === 0 ? { ...p, score: 10 } : p)
+    };
+    
+    const multiplierAction: JapanBallAction = {
+      ball: 0,
+      type: 'multiplier',
+      value: 2,
+      label: 'x2'
+    };
+
+    const updatedGame = engine.handleBallAction(gameWithPoints, multiplierAction);
+    
+    expect(updatedGame.players[0].score).toBe(20); // 10 * 2
+  });
+
+  it('should handle deduction action', () => {
+    const settingsWithDeduction = {
+      ...defaultSettings,
+      deductionEnabled: true,
+      deductions: [{ label: '-3', value: 3 }]
+    };
+    
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], settingsWithDeduction);
+    // First add some points
+    const gameWithPoints = {
+      ...game,
+      players: game.players.map((p, i) => i === 0 ? { ...p, score: 10 } : p)
+    };
+    
+    const deductionAction: JapanBallAction = {
+      ball: 0,
+      type: 'deduction',
+      value: 3,
+      label: '-3'
+    };
+
+    const updatedGame = engine.handleBallAction(gameWithPoints, deductionAction);
+    
+    expect(updatedGame.players[0].score).toBe(7); // 10 - 3
+  });
+
+  it('should not allow negative scores', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    // Player has only 2 points
+    const gameWithPoints = {
+      ...game,
+      players: game.players.map((p, i) => i === 0 ? { ...p, score: 2 } : p)
+    };
+    
+    const deductionAction: JapanBallAction = {
+      ball: 0,
+      type: 'deduction',
+      value: 5,
+      label: '-5'
+    };
+
+    const updatedGame = engine.handleBallAction(gameWithPoints, deductionAction);
+    
+    expect(updatedGame.players[0].score).toBe(0); // Should not go below 0
+  });
+
+  it('should switch player after action', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    
+    const ballAction: JapanBallAction = {
+      ball: 3,
+      type: 'ball',
+      value: 3,
+      label: undefined
+    };
+
+    const updatedGame = engine.handleBallAction(game, ballAction);
+    
+    expect(updatedGame.currentPlayerIndex).toBe(1); // Should switch to player 2
+    expect(updatedGame.players[0].isActive).toBe(false);
+    expect(updatedGame.players[1].isActive).toBe(true);
+  });
+
+  it('should handle switch player manually', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    
+    const updatedGame = engine.handleSwitchPlayer(game);
+    
+    expect(updatedGame.currentPlayerIndex).toBe(1);
+    expect(updatedGame.players[0].isActive).toBe(false);
+    expect(updatedGame.players[1].isActive).toBe(true);
+  });
+
+  it('should check victory condition - no winner yet', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    
+    const result = engine.checkVictoryCondition(game);
+    
+    expect(result.isGameOver).toBe(false);
+    expect(result.winnerId).toBeUndefined();
+  });
+
+  it('should handle pocket ball by calling handleBallAction', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    
+    const updatedGame = engine.handlePocketBall(game, 7);
+    
+    expect(updatedGame.players[0].score).toBe(7);
+    expect(updatedGame.currentPlayerIndex).toBe(1);
+  });
+
+  it('should handle undo action', () => {
+    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    
+    // Add a ball action
+    const ballAction: JapanBallAction = {
+      ball: 6,
+      type: 'ball',
+      value: 6,
+      label: undefined
+    };
+    
+    const gameWithAction = engine.handleBallAction(game, ballAction);
+    expect(gameWithAction.players[0].score).toBe(6);
+    expect(gameWithAction.shotHistory).toHaveLength(1);
+    
+    // Undo the action
+    const undoneGame = engine.handleUndo(gameWithAction);
+    expect(undoneGame.players[0].score).toBe(0);
+    expect(undoneGame.shotHistory).toHaveLength(0);
+  });
+});

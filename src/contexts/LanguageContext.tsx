@@ -39,6 +39,7 @@ const translations: Translations = {
     'setup.gameType.setmatch': 'セットマッチ',
     'setup.gameType.rotation': 'ローテーション',
     'setup.gameType.bowlard': 'ボーラード',
+    'setup.gameType.japan': 'ジャパンルール',
 
     'setup.players': 'プレイヤー',
     'setup.player': 'プレイヤー',
@@ -212,6 +213,7 @@ const translations: Translations = {
     'setup.gameType.setmatch': 'Set Match',
     'setup.gameType.rotation': 'Rotation',
     'setup.gameType.bowlard': 'Bowlard',
+    'setup.gameType.japan': 'Japan Rule',
 
     'setup.players': 'Players',
     'setup.player': 'Player',

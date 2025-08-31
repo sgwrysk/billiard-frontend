@@ -11,6 +11,7 @@ import { GameType } from '../types/index';
 import { SetMatchBoard } from './games/SetMatchBoard';
 import { RotationBoard } from './games/RotationBoard';
 import { BowlardBoard } from './games/BowlardBoard';
+import JapanGameScreen from './games/japan/JapanGameScreen';
 import { ConfirmDialog } from './ConfirmDialog';
 
 interface GameBoardProps {
@@ -30,6 +31,12 @@ interface GameBoardProps {
   canSwapPlayers?: () => boolean;
   canUndoLastShot?: boolean;
   onChessClockStateChange?: (state: ChessClockState) => void;
+  onRackComplete?: (rackData: { player1Balls: number; player2Balls: number; rackNumber: number }) => void;
+  onApplyMultiplier?: (playerId: string, multiplier: number) => void;
+  onApplyDeduction?: (playerId: string, deduction: number) => void;
+  onApplyMultiplierAll?: (multiplier: number) => void;
+  onNextRack?: () => void;
+  onPlayerOrderChange?: (selectedPlayerId: string) => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -48,6 +55,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
   canSwapPlayers,
   canUndoLastShot,
   onChessClockStateChange,
+  onRackComplete: _onRackComplete,
+  onApplyMultiplier,
+  onApplyDeduction,
+  onApplyMultiplierAll,
+  onNextRack,
+  onPlayerOrderChange,
 }) => {
   const { t } = useLanguage();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -117,6 +130,29 @@ const GameBoard: React.FC<GameBoardProps> = ({
             onAddPins={onAddPins!}
             onUndoBowlingRoll={onUndoBowlingRoll!}
             onEndGame={onEndGame}
+          />
+        );
+      
+      case GameType.JAPAN:
+        return (
+          <JapanGameScreen
+            game={game}
+            onBallClick={(ballNumber) => onPocketBall(ballNumber)}
+            onMultiplierClick={(multiplier) => onApplyMultiplier?.(game.players[game.currentPlayerIndex].id, multiplier.value)}
+            onDeductionClick={(deduction) => onApplyDeduction?.(game.players[game.currentPlayerIndex].id, deduction.value)}
+            onNextRack={() => onNextRack?.()}
+            onUndo={() => onUndoLastShot()}
+            onEndGame={() => onEndGame()}
+            onScoreEditToggle={() => {
+              // TODO: Implement score edit mode toggle
+              console.log('Score edit toggle requested');
+            }}
+            onPlayerOrderChange={(selectedPlayerId) => {
+              onPlayerOrderChange?.(selectedPlayerId);
+            }}
+            onMultiplierAllClick={(multiplier) => onApplyMultiplierAll?.(multiplier)}
+            onPlayerSelect={(playerIndex) => onSwitchToPlayer(playerIndex)}
+            isScoreEditMode={false}
           />
         );
       

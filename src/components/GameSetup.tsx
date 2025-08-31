@@ -17,6 +17,8 @@ import type { ChessClockSettings } from '../types/index';
 import { ToggleSwitch, NumberInputStepper, PlayerInputField, useErrorNotification, ErrorNotification } from './common';
 import ChessClockSetup from './ChessClockSetup';
 import { autoSavePlayer } from '../utils/playerStorage';
+import JapanGameSettingsComponent from './games/japan/JapanGameSettings';
+import type { JapanGameSettings } from '../types/japan';
 
 interface PlayerSetup {
   name: string;
@@ -25,7 +27,7 @@ interface PlayerSetup {
 }
 
 interface GameSetupProps {
-  onStartGame: (players: PlayerSetup[], gameType: GameType, alternatingBreak?: boolean, chessClock?: ChessClockSettings) => void;
+  onStartGame: (players: PlayerSetup[], gameType: GameType, alternatingBreak?: boolean, chessClock?: ChessClockSettings, japanSettings?: JapanGameSettings) => void;
 }
 
 const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
@@ -37,6 +39,18 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   ]);
   const [gameType, setGameType] = useState<GameType>(GameType.SET_MATCH);
   const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
+  
+  // Japan game settings
+  const [japanSettings, setJapanSettings] = useState<JapanGameSettings>({
+    handicapBalls: [5, 9],
+    multipliers: [{ label: 'x2', value: 2 }],
+    deductionEnabled: false,
+    deductions: [],
+    orderChangeInterval: 10,
+    orderChangeEnabled: false,
+    multipliersEnabled: false
+  });
+  const [japanSettingsValid, setJapanSettingsValid] = useState(true);
   
   // Chess clock settings
   const [chessClock, setChessClock] = useState<ChessClockSettings>({
@@ -86,6 +100,20 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
     setPlayers(updatedPlayers);
   };
 
+  const handleAddPlayer = () => {
+    const maxPlayers = gameType === GameType.JAPAN ? 10 : (gameType === GameType.BOWLARD ? 1 : 4);
+    if (players.length < maxPlayers) {
+      setPlayers([...players, { name: '', targetScore: 120, targetSets: 5 }]);
+    }
+  };
+
+  const handleRemovePlayer = (index: number) => {
+    const minPlayers = gameType === GameType.BOWLARD ? 1 : 2;
+    if (players.length > minPlayers) {
+      setPlayers(players.filter((_, i) => i !== index));
+    }
+  };
+
   const handleStartGame = () => {
     const validPlayers = players.filter(player => player.name.trim());
     if (validPlayers.length >= 2) {
@@ -94,7 +122,24 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
         validPlayers.forEach(player => {
           autoSavePlayer(player.name);
         });
-        onStartGame(validPlayers, gameType, gameType === GameType.SET_MATCH ? alternatingBreak : undefined, chessClock.enabled ? chessClock : undefined);
+        
+        // Pass Japan settings if it's Japan game
+        if (gameType === GameType.JAPAN) {
+          if (!japanSettingsValid) {
+            showError('Japan設定に問題があります。設定を確認してください。');
+            return;
+          }
+          console.log('Japan settings:', japanSettings);
+          // TODO: Pass Japan settings to the game engine
+        }
+        
+        onStartGame(
+          validPlayers, 
+          gameType, 
+          gameType === GameType.SET_MATCH ? alternatingBreak : undefined, 
+          chessClock.enabled ? chessClock : undefined,
+          gameType === GameType.JAPAN ? japanSettings : undefined
+        );
       } catch (error) {
         showError(error instanceof Error ? error.message : 'Failed to save player data');
       }
@@ -115,8 +160,8 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
     if (newGameType !== GameType.SET_MATCH) {
       setAlternatingBreak(false);
     }
-    // Reset chess clock settings when changing to Bowlard (not supported)
-    if (newGameType === GameType.BOWLARD) {
+    // Reset chess clock settings when changing to Bowlard or Japan (not supported)
+    if (newGameType === GameType.BOWLARD || newGameType === GameType.JAPAN) {
       setChessClock(prev => ({ ...prev, enabled: false }));
     }
   };
@@ -136,6 +181,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
               <MenuItem value={GameType.SET_MATCH}>{t('setup.gameType.setmatch')}</MenuItem>
               <MenuItem value={GameType.ROTATION}>{t('setup.gameType.rotation')}</MenuItem>
               <MenuItem value={GameType.BOWLARD}>{t('setup.gameType.bowlard')}</MenuItem>
+              <MenuItem value={GameType.JAPAN}>{t('setup.gameType.japan')}</MenuItem>
             </Select>
           </FormControl>
 
@@ -144,8 +190,21 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
           {/* プレイヤー設定 */}
           <Grid container spacing={2}>
             {(gameType === GameType.BOWLARD ? players.slice(0, 1) : players).map((player, index) => (
-              <Grid item xs={12} md={gameType === GameType.BOWLARD ? 12 : 6} key={index}>
-                <Card variant="outlined" sx={{ p: 2 }}>
+              <Grid item xs={12} md={gameType === GameType.BOWLARD ? 12 : (gameType === GameType.JAPAN ? 12 : 6)} key={index}>
+                <Card variant="outlined" sx={{ p: 2, position: 'relative' }}>
+                  
+                  {/* プレイヤー削除ボタン - Japanルールかつ最小人数を上回る場合のみ表示 */}
+                  {gameType === GameType.JAPAN && players.length > 2 && (
+                    <Button
+                      onClick={() => handleRemovePlayer(index)}
+                      sx={{ position: 'absolute', top: 8, right: 8, minWidth: 'auto', p: 0.5 }}
+                      size="small"
+                      color="error"
+                      variant="text"
+                    >
+                      ×
+                    </Button>
+                  )}
                   
                   <PlayerInputField
                     label={t('setup.playerName')}
@@ -213,6 +272,20 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
             ))}
           </Grid>
 
+          {/* プレイヤー追加ボタン - Japanルールのみ */}
+          {gameType === GameType.JAPAN && players.length < 10 && (
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+              <Button
+                onClick={handleAddPlayer}
+                variant="outlined"
+                startIcon={<span>+</span>}
+                size="medium"
+              >
+                {t('setup.addPlayer')}
+              </Button>
+            </Box>
+          )}
+
           {/* 交互ブレイク設定 */}
           {gameType === GameType.SET_MATCH && (
             <Box sx={{ mt: 3 }}>
@@ -249,6 +322,15 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                 players={players}
               />
             </Box>
+          )}
+
+          {/* ジャパンルール設定 */}
+          {gameType === GameType.JAPAN && (
+            <JapanGameSettingsComponent
+              settings={japanSettings}
+              onSettingsChange={setJapanSettings}
+              onValidationChange={setJapanSettingsValid}
+            />
           )}
 
           {/* Game start button */}

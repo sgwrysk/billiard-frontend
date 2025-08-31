@@ -253,11 +253,14 @@ const AppContent: React.FC = () => {
       targetSets: player.targetSets,
     }));
     
+    // Preserve chess clock settings from finished game
+    const chessClockSettings = finishedGame.chessClock;
+    
     // Clear finished game state first
     setFinishedGame(null);
     
-    // Start new game directly
-    startGame(rematchPlayers, finishedGame.type);
+    // Start new game with preserved settings (chess clock and alternating break)
+    startGame(rematchPlayers, finishedGame.type, chessClockSettings);
     setCurrentScreen(AppScreen.GAME);
     resetScrollPosition();
   };

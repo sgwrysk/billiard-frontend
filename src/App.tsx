@@ -405,8 +405,14 @@ const AppContent: React.FC = () => {
         resetScrollPosition();
       } else {
         // Show confirmation dialog if game is in progress
+        setPendingNavigation(AppScreen.HOME);
         setShowExitConfirm(true);
       }
+    } else if (currentScreen === AppScreen.VICTORY && finishedGame) {
+      // Victory screen: navigate directly to home without confirmation (game already finished)
+      setFinishedGame(null);
+      setCurrentScreen(AppScreen.HOME);
+      resetScrollPosition();
     } else {
       setCurrentScreen(AppScreen.HOME);
       resetScrollPosition();
@@ -445,6 +451,9 @@ const AppContent: React.FC = () => {
     if (currentScreen === AppScreen.GAME && currentGame) {
       return getGameTypeLabel(currentGame.type);
     }
+    if (currentScreen === AppScreen.VICTORY && finishedGame) {
+      return t('victory.gameResult');
+    }
     return t('app.title');
   };
 
@@ -468,11 +477,11 @@ const AppContent: React.FC = () => {
             {getAppBarTitle()}
           </Typography>
 
-          {/* Home button - only show in game screen */}
-          {currentScreen === AppScreen.GAME && currentGame && (
+          {/* Home button - show in game and victory screens */}
+          {((currentScreen === AppScreen.GAME && currentGame) || (currentScreen === AppScreen.VICTORY && finishedGame)) && (
             <IconButton
               onClick={handleHomeButtonClick}
-              title={t('game.backToHome')}
+              title={currentScreen === AppScreen.VICTORY ? t('victory.backToHome') : t('game.backToHome')}
               size="large"
               sx={{ 
                 mr: 2,

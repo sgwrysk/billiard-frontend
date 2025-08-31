@@ -140,6 +140,14 @@ const translations: Translations = {
     'confirm.exitGame.message': 'ゲームが進行中です。ゲームを中断してホームに戻りますか？\n※進行中のデータは失われます。',
     'confirm.exitGame.confirm': 'ホームに戻る',
     'confirm.exitGame.cancel': 'ゲームを続ける',
+    
+    // Dynamic navigation confirmation dialogs
+    'confirm.exitToHome.title': 'ゲームを中断',
+    'confirm.exitToHome.message': 'ゲームが進行中です。ゲームを中断してホームに戻りますか？\n※進行中のデータは失われます。',
+    'confirm.exitToHome.confirm': 'ホームに戻る',
+    'confirm.exitToPlayerManagement.title': 'ゲームを中断',
+    'confirm.exitToPlayerManagement.message': 'ゲームが進行中です。ゲームを中断してプレイヤー管理に移動しますか？\n※進行中のデータは失われます。',
+    'confirm.exitToPlayerManagement.confirm': 'プレイヤー管理へ',
 
     // Player management
     'playerManagement.title': 'プレイヤー管理',
@@ -292,6 +300,14 @@ const translations: Translations = {
     'confirm.exitGame.message': 'A game is in progress. Do you want to exit the game and return to home?\n※Progress will be lost.',
     'confirm.exitGame.confirm': 'Return to Home',
     'confirm.exitGame.cancel': 'Continue Game',
+    
+    // Dynamic navigation confirmation dialogs
+    'confirm.exitToHome.title': 'Exit Game',
+    'confirm.exitToHome.message': 'A game is in progress. Do you want to exit the game and return to home?\n※Progress will be lost.',
+    'confirm.exitToHome.confirm': 'Return to Home',
+    'confirm.exitToPlayerManagement.title': 'Exit Game',
+    'confirm.exitToPlayerManagement.message': 'A game is in progress. Do you want to exit the game and go to Player Management?\n※Progress will be lost.',
+    'confirm.exitToPlayerManagement.confirm': 'Go to Player Management',
 
     // Player management
     'playerManagement.title': 'Player Management',

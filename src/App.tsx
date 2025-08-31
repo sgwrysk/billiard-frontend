@@ -134,6 +134,22 @@ const AppScreen = {
   PLAYER_MANAGEMENT: 'PLAYER_MANAGEMENT',
 } as const;
 
+// Menu configuration for extensible menu management
+const MENU_ITEMS = [
+  { 
+    screen: AppScreen.HOME, 
+    icon: HomeIcon, 
+    labelKey: 'menu.scoreInput',
+    requiresGameExitConfirmation: true 
+  },
+  { 
+    screen: AppScreen.PLAYER_MANAGEMENT, 
+    icon: PeopleIcon, 
+    labelKey: 'menu.playerManagement',
+    requiresGameExitConfirmation: true 
+  },
+] as const;
+
 function App() {
   return (
     <LanguageProvider>
@@ -173,6 +189,7 @@ const AppContent: React.FC = () => {
   
   const [finishedGame, setFinishedGame] = useState<Game | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
 
   // Helper function to reset scroll position to top
@@ -305,6 +322,56 @@ const AppContent: React.FC = () => {
     setLanguage(newLanguage);
   };
 
+  // Unified navigation handler with game state confirmation
+  const handleSafeNavigation = (targetScreen: string, skipConfirmation = false) => {
+    // Check if confirmation is needed
+    if (currentScreen === AppScreen.GAME && currentGame && !canSwapPlayers() && !skipConfirmation) {
+      // Game is in progress, show confirmation dialog
+      setPendingNavigation(targetScreen);
+      setShowExitConfirm(true);
+    } else {
+      // Safe to navigate directly
+      navigateToScreen(targetScreen);
+    }
+  };
+
+  // Helper function to perform actual navigation
+  const navigateToScreen = (targetScreen: string) => {
+    if (targetScreen === AppScreen.HOME) {
+      resetGame();
+    }
+    setCurrentScreen(targetScreen);
+    resetScrollPosition();
+  };
+
+  // Get dynamic confirmation dialog messages based on target screen
+  const getConfirmationMessages = (targetScreen: string) => {
+    switch (targetScreen) {
+      case AppScreen.HOME:
+        return {
+          title: t('confirm.exitToHome.title'),
+          message: t('confirm.exitToHome.message'),
+          confirmText: t('confirm.exitToHome.confirm'),
+          cancelText: t('confirm.exitGame.cancel'),
+        };
+      case AppScreen.PLAYER_MANAGEMENT:
+        return {
+          title: t('confirm.exitToPlayerManagement.title'),
+          message: t('confirm.exitToPlayerManagement.message'),
+          confirmText: t('confirm.exitToPlayerManagement.confirm'),
+          cancelText: t('confirm.exitGame.cancel'),
+        };
+      default:
+        // Fallback to home messages for unknown screens
+        return {
+          title: t('confirm.exitToHome.title'),
+          message: t('confirm.exitToHome.message'),
+          confirmText: t('confirm.exitToHome.confirm'),
+          cancelText: t('confirm.exitGame.cancel'),
+        };
+    }
+  };
+
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -314,9 +381,18 @@ const AppContent: React.FC = () => {
   };
 
   const handleMenuItemClick = (screen: string) => {
-    setCurrentScreen(screen);
-    resetScrollPosition();
     handleMenuClose();
+    
+    // Find menu item configuration
+    const menuItem = MENU_ITEMS.find(item => item.screen === screen);
+    
+    if (menuItem?.requiresGameExitConfirmation) {
+      // Use safe navigation for items requiring confirmation
+      handleSafeNavigation(screen);
+    } else {
+      // Direct navigation for items not requiring confirmation
+      navigateToScreen(screen);
+    }
   };
 
 
@@ -339,13 +415,17 @@ const AppContent: React.FC = () => {
 
   const handleConfirmExit = () => {
     setShowExitConfirm(false);
-    resetGame();
-    setCurrentScreen(AppScreen.HOME);
-    resetScrollPosition();
+    
+    // Navigate to pending screen if available, otherwise go to home
+    const targetScreen = pendingNavigation || AppScreen.HOME;
+    setPendingNavigation(null);
+    
+    navigateToScreen(targetScreen);
   };
 
   const handleCancelExit = () => {
     setShowExitConfirm(false);
+    setPendingNavigation(null);
   };
 
   const getGameTypeLabel = (type: GameType) => {
@@ -449,18 +529,20 @@ const AppContent: React.FC = () => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={() => handleMenuItemClick(AppScreen.HOME)}>
-          <ListItemIcon>
-            <HomeIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={t('menu.scoreInput')} />
-        </MenuItem>
-        <MenuItem onClick={() => handleMenuItemClick(AppScreen.PLAYER_MANAGEMENT)}>
-          <ListItemIcon>
-            <PeopleIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={t('menu.playerManagement')} />
-        </MenuItem>
+        {MENU_ITEMS.map((menuItem) => {
+          const IconComponent = menuItem.icon;
+          return (
+            <MenuItem 
+              key={menuItem.screen} 
+              onClick={() => handleMenuItemClick(menuItem.screen)}
+            >
+              <ListItemIcon>
+                <IconComponent fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t(menuItem.labelKey)} />
+            </MenuItem>
+          );
+        })}
         <Divider />
       </Menu>
 
@@ -512,10 +594,7 @@ const AppContent: React.FC = () => {
       {/* Exit confirmation dialog */}
       <ConfirmDialog
         open={showExitConfirm}
-        title={t('confirm.exitGame.title')}
-        message={t('confirm.exitGame.message')}
-        confirmText={t('confirm.exitGame.confirm')}
-        cancelText={t('confirm.exitGame.cancel')}
+        {...getConfirmationMessages(pendingNavigation || AppScreen.HOME)}
         onConfirm={handleConfirmExit}
         onCancel={handleCancelExit}
       />

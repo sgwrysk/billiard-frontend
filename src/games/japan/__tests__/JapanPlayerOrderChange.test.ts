@@ -168,7 +168,7 @@ describe('Japan Game Player Order Change', () => {
       multipliersEnabled: false
     };
     
-    let game = engine.initializeGame(playerSetups, japanSettings);
+    const game = engine.initializeGame(playerSetups, japanSettings);
     
     // Should not show at rack 1
     game.currentRack = 1;

@@ -193,9 +193,7 @@ const AppContent: React.FC = () => {
     canUndoLastShot,
     updateChessClockState,
     handleRackComplete,
-    handleApplyMultiplier,
-    handleApplyDeduction,
-    handleApplyMultiplierAll,
+    handleMultiplierChange,
     handleNextRack,
     handlePlayerOrderChange,
   } = useGame();
@@ -462,6 +460,8 @@ const AppContent: React.FC = () => {
         return t('setup.gameType.rotation');
       case GameType.BOWLARD:
         return t('setup.gameType.bowlard');
+      case GameType.JAPAN:
+        return t('setup.gameType.japan');
       default:
         return type;
     }
@@ -603,9 +603,7 @@ const AppContent: React.FC = () => {
             canUndoLastShot={canUndoLastShot()}
             onChessClockStateChange={handleChessClockStateChange}
             onRackComplete={handleRackComplete}
-            onApplyMultiplier={handleApplyMultiplier}
-            onApplyDeduction={handleApplyDeduction}
-            onApplyMultiplierAll={handleApplyMultiplierAll}
+            onMultiplierChange={handleMultiplierChange}
             onNextRack={handleNextRack}
             onPlayerOrderChange={handlePlayerOrderChange}
           />

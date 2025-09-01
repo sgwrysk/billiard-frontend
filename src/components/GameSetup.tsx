@@ -43,12 +43,8 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   // Japan game settings
   const [japanSettings, setJapanSettings] = useState<JapanGameSettings>({
     handicapBalls: [5, 9],
-    multipliers: [{ label: 'x2', value: 2 }],
-    deductionEnabled: false,
-    deductions: [],
     orderChangeInterval: 10,
-    orderChangeEnabled: false,
-    multipliersEnabled: false
+    orderChangeEnabled: false
   });
   const [japanSettingsValid, setJapanSettingsValid] = useState(true);
   
@@ -68,21 +64,34 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   
 
 
-  // Update player names when language changes
+  // Update player names when language changes (only for initial two players)
   useEffect(() => {
     setPlayers(prevPlayers => 
       prevPlayers.map((player, index) => ({
         ...player,
-        name: player.name === '' || player.name.includes('Player') || player.name.includes('プレイヤー') 
+        // Only auto-generate names for the initial two players or players with existing auto-generated names
+        // Exception: Don't auto-generate for Japan mode beyond initial players
+        name: (index < 2 && (player.name === '' || player.name.includes('Player') || player.name.includes('プレイヤー')) && 
+               !(gameType === GameType.JAPAN && index >= 2)) 
           ? `${t('setup.playerName')} ${index + 1}`
           : player.name
       }))
     );
-  }, [language, t]);
+  }, [language, t, gameType]);
 
 
 
   const handleUpdatePlayerName = (index: number, name: string) => {
+    // Clear any existing error notifications first
+    hideNotification();
+    
+    // Check for duplicate names only if name is not empty
+    const trimmedName = name.trim();
+    if (trimmedName && trimmedName.length > 0 && players.some((player, i) => i !== index && player.name.trim().toLowerCase() === trimmedName.toLowerCase())) {
+      showError('同じ名前のプレイヤーが既に存在します');
+      return;
+    }
+    
     const updatedPlayers = [...players];
     updatedPlayers[index].name = name;
     setPlayers(updatedPlayers);
@@ -103,6 +112,9 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   const handleAddPlayer = () => {
     const maxPlayers = gameType === GameType.JAPAN ? 10 : (gameType === GameType.BOWLARD ? 1 : 4);
     if (players.length < maxPlayers) {
+      // Clear any existing error notifications
+      hideNotification();
+      // Explicitly set empty name to avoid auto-generation
       setPlayers([...players, { name: '', targetScore: 120, targetSets: 5 }]);
     }
   };
@@ -116,6 +128,16 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
 
   const handleStartGame = () => {
     const validPlayers = players.filter(player => player.name.trim());
+    
+    // Check for duplicate names
+    const playerNames = validPlayers.map(p => p.name.trim().toLowerCase());
+    const hasDuplicates = playerNames.some((name, index) => playerNames.indexOf(name) !== index);
+    
+    if (hasDuplicates) {
+      showError('重複したプレイヤー名があります。異なる名前を設定してください。');
+      return;
+    }
+    
     if (validPlayers.length >= 2) {
       // Auto-save players when starting game
       try {
@@ -211,7 +233,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                     value={player.name}
                     onChange={(name) => handleUpdatePlayerName(index, name)}
                     onFocus={(e) => e.target.select()}
-                    playerPosition={(index + 1) as 1 | 2}
+                    playerPosition={gameType === GameType.JAPAN ? undefined : (index + 1) as 1 | 2}
                     variant="outlined"
                     size="small"
                     fullWidth

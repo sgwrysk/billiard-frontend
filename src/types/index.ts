@@ -84,6 +84,7 @@ export interface Game {
   japanSettings?: import('./japan').JapanGameSettings; // Japan game settings
   japanRackHistory?: import('./japan').JapanRackResult[]; // Japan game rack history
   japanPlayerOrderHistory?: import('./japan').JapanPlayerOrder[]; // Japan player order history for different periods
+  japanCurrentMultiplier?: number; // Current multiplier value (default: 1)
 }
 
 // Shot information type definition

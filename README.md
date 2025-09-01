@@ -14,6 +14,10 @@ A modern billiard score management application built with React + TypeScript + M
 - **Set Match**: Simple set counting game (first to reach target sets wins)
 - **Rotation**: Ball numbers equal points, target specific score to win (120, 180, 240 points)  
 - **Bowlard**: Bowling-style game played with billiard balls (10 frames, strikes and spares)
+- **Japan Rule (BETA)**: Multi-player handicap game with rotating player order
+  - Support for 2-10 players with customizable handicap balls
+  - Point multiplication system and cumulative scoring
+  - Automatic player order rotation every N racks
 
 ### Core Features
 - 👥 **2-Player Games**: All games support exactly 2 players

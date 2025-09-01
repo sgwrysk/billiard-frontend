@@ -15,8 +15,6 @@ describe('Japan Game Player Order History', () => {
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 5, // Use smaller interval for testing
       orderChangeEnabled: true,
       multipliersEnabled: false
@@ -49,17 +47,17 @@ describe('Japan Game Player Order History', () => {
       playerOrder: ['player-1', 'player-2', 'player-3']
     });
     
-    // Second period should have new order (player-2 first, then reverse order of others)
+    // Second period should have new order (player-2 first, then A→C counter-clockwise)
     expect(game.japanPlayerOrderHistory![1]).toEqual({
       fromRack: 6,
       toRack: 10,
-      playerOrder: ['player-2', 'player-3', 'player-1']
+      playerOrder: ['player-2', 'player-1', 'player-3']
     });
     
     // Current game player order should match new period
     expect(game.players[0].id).toBe('player-2');
-    expect(game.players[1].id).toBe('player-3');
-    expect(game.players[2].id).toBe('player-1');
+    expect(game.players[1].id).toBe('player-1');
+    expect(game.players[2].id).toBe('player-3');
   });
   
   it('should handle multiple order changes correctly', () => {
@@ -76,8 +74,6 @@ describe('Japan Game Player Order History', () => {
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 3, // Use smaller interval for testing
       orderChangeEnabled: true,
       multipliersEnabled: false
@@ -124,8 +120,6 @@ describe('Japan Game Player Order History', () => {
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 5,
       orderChangeEnabled: true,
       multipliersEnabled: false

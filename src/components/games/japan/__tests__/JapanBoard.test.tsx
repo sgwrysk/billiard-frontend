@@ -27,12 +27,8 @@ describe('JapanBoard', () => {
   
   const defaultSettings: JapanGameSettings = {
     handicapBalls: [5, 9],
-    multipliers: [{ label: 'x2', value: 2 }],
-    deductionEnabled: false,
-    deductions: [],
     orderChangeInterval: 10,
-    orderChangeEnabled: false,
-    multipliersEnabled: false
+    orderChangeEnabled: false
   };
 
   const mockGame: Game = {
@@ -120,83 +116,7 @@ describe('JapanBoard', () => {
     });
   });
 
-  it('should show multiplier buttons when enabled', () => {
-    const gameWithMultipliers = {
-      ...mockGame,
-      japanSettings: {
-        ...defaultSettings,
-        multipliersEnabled: true,
-        multipliers: [{ label: 'x2', value: 2 }, { label: 'x3', value: 3 }]
-      }
-    };
 
-    renderWithTheme(<JapanBoard {...defaultProps} game={gameWithMultipliers} />);
-    
-    expect(screen.getByText('x2')).toBeInTheDocument();
-    expect(screen.getByText('x3')).toBeInTheDocument();
-  });
-
-  it('should show deduction buttons when enabled', () => {
-    const gameWithDeductions = {
-      ...mockGame,
-      japanSettings: {
-        ...defaultSettings,
-        deductionEnabled: true,
-        deductions: [{ label: '-1', value: 1 }, { label: '-2', value: 2 }]
-      }
-    };
-
-    renderWithTheme(<JapanBoard {...defaultProps} game={gameWithDeductions} />);
-    
-    expect(screen.getByText('-1')).toBeInTheDocument();
-    expect(screen.getByText('-2')).toBeInTheDocument();
-  });
-
-  it('should call onBallAction when multiplier is clicked', () => {
-    const gameWithMultipliers = {
-      ...mockGame,
-      japanSettings: {
-        ...defaultSettings,
-        multipliersEnabled: true,
-        multipliers: [{ label: 'x2', value: 2 }]
-      }
-    };
-
-    renderWithTheme(<JapanBoard {...defaultProps} game={gameWithMultipliers} />);
-    
-    const multiplier = screen.getByText('x2');
-    fireEvent.click(multiplier);
-    
-    expect(mockOnBallAction).toHaveBeenCalledWith({
-      ball: 0, // No specific ball for multiplier
-      type: 'multiplier',
-      value: 2,
-      label: 'x2'
-    });
-  });
-
-  it('should call onBallAction when deduction is clicked', () => {
-    const gameWithDeductions = {
-      ...mockGame,
-      japanSettings: {
-        ...defaultSettings,
-        deductionEnabled: true,
-        deductions: [{ label: '-1', value: 1 }]
-      }
-    };
-
-    renderWithTheme(<JapanBoard {...defaultProps} game={gameWithDeductions} />);
-    
-    const deduction = screen.getByText('-1');
-    fireEvent.click(deduction);
-    
-    expect(mockOnBallAction).toHaveBeenCalledWith({
-      ball: 0, // No specific ball for deduction
-      type: 'deduction',
-      value: 1,
-      label: '-1'
-    });
-  });
 
   it('should highlight active player', () => {
     renderWithTheme(<JapanBoard {...defaultProps} />);

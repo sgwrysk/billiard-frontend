@@ -13,24 +13,61 @@ import {
   Typography,
   Box,
 } from '@mui/material';
-import type { Player } from '../../../types/index';
+import type { Player, Game } from '../../../types/index';
 
 interface PlayerOrderChangeDialogProps {
   open: boolean;
   players: Player[];
   currentRack: number;
+  game: Game;
   onConfirm: (selectedPlayerId: string) => void;
   onCancel: () => void;
+  onEndGame: () => void;
 }
 
 const PlayerOrderChangeDialog: React.FC<PlayerOrderChangeDialogProps> = ({
   open,
   players,
   currentRack,
+  game,
   onConfirm,
   onCancel,
+  onEndGame,
 }) => {
+  // Find the last player who scored in the current rack
+  const getLastScorerInCurrentRack = (): string => {
+    // Find the last rack complete shot to determine current rack boundary
+    let lastRackCompleteIndex = -1;
+    for (let i = game.shotHistory.length - 1; i >= 0; i--) {
+      if (game.shotHistory[i].customData?.type === 'rack_complete') {
+        lastRackCompleteIndex = i;
+        break;
+      }
+    }
+    
+    // Get shots from current rack
+    const currentRackShots = game.shotHistory.slice(lastRackCompleteIndex + 1);
+    
+    // Find the last ball_click shot (actual scoring shot)
+    for (let i = currentRackShots.length - 1; i >= 0; i--) {
+      const shot = currentRackShots[i];
+      if (shot.customData?.type === 'ball_click') {
+        return shot.playerId;
+      }
+    }
+    
+    // Fallback to first player if no shots found
+    return players[0]?.id || '';
+  };
+  
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>('');
+  
+  // Update selection when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      setSelectedPlayerId(getLastScorerInCurrentRack());
+    }
+  }, [open, game.shotHistory]);
 
   const handleConfirm = () => {
     if (selectedPlayerId) {
@@ -126,7 +163,16 @@ const PlayerOrderChangeDialog: React.FC<PlayerOrderChangeDialogProps> = ({
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 3, gap: 2 }}>
+      <DialogActions sx={{ px: 3, pb: 3, gap: 1.5 }}>
+        <Button
+          onClick={onEndGame}
+          variant="outlined"
+          color="error"
+          size="large"
+          sx={{ flex: 1 }}
+        >
+          ゲーム終了
+        </Button>
         <Button
           onClick={handleCancel}
           variant="outlined"

@@ -37,6 +37,8 @@ import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
 import { UIColors, BowlardColors, AppStyles, AppColors } from '../constants/colors';
 import SetHistory from './SetHistory';
+import JapanCumulativePointsTable from './games/japan/JapanCumulativePointsTable';
+import { JapanScoreCalculator } from '../games/japan/JapanScoreCalculator';
 
 ChartJS.register(
   CategoryScale,
@@ -73,6 +75,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         return t('setup.gameType.rotation');
       case GameType.BOWLARD:
         return t('setup.gameType.bowlard');
+      case GameType.JAPAN:
+        return t('setup.gameType.japan');
       default:
         return type;
     }
@@ -160,6 +164,10 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
     if (game.type === GameType.ROTATION) {
       return generateRotationChartData();
+    }
+
+    if (game.type === GameType.JAPAN) {
+      return generateJapanChartData();
     }
 
     if (!game.scoreHistory || game.scoreHistory.length === 0) {
@@ -324,6 +332,41 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     };
   };
 
+  // Generate chart data for Japan game - rack vs cumulative points
+  const generateJapanChartData = () => {
+    if (!game.japanRackHistory || game.japanRackHistory.length === 0) {
+      return null;
+    }
+
+    const playerColors = UIColors.chart.playerColors;
+    const racks = game.japanRackHistory.sort((a, b) => a.rackNumber - b.rackNumber);
+    
+    // Create labels (rack numbers)
+    const labels = racks.map(rack => `ラック${rack.rackNumber}`);
+    
+    // Create datasets for each player
+    const datasets = game.players.map((player, index) => {
+      const playerData = racks.map(rack => {
+        const playerResult = rack.playerResults.find(result => result.playerId === player.id);
+        return playerResult ? playerResult.totalPoints : 0;
+      });
+
+      return {
+        label: player.name,
+        data: playerData,
+        borderColor: playerColors[index % playerColors.length],
+        backgroundColor: playerColors[index % playerColors.length] + '20',
+        tension: 0.1,
+        fill: false,
+      };
+    });
+
+    return {
+      labels,
+      datasets,
+    };
+  };
+
   // Calculate actual sets won for a player from scoreHistory
   const calculateActualSetsWon = (playerId: string) => {
     if (game.type !== GameType.SET_MATCH || !game.scoreHistory || game.scoreHistory.length === 0) {
@@ -334,6 +377,11 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     return game.scoreHistory
       .filter(entry => entry.score === 1 && entry.playerId === playerId)
       .length;
+  };
+
+  // Get final cumulative points for Japan games
+  const getJapanFinalScore = (playerId: string) => {
+    return JapanScoreCalculator.getPreviousRackTotalPoints(game, playerId);
   };
 
 
@@ -360,7 +408,10 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       x: {
         title: {
           display: true,
-          text: game.type === GameType.BOWLARD ? 'Frame' : game.type === GameType.ROTATION ? 'Inning' : 'Shot',
+          text: game.type === GameType.BOWLARD ? 'Frame' 
+               : game.type === GameType.ROTATION ? 'Inning'
+               : game.type === GameType.JAPAN ? 'Rack'
+               : 'Shot',
         },
       },
     },
@@ -368,8 +419,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
-      {/* Victory announcement (for non-Bowlard games only) */}
-      {game.type !== GameType.BOWLARD && (
+      {/* Victory announcement (for non-Bowlard and non-Japan games only) */}
+      {game.type !== GameType.BOWLARD && game.type !== GameType.JAPAN && (
         <Card sx={{ mb: 3, bgcolor: 'success.50', border: '2px solid', borderColor: 'success.main' }}>
           <CardContent sx={{ textAlign: 'center', py: 4 }}>
             <EmojiEvents sx={{ fontSize: 80, color: 'gold', mb: 2 }} />
@@ -811,7 +862,21 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
                           <Typography variant="h6" color="primary">
                             {game.type === GameType.SET_MATCH 
                               ? <span style={AppStyles.monoFont}>{`${calculateActualSetsWon(player.id)}セット`}</span>
-                              : <span style={AppStyles.monoFont}>{`${player.score}点`}</span>
+                              : game.type === GameType.JAPAN 
+                                ? (() => {
+                                    const finalScore = getJapanFinalScore(player.id);
+                                    return (
+                                      <span 
+                                        style={{
+                                          ...AppStyles.monoFont, 
+                                          color: finalScore > 0 ? '#1976d2' : finalScore < 0 ? '#d32f2f' : 'inherit'
+                                        }}
+                                      >
+                                        {`${finalScore}点`}
+                                      </span>
+                                    );
+                                  })()
+                                : <span style={AppStyles.monoFont}>{`${player.score}点`}</span>
                             }
                           </Typography>
                         </Box>
@@ -823,6 +888,14 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
           </Grid>
         </CardContent>
       </Card>
+
+      {/* ジャパンルール: ポイント累計表を表示 */}
+      {game.type === GameType.JAPAN && (
+        <JapanCumulativePointsTable 
+          game={game} 
+          shouldShowCumulativePoints={() => true} 
+        />
+      )}
 
       {/* セットマッチ: 共通 SetHistory コンポーネントで統一表示 */}
       {game.type === GameType.SET_MATCH && (
@@ -845,8 +918,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
 
 
-      {/* ポケットしたボール詳細（セットマッチ・ボーラード以外） */}
-      {game.type !== GameType.SET_MATCH && game.type !== GameType.BOWLARD && (() => {
+      {/* ポケットしたボール詳細（セットマッチ・ボーラード・ジャパンルール以外） */}
+      {game.type !== GameType.SET_MATCH && game.type !== GameType.BOWLARD && game.type !== GameType.JAPAN && (() => {
         const rackData = getCompletePocketedBallsByRack();
         return (
           <Card sx={{ mb: 3 }}>

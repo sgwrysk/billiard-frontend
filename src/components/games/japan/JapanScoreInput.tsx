@@ -16,8 +16,6 @@ interface JapanScoreInputProps {
   onRackComplete: (rackData: { player1Balls: number; player2Balls: number; rackNumber: number }) => void;
   onSwitchPlayer: () => void;
   onUndoLastShot: () => void;
-  onApplyMultiplier: (playerId: string, multiplier: number) => void;
-  onApplyDeduction: (playerId: string, deduction: number) => void;
   canUndoLastShot?: boolean;
 }
 
@@ -26,12 +24,8 @@ const JapanScoreInput: React.FC<JapanScoreInputProps> = ({
   onRackComplete,
   onSwitchPlayer,
   onUndoLastShot,
-  onApplyMultiplier,
-  onApplyDeduction,
   canUndoLastShot = false,
 }) => {
-  const japanSettings = game.japanSettings!;
-  const currentPlayer = game.players[game.currentPlayerIndex];
   
   // State for ball count inputs for each player
   const [ballCounts, setBallCounts] = useState<Record<string, number>>(
@@ -57,13 +51,7 @@ const JapanScoreInput: React.FC<JapanScoreInputProps> = ({
     }
   };
 
-  const handleMultiplierClick = (multiplier: { label: string; value: number }) => {
-    onApplyMultiplier(currentPlayer.id, multiplier.value);
-  };
 
-  const handleDeductionClick = (deduction: { label: string; value: number }) => {
-    onApplyDeduction(currentPlayer.id, deduction.value);
-  };
 
   return (
     <Box sx={{ p: 2, maxWidth: '1200px', mx: 'auto' }}>
@@ -135,55 +123,7 @@ const JapanScoreInput: React.FC<JapanScoreInputProps> = ({
         </Button>
       </Box>
 
-      {/* Multiplier Buttons */}
-      {japanSettings.multipliersEnabled && japanSettings.multipliers.length > 0 && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              倍率 ({currentPlayer.name})
-            </Typography>
-            <Grid container spacing={1}>
-              {japanSettings.multipliers.map((multiplier, index) => (
-                <Grid item key={index}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => handleMultiplierClick(multiplier)}
-                    sx={{ minWidth: 60, minHeight: 40 }}
-                  >
-                    {multiplier.label}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Deduction Buttons */}
-      {japanSettings.deductionEnabled && japanSettings.deductions.length > 0 && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              減点 ({currentPlayer.name})
-            </Typography>
-            <Grid container spacing={1}>
-              {japanSettings.deductions.map((deduction, index) => (
-                <Grid item key={index}>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDeductionClick(deduction)}
-                    sx={{ minWidth: 60, minHeight: 40 }}
-                  >
-                    {deduction.label}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Control Buttons */}
       <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>

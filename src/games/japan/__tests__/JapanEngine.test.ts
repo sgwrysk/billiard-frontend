@@ -8,12 +8,8 @@ describe('JapanEngine (Correct Implementation)', () => {
   
   const defaultSettings: JapanGameSettings = {
     handicapBalls: [5, 9],
-    multipliers: [{ label: 'x2', value: 2 }],
-    deductionEnabled: false,
-    deductions: [],
     orderChangeInterval: 10,
-    orderChangeEnabled: false,
-    multipliersEnabled: false
+    orderChangeEnabled: false
   };
 
   beforeEach(() => {
@@ -79,55 +75,22 @@ describe('JapanEngine (Correct Implementation)', () => {
     expect(updatedGame.players[0].score).toBeGreaterThan(5); // Should be > 5 due to handicap bonus
   });
 
-  it('should apply multiplier to current score', () => {
-    const settingsWithMultiplier = {
-      ...defaultSettings,
-      multipliersEnabled: true
-    };
-    
-    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], settingsWithMultiplier);
-    // First add some points
-    const gameWithPoints = {
-      ...game,
-      players: game.players.map((p, i) => i === 0 ? { ...p, score: 10 } : p)
-    };
-    
-    const updatedGame = engine.handleMultiplier(gameWithPoints, 'player-1', 2);
-    
-    expect(updatedGame.players[0].score).toBe(20); // 10 * 2
-  });
-
-  it('should apply deduction to current score', () => {
-    const settingsWithDeduction = {
-      ...defaultSettings,
-      deductionEnabled: true,
-      deductions: [{ label: '-3', value: 3 }]
-    };
-    
-    const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], settingsWithDeduction);
-    // First add some points
-    const gameWithPoints = {
-      ...game,
-      players: game.players.map((p, i) => i === 0 ? { ...p, score: 10 } : p)
-    };
-    
-    const updatedGame = engine.handleDeduction(gameWithPoints, 'player-1', 3);
-    
-    expect(updatedGame.players[0].score).toBe(7); // 10 - 3
-  });
-
-  it('should not allow negative scores', () => {
+  it('should update multiplier value', () => {
     const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
-    // Player has only 2 points
-    const gameWithPoints = {
-      ...game,
-      players: game.players.map((p, i) => i === 0 ? { ...p, score: 2 } : p)
-    };
     
-    const updatedGame = engine.handleDeduction(gameWithPoints, 'player-1', 5);
+    // Test setting multiplier to 5
+    const updatedGame = engine.handleMultiplierChange(game, 5);
+    expect(updatedGame.japanCurrentMultiplier).toBe(5);
     
-    expect(updatedGame.players[0].score).toBe(0); // Should not go below 0
+    // Test boundary validation - should clamp to max 100
+    const gameWith200 = engine.handleMultiplierChange(game, 200);
+    expect(gameWith200.japanCurrentMultiplier).toBe(100);
+    
+    // Test boundary validation - should clamp to min 1
+    const gameWith0 = engine.handleMultiplierChange(game, 0);
+    expect(gameWith0.japanCurrentMultiplier).toBe(1);
   });
+
 
   it('should advance rack number after completion', () => {
     const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
@@ -152,23 +115,18 @@ describe('JapanEngine (Correct Implementation)', () => {
     expect(result.winnerId).toBeUndefined();
   });
 
-  it.skip('should handle undo action', () => {
-    // TODO: Implement complex undo logic for rack completion
+  it('should handle UNDO_LAST_SHOT action', () => {
     const game = engine.initializeGame([{ name: 'Player 1' }, { name: 'Player 2' }], defaultSettings);
+    const initialScore = game.players[0].score;
     
-    // Complete a rack
-    const rackData = {
-      player1Balls: 3,
-      player2Balls: 7,
-      rackNumber: 1
-    };
+    // Pocket a handicap ball to create a shot to undo
+    const gameWithShot = engine.handlePocketBall(game, 5);
+    expect(gameWithShot.shotHistory.length).toBe(1);
+    expect(gameWithShot.players[0].score).toBeGreaterThan(initialScore);
     
-    const gameWithRack = engine.handleRackComplete(game, rackData);
-    expect(gameWithRack.players[0].score).toBeGreaterThan(0);
-    expect(gameWithRack.currentRack).toBe(2);
-    
-    // Undo the rack - this is complex to implement correctly
-    const undoneGame = engine.handleUndo(gameWithRack);
-    expect(undoneGame.currentRack).toBe(1);
+    // Test that handleCustomAction properly routes UNDO_LAST_SHOT
+    const undoneGame = engine.handleCustomAction(gameWithShot, 'UNDO_LAST_SHOT');
+    expect(undoneGame.shotHistory.length).toBe(0);
+    expect(undoneGame.players[0].score).toBe(initialScore);
   });
 });

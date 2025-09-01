@@ -321,27 +321,11 @@ export const useGame = () => {
     }
   }, [currentGame]);
 
-  const handleApplyMultiplier = useCallback((playerId: string, multiplier: number) => {
+  const handleMultiplierChange = useCallback((multiplier: number) => {
     if (!currentGame || currentGame.type !== GameType.JAPAN) return;
 
     const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
-    const updatedGame = engine.handleCustomAction(currentGame, 'multiplier', { playerId, value: multiplier });
-    setCurrentGame(updatedGame);
-  }, [currentGame]);
-
-  const handleApplyDeduction = useCallback((playerId: string, deduction: number) => {
-    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
-
-    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
-    const updatedGame = engine.handleCustomAction(currentGame, 'deduction', { playerId, value: deduction });
-    setCurrentGame(updatedGame);
-  }, [currentGame]);
-
-  const handleApplyMultiplierAll = useCallback((multiplier: number) => {
-    if (!currentGame || currentGame.type !== GameType.JAPAN) return;
-
-    const engine = GameEngineFactory.getEngine(currentGame.type) as JapanEngine;
-    const updatedGame = engine.handleCustomAction(currentGame, 'multiplier_all', { value: multiplier });
+    const updatedGame = engine.handleMultiplierChange(currentGame, multiplier);
     setCurrentGame(updatedGame);
   }, [currentGame]);
 
@@ -391,9 +375,7 @@ export const useGame = () => {
     addPins,
     undoBowlingRoll,
     handleRackComplete,
-    handleApplyMultiplier,
-    handleApplyDeduction,
-    handleApplyMultiplierAll,
+    handleMultiplierChange,
     handleNextRack,
     handlePlayerOrderChange,
     

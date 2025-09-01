@@ -38,23 +38,6 @@ const JapanBoard: React.FC<JapanBoardProps> = ({
     });
   };
 
-  const handleMultiplierClick = (multiplier: { label: string; value: number }) => {
-    onBallAction({
-      ball: 0,
-      type: 'multiplier',
-      value: multiplier.value,
-      label: multiplier.label
-    });
-  };
-
-  const handleDeductionClick = (deduction: { label: string; value: number }) => {
-    onBallAction({
-      ball: 0,
-      type: 'deduction',
-      value: deduction.value,
-      label: deduction.label
-    });
-  };
 
   const isHandicapBall = (ballNumber: number) => {
     return japanSettings.handicapBalls.includes(ballNumber);
@@ -119,55 +102,7 @@ const JapanBoard: React.FC<JapanBoardProps> = ({
         </CardContent>
       </Card>
 
-      {/* Multiplier Buttons */}
-      {japanSettings.multipliersEnabled && japanSettings.multipliers.length > 0 && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              倍率
-            </Typography>
-            <Grid container spacing={1}>
-              {japanSettings.multipliers.map((multiplier, index) => (
-                <Grid item key={index}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => handleMultiplierClick(multiplier)}
-                    sx={{ minWidth: 60, minHeight: 40 }}
-                  >
-                    {multiplier.label}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Deduction Buttons */}
-      {japanSettings.deductionEnabled && japanSettings.deductions.length > 0 && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              減点
-            </Typography>
-            <Grid container spacing={1}>
-              {japanSettings.deductions.map((deduction, index) => (
-                <Grid item key={index}>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDeductionClick(deduction)}
-                    sx={{ minWidth: 60, minHeight: 40 }}
-                  >
-                    {deduction.label}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Control Buttons */}
       <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>

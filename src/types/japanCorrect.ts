@@ -7,16 +7,9 @@ export interface JapanMultiplier {
   value: number;
 }
 
-export interface JapanDeduction {
-  label: string;
-  value: number;
-}
-
 export interface JapanGameSettings {
   handicapBalls: number[];
   multipliers: JapanMultiplier[];
-  deductionEnabled: boolean;
-  deductions: JapanDeduction[];
   orderChangeInterval: number;
   orderChangeEnabled: boolean;
   multipliersEnabled: boolean;
@@ -37,7 +30,7 @@ export interface JapanBallCollection {
 }
 
 export interface JapanRackAction {
-  type: 'ball' | 'multiplier' | 'deduction';
+  type: 'ball' | 'multiplier';
   ballNumber?: number; // ballの場合のみ
   value: number; // ポイント値
   label: string;

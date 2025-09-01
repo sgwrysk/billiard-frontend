@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { JapanEngine } from '../JapanEngine';
 
-describe('Japan Game Player Order Change', () => {
-  it('should handle 3-player order change correctly', () => {
+describe('Japan Game Player Order Change Integration', () => {
+  it('should integrate with player order calculator and update game state correctly', () => {
     const engine = new JapanEngine();
     
     // Create a game with 3 players: A, B, C
@@ -15,8 +15,6 @@ describe('Japan Game Player Order Change', () => {
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 10,
       orderChangeEnabled: true,
       multipliersEnabled: false
@@ -29,12 +27,12 @@ describe('Japan Game Player Order Change', () => {
     expect(game.players[1].id).toBe('player-2');
     expect(game.players[2].id).toBe('player-3');
     
-    // Select player-2 as first player - should result in: player-2, player-3, player-1 (reverse order of remaining)
+    // Select player-2 as first player - should result in: player-2, player-1, player-3 (B→A→C)
     game = engine.handleCustomAction(game, 'playerOrderChange', { selectedPlayerId: 'player-2' });
     
     expect(game.players[0].id).toBe('player-2'); // Selected player first
-    expect(game.players[1].id).toBe('player-3'); // Remaining players in reverse order
-    expect(game.players[2].id).toBe('player-1');
+    expect(game.players[1].id).toBe('player-1'); // Counter-clockwise arrangement
+    expect(game.players[2].id).toBe('player-3');
     
     // First player should be active
     expect(game.players[0].isActive).toBe(true);
@@ -43,54 +41,45 @@ describe('Japan Game Player Order Change', () => {
     expect(game.currentPlayerIndex).toBe(0);
   });
 
-  it('should handle all 3-player order change patterns correctly', () => {
+  it('should update player order history correctly', () => {
     const engine = new JapanEngine();
     
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 10,
-      orderChangeEnabled: false,
+      orderChangeEnabled: true,
       multipliersEnabled: false
     };
     
-    // Test case 1: A→B→C (select A) → A→C→B
-    let game1 = engine.initializeGame([
+    let game = engine.initializeGame([
       { name: 'Player A' },
       { name: 'Player B' },
       { name: 'Player C' }
     ], japanSettings);
     
-    game1 = engine.handleCustomAction(game1, 'playerOrderChange', { selectedPlayerId: 'player-1' });
-    expect(game1.players.map(p => p.id)).toEqual(['player-1', 'player-3', 'player-2']);
+    // Set current rack to 10 to trigger order change
+    game.currentRack = 10;
     
-    // Test case 2: A→B→C (select B) → B→A→C  
-    let game2 = engine.initializeGame([
-      { name: 'Player A' },
-      { name: 'Player B' },
-      { name: 'Player C' }
-    ], japanSettings);
+    // Perform order change
+    game = engine.handleCustomAction(game, 'playerOrderChange', { selectedPlayerId: 'player-2' });
     
-    game2 = engine.handleCustomAction(game2, 'playerOrderChange', { selectedPlayerId: 'player-2' });
-    expect(game2.players.map(p => p.id)).toEqual(['player-2', 'player-3', 'player-1']);
+    // Check that player order history was updated
+    expect(game.japanPlayerOrderHistory).toBeDefined();
+    expect(game.japanPlayerOrderHistory!.length).toBeGreaterThanOrEqual(1);
     
-    // Test case 3: A→B→C (select C) → C→B→A
-    let game3 = engine.initializeGame([
-      { name: 'Player A' },
-      { name: 'Player B' },
-      { name: 'Player C' }
-    ], japanSettings);
-    
-    game3 = engine.handleCustomAction(game3, 'playerOrderChange', { selectedPlayerId: 'player-3' });
-    expect(game3.players.map(p => p.id)).toEqual(['player-3', 'player-2', 'player-1']);
+    // Find the order history entry for the current period
+    const orderHistory = game.japanPlayerOrderHistory!.find(h => h.fromRack === 11);
+    expect(orderHistory).toBeDefined();
+    expect(orderHistory!.fromRack).toBe(11); // Next rack after order change
+    expect(orderHistory!.toRack).toBe(20); // Until next order change interval
+    expect(orderHistory!.playerOrder).toEqual(['player-2', 'player-1', 'player-3']);
   });
   
-  it('should handle 4-player order change and avoid same cycle', () => {
+  it('should handle 4+ players through integration', () => {
     const engine = new JapanEngine();
     
-    // Create a game with 4 players: A, B, C, D
+    // Create a game with 4 players
     const playerSetups = [
       { name: 'Player A' },
       { name: 'Player B' },
@@ -101,8 +90,6 @@ describe('Japan Game Player Order Change', () => {
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 10,
       orderChangeEnabled: true,
       multipliersEnabled: false
@@ -120,29 +107,10 @@ describe('Japan Game Player Order Change', () => {
     // New order should start with player-2
     expect(game.players[0].id).toBe('player-2');
     
-    // Should not create same cycle as original
-    const newOrder = game.players.map(p => p.id);
-    
-    // Create cycle maps for comparison
-    const originalCycle = new Map();
-    const newCycle = new Map();
-    
-    for (let i = 0; i < originalOrder.length; i++) {
-      const nextIndex = (i + 1) % originalOrder.length;
-      originalCycle.set(originalOrder[i], originalOrder[nextIndex]);
-      newCycle.set(newOrder[i], newOrder[nextIndex]);
-    }
-    
-    // Cycles should be different
-    let cyclesSame = true;
-    for (const [player, nextPlayer] of originalCycle) {
-      if (newCycle.get(player) !== nextPlayer) {
-        cyclesSame = false;
-        break;
-      }
-    }
-    
-    expect(cyclesSame).toBe(false);
+    // All players should still be present
+    const newOrderIds = game.players.map(p => p.id).sort();
+    const expectedIds = ['player-1', 'player-2', 'player-3', 'player-4'];
+    expect(newOrderIds).toEqual(expectedIds);
     
     // First player should be active
     expect(game.players[0].isActive).toBe(true);
@@ -161,8 +129,6 @@ describe('Japan Game Player Order Change', () => {
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 10,
       orderChangeEnabled: true,
       multipliersEnabled: false
@@ -202,8 +168,6 @@ describe('Japan Game Player Order Change', () => {
     const japanSettings = {
       handicapBalls: [5, 9],
       multipliers: [{ label: 'x2', value: 2 }],
-      deductionEnabled: false,
-      deductions: [],
       orderChangeInterval: 10,
       orderChangeEnabled: true,
       multipliersEnabled: false

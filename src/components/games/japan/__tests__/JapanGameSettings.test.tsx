@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
+import { LanguageProvider } from '../../../../contexts/LanguageContext';
 import JapanGameSettings from '../JapanGameSettings';
 import type { JapanGameSettings as JapanGameSettingsType } from '../../../../types/japan';
 
@@ -9,9 +10,11 @@ const theme = createTheme();
 
 const renderWithTheme = (component: React.ReactElement) => {
   return render(
-    <ThemeProvider theme={theme}>
-      {component}
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider theme={theme}>
+        {component}
+      </ThemeProvider>
+    </LanguageProvider>
   );
 };
 
@@ -20,12 +23,8 @@ describe('JapanGameSettings', () => {
   
   const defaultSettings: JapanGameSettingsType = {
     handicapBalls: [5, 9],
-    multipliers: [{ label: 'x2', value: 2 }],
-    deductionEnabled: false,
-    deductions: [],
     orderChangeInterval: 10,
-    orderChangeEnabled: false,
-    multipliersEnabled: false
+    orderChangeEnabled: false
   };
 
   const defaultProps = {
@@ -42,7 +41,6 @@ describe('JapanGameSettings', () => {
     
     expect(screen.getByText('ハンディキャップボール')).toBeInTheDocument();
     expect(screen.getByText('順替えのラック数を変更する（デフォルト: 10）')).toBeInTheDocument();
-    expect(screen.getByText('倍率ボタンを変更する（デフォルト: x2）')).toBeInTheDocument();
   });
 
   it('should show handicap balls as ball buttons with 5 and 9 active by default', () => {
@@ -55,37 +53,6 @@ describe('JapanGameSettings', () => {
     // Balls 5 and 9 should be active by default (this is tested via the component state)
   });
 
-  it('should show default multiplier when multiplier toggle is enabled', () => {
-    const enabledSettings = {
-      ...defaultSettings,
-      multipliersEnabled: true
-    };
-
-    renderWithTheme(
-      <JapanGameSettings 
-        {...defaultProps} 
-        settings={enabledSettings} 
-      />
-    );
-    
-    expect(screen.getByText('x2')).toBeInTheDocument();
-  });
-
-  it('should show multiplier settings when multiplier toggle is enabled', () => {
-    renderWithTheme(<JapanGameSettings {...defaultProps} />);
-    
-    // Initially, multiplier settings should be hidden
-    expect(screen.queryByRole('button', { name: /倍率ボタンを追加/i })).not.toBeInTheDocument();
-    
-    // Enable multiplier settings
-    const multiplierToggle = screen.getByRole('checkbox', { name: /倍率ボタンを変更する/i });
-    fireEvent.click(multiplierToggle);
-    
-    expect(mockOnSettingsChange).toHaveBeenCalledWith({
-      ...defaultSettings,
-      multipliersEnabled: true
-    });
-  });
 
   it('should show order change settings when order change toggle is enabled', () => {
     renderWithTheme(<JapanGameSettings {...defaultProps} />);
@@ -101,17 +68,6 @@ describe('JapanGameSettings', () => {
     });
   });
 
-  it('should toggle deduction settings', () => {
-    renderWithTheme(<JapanGameSettings {...defaultProps} />);
-    
-    const deductionToggle = screen.getByRole('checkbox', { name: /減点を有効にする/i });
-    fireEvent.click(deductionToggle);
-    
-    expect(mockOnSettingsChange).toHaveBeenCalledWith({
-      ...defaultSettings,
-      deductionEnabled: true
-    });
-  });
 
   it('should show validation error when neither 9 nor 10 is selected', () => {
     const invalidSettings = {

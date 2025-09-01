@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
@@ -30,7 +30,7 @@ describe('GameSetup - Japan Game Integration', () => {
     const gameTypeSelect = screen.getByLabelText('ゲームタイプ');
     fireEvent.mouseDown(gameTypeSelect);
     
-    expect(screen.getByText('ジャパンルール')).toBeInTheDocument();
+    expect(screen.getByText('5-9, 5-10 (ジャパンルール)')).toBeInTheDocument();
   });
 
   it('should show Japan settings when Japan game type is selected', () => {
@@ -39,10 +39,10 @@ describe('GameSetup - Japan Game Integration', () => {
     const gameTypeSelect = screen.getByLabelText('ゲームタイプ');
     fireEvent.mouseDown(gameTypeSelect);
     
-    const japanOption = screen.getByText('ジャパンルール');
+    const japanOption = screen.getByText('5-9, 5-10 (ジャパンルール)');
     fireEvent.click(japanOption);
     
-    expect(screen.getByText('ジャパンルール設定')).toBeInTheDocument();
+    expect(screen.getByText('5-9, 5-10 (ジャパンルール) 設定')).toBeInTheDocument();
     expect(screen.getByText('ハンディキャップボール')).toBeInTheDocument();
   });
 
@@ -52,7 +52,7 @@ describe('GameSetup - Japan Game Integration', () => {
     // Select Japan game type
     const gameTypeSelect = screen.getByLabelText('ゲームタイプ');
     fireEvent.mouseDown(gameTypeSelect);
-    const japanOption = screen.getByText('ジャパンルール');
+    const japanOption = screen.getByText('5-9, 5-10 (ジャパンルール)');
     fireEvent.click(japanOption);
     
     // Should show add player button
@@ -73,7 +73,7 @@ describe('GameSetup - Japan Game Integration', () => {
     // Select Japan game type
     const gameTypeSelect = screen.getByLabelText('ゲームタイプ');
     fireEvent.mouseDown(gameTypeSelect);
-    const japanOption = screen.getByText('ジャパンルール');
+    const japanOption = screen.getByText('5-9, 5-10 (ジャパンルール)');
     fireEvent.click(japanOption);
     
     // Add a third player first
@@ -98,7 +98,7 @@ describe('GameSetup - Japan Game Integration', () => {
     // Select Japan game type
     const gameTypeSelect = screen.getByLabelText('ゲームタイプ');
     fireEvent.mouseDown(gameTypeSelect);
-    const japanOption = screen.getByText('ジャパンルール');
+    const japanOption = screen.getByText('5-9, 5-10 (ジャパンルール)');
     fireEvent.click(japanOption);
     
     // Click add 8 times (starting with 2, should get to 10)
@@ -124,7 +124,7 @@ describe('GameSetup - Japan Game Integration', () => {
     // Select Japan game type
     const gameTypeSelect = screen.getByLabelText('ゲームタイプ');
     fireEvent.mouseDown(gameTypeSelect);
-    const japanOption = screen.getByText('ジャパンルール');
+    const japanOption = screen.getByText('5-9, 5-10 (ジャパンルール)');
     fireEvent.click(japanOption);
     
     // With only 2 players, should not show remove buttons
@@ -138,7 +138,7 @@ describe('GameSetup - Japan Game Integration', () => {
     // Select Japan game type
     const gameTypeSelect = screen.getByLabelText('ゲームタイプ');
     fireEvent.mouseDown(gameTypeSelect);
-    const japanOption = screen.getByText('ジャパンルール');
+    const japanOption = screen.getByText('5-9, 5-10 (ジャパンルール)');
     fireEvent.click(japanOption);
     
     // Click ball 9 to deselect it (it's selected by default)

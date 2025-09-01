@@ -39,7 +39,8 @@ const translations: Translations = {
     'setup.gameType.setmatch': 'セットマッチ',
     'setup.gameType.rotation': 'ローテーション',
     'setup.gameType.bowlard': 'ボーラード',
-    'setup.gameType.japan': 'ジャパンルール',
+    'setup.gameType.japan': '5-9, 5-10 (ジャパンルール) - BETA',
+    'setup.japanSettings': '5-9, 5-10 (ジャパンルール) 設定',
 
     'setup.players': 'プレイヤー',
     'setup.player': 'プレイヤー',
@@ -213,7 +214,8 @@ const translations: Translations = {
     'setup.gameType.setmatch': 'Set Match',
     'setup.gameType.rotation': 'Rotation',
     'setup.gameType.bowlard': 'Bowlard',
-    'setup.gameType.japan': 'Japan Rule',
+    'setup.gameType.japan': '5-9, 5-10 (Japan Rule) - BETA',
+    'setup.japanSettings': '5-9, 5-10 (Japan Rule) Settings - BETA',
 
     'setup.players': 'Players',
     'setup.player': 'Player',

@@ -15,9 +15,12 @@ A modern billiard score management application built with React + TypeScript + M
 - **Rotation**: Ball numbers equal points, target specific score to win (120, 180, 240 points)  
 - **Bowlard**: Bowling-style game played with billiard balls (10 frames, strikes and spares)
 - **Japan Rule (BETA)**: Multi-player handicap game with rotating player order
-  - Support for 2-10 players with customizable handicap balls
-  - Point multiplication system and cumulative scoring
-  - Automatic player order rotation every N racks
+  - Support for 2-10 players with customizable handicap balls (default: 5, 9)
+  - Point multiplication system for strategic scoring (1x to 100x multiplier)
+  - Cumulative scoring across multiple racks with detailed history tracking
+  - Automatic player order rotation every configurable number of racks (default: 10)
+  - Advanced undo functionality with cross-rack support
+  - Real-time cumulative points table with rack-by-rack breakdown
 
 ### Core Features
 - 👥 **2-Player Games**: All games support exactly 2 players
@@ -97,13 +100,14 @@ npm run preview
 ## 🎮 How to Use
 
 ### 1. Game Setup
-1. Select game type (Set Match, Rotation, or Bowlard)
-2. Enter player names (default: Player 1, Player 2)
-3. Set target (sets for Set Match, points for Rotation, or frames for Bowlard)
-4. Use preset buttons for common targets
-5. Configure optional chess clock with time limits and warnings
-6. Enable alternating break for Set Match (optional)
-7. Click "Start Game"
+1. Select game type (Set Match, Rotation, Bowlard, or Japan Rule)
+2. Enter player names (2-10 players for Japan Rule, 2 players for others)
+3. Set target (sets for Set Match, points for Rotation, frames for Bowlard)
+4. For Japan Rule: Configure handicap balls and player order rotation interval
+5. Use preset buttons for common targets
+6. Configure optional chess clock with time limits and warnings
+7. Enable alternating break for Set Match (optional)
+8. Click "Start Game"
 
 ### 2. Set Match Gameplay
 1. Click on player info to add a set
@@ -125,21 +129,30 @@ npm run preview
 3. Play 10 frames with up to 2 rolls per frame (3 for frame 10)
 4. Game ends after completing all 10 frames
 
-### 5. Chess Clock Features (Optional)
+### 5. Japan Rule Gameplay
+1. Click handicap ball numbers (configurable, default: 5, 9) to score points
+2. Use multiplier input to apply strategic point multiplication (1x-100x)
+3. Click "Next Rack" to complete current rack and advance to next
+4. Player order automatically rotates based on configured interval
+5. View cumulative points across all completed racks
+6. Advanced undo supports cross-rack corrections
+7. Game continues indefinitely until manually ended
+
+### 6. Chess Clock Features (Optional)
 - Individual time limits for each player
 - Configurable warning time alerts
 - Visual indicators for active player and time remaining
 - Automatic switching between players
 - Time up notifications
 
-### 6. Victory Screen
+### 7. Victory Screen
 - Displays game statistics and winner
 - Shows score progression graph (Rotation) or set history table (Set Match)
 - Displays final time remaining (if chess clock was used)
 - Offers rematch with same settings
 - Tracks cumulative wins per player
 
-### 7. Language Support
+### 8. Language Support
 - Switch between Japanese/English on home screen
 - All UI text and player names are translated
 
@@ -209,6 +222,33 @@ Bug reports and feature requests are welcome! Please use GitHub Issues.
 - **Commit Messages**: All commit messages must be written in **English only**
 - **Testing**: Maintain 90%+ test coverage with comprehensive test suites
 
+## 📁 Architecture
+
+### Japan Rule Components
+The Japan Rule game mode includes extensive specialized components:
+
+#### UI Components (`src/components/games/japan/`)
+- `JapanGameScreen.tsx` - Main game interface with player panels and multiplier controls
+- `JapanGameSettings.tsx` - Handicap ball configuration and rotation settings
+- `JapanCumulativePointsTable.tsx` - Real-time cumulative scoring table
+- `JapanBoard.tsx` - Game board layout and ball interaction
+- `JapanScoreInput.tsx` - Point input and multiplier interface
+- `PlayerOrderChangeDialog.tsx` - Player order rotation management
+
+#### Game Engine (`src/games/japan/`)
+- `JapanEngine.ts` - Core game logic and state management
+- `JapanScoreCalculator.ts` - Point calculation and rack scoring logic
+- `JapanUndoHandler.ts` - Advanced undo functionality with cross-rack support
+- `PlayerOrderCalculator.ts` - Player rotation and ordering logic
+
+#### Type Definitions (`src/types/`)
+- `japan.ts` - TypeScript interfaces for Japan Rule specific data structures
+
+#### Comprehensive Testing
+- 30+ dedicated test files covering all Japan Rule functionality
+- Component tests, engine tests, and integration tests
+- Cross-rack undo scenarios, multiplayer order changes, and edge cases
+
 ## 🧪 Testing
 
 This project includes comprehensive test coverage:
@@ -219,11 +259,13 @@ This project includes comprehensive test coverage:
 - **@testing-library/jest-dom**: Additional matchers
 
 ### Coverage
-- **380+ Tests**: Comprehensive test suite
+- **400+ Tests**: Comprehensive test suite including extensive Japan Rule testing
 - **90%+ Coverage**: High code coverage across components, hooks, and utilities
-- **Component Tests**: All UI components thoroughly tested
+- **Component Tests**: All UI components thoroughly tested, including Japan Rule components
+- **Game Engine Tests**: Complete coverage of Japan Rule game logic and calculations
 - **Utility Tests**: Complete coverage of utility functions
 - **Integration Tests**: Game flow and user interaction tests
+- **Japan Rule Speciality Tests**: Cross-rack undo, multiplayer scenarios, and edge cases
 
 ### Running Tests
 ```bash

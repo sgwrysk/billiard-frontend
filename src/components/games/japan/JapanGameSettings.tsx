@@ -8,7 +8,6 @@ import {
   Alert
 } from '@mui/material';
 import { BallButton, NumberInputStepper } from '../../common';
-import { useLanguage } from '../../../contexts/LanguageContext';
 import type { JapanGameSettings } from '../../../types/japan';
 
 interface JapanGameSettingsProps {
@@ -22,7 +21,6 @@ const JapanGameSettingsComponent: React.FC<JapanGameSettingsProps> = ({
   onSettingsChange,
   onValidationChange
 }) => {
-  const { t } = useLanguage();
   const [errors, setErrors] = React.useState<string[]>([]);
 
   const validateSettings = React.useCallback(() => {

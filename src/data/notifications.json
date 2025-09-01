@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-01-01",
+      "date": "2025-09-01",
+      "category": "feature",
+      "content": {
+        "ja": "ジャパンルール（5-9, 5-10）ベータ版をリリースしました。",
+        "en": "Released Japan Rule (5-9, 5-10) BETA."
+      }
+    },
+    {
       "id": "2025-08-31-05",
       "date": "2025-08-31",
       "category": "bugfix",

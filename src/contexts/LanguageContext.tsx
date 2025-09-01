@@ -215,7 +215,7 @@ const translations: Translations = {
     'setup.gameType.rotation': 'Rotation',
     'setup.gameType.bowlard': 'Bowlard',
     'setup.gameType.japan': '5-9, 5-10 (Japan Rule) - BETA',
-    'setup.japanSettings': '5-9, 5-10 (Japan Rule) Settings - BETA',
+    'setup.japanSettings': '5-9, 5-10 (Japan Rule) Settings',
 
     'setup.players': 'Players',
     'setup.player': 'Player',

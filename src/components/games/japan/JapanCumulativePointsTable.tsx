@@ -186,7 +186,7 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                       <Box
                         key={`rack-header-${startRack + i}`}
                         sx={{
-                          minWidth: '60px',
+                          minWidth: startRack + i === currentRack && i === racksInThisTable - 1 ? '61px' : '60px', // Add 1px width for current rack at table end
                           flex: 1,
                           padding: '2px',
                           textAlign: 'center',
@@ -201,10 +201,11 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                           borderBottom: `1px solid ${AppColors.theme.primary}`,
                           borderRight: i === racksInThisTable - 1 ? 'none' : `1px solid ${AppColors.theme.primary}`,
                           ...(startRack + i === currentRack && {
-                            borderLeft: `1px solid ${AppColors.theme.primary}`,
-                            borderTop: `1px solid ${AppColors.theme.primary}`,
-                            borderRight: `2px solid ${AppColors.theme.primary}`,
-                            borderBottom: `1px solid ${AppColors.theme.primary}`
+                            borderLeft: `1px solid ${AppColors.theme.primary} !important`,
+                            borderTop: `1px solid ${AppColors.theme.primary} !important`,
+                            borderRight: `2px solid ${AppColors.theme.primary} !important`,
+                            borderBottom: `1px solid ${AppColors.theme.primary} !important`,
+                            borderColor: `${AppColors.theme.primary} !important`
                           })
                         }}
                       >
@@ -234,7 +235,7 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                           
                           return (
                             <Box key={`score-${player.id}-${rackNumber}`} sx={{
-                              minWidth: '60px',
+                              minWidth: rackNumber === currentRack && i === racksInThisTable - 1 ? '61px' : '60px', // Add 1px width for current rack at table end
                               flex: 1,
                               display: 'flex',
                               flexDirection: 'column',

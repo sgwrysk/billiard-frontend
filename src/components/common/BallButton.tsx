@@ -8,7 +8,7 @@ interface BallButtonProps {
   isActive?: boolean;
   onClick?: (ballNumber: number) => void;
   disabled?: boolean;
-  size?: 'small' | 'medium';
+  size?: 'xs' | 'small' | 'medium';
 }
 
 const BallButton: React.FC<BallButtonProps> = ({
@@ -18,9 +18,9 @@ const BallButton: React.FC<BallButtonProps> = ({
   disabled = false,
   size = 'medium'
 }) => {
-  const dimensions = size === 'small' ? { xs: 40, sm: 36 } : { xs: 60, sm: 52 };
-  const fontSize = size === 'small' ? { xs: '0.9rem', sm: '0.8rem' } : { xs: '1.2rem', sm: '1.1rem' };
-  const whiteCirle = size === 'small' ? { xs: '22px', sm: '20px' } : { xs: '32px', sm: '28px' };
+  const dimensions = size === 'xs' ? { xs: 28, sm: 26 } : size === 'small' ? { xs: 40, sm: 36 } : { xs: 60, sm: 52 };
+  const fontSize = size === 'xs' ? { xs: '0.7rem', sm: '0.65rem' } : size === 'small' ? { xs: '0.9rem', sm: '0.8rem' } : { xs: '1.2rem', sm: '1.1rem' };
+  const whiteCirle = size === 'xs' ? { xs: '16px', sm: '15px' } : size === 'small' ? { xs: '22px', sm: '20px' } : { xs: '32px', sm: '28px' };
 
   return (
     <Button

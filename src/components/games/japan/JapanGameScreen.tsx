@@ -217,22 +217,43 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                         border: player.isActive ? `2px solid ${AppColors.theme.primary}` : '1px solid rgba(0,0,0,0.12)',
                         opacity: 1,
                         cursor: 'pointer',
+                        position: 'relative', // For positioning the cumulative points
                         '&:hover': {
                           backgroundColor: 'rgba(0, 0, 0, 0.04)',
                         }
                       }}
                       onClick={() => handlePlayerClick(playerIndex)}
                     >
-                      <CardContent>
-                        <Typography variant="h6" gutterBottom>{player.name}</Typography>
+                      <CardContent sx={{ pb: 1, '&:last-child': { pb: 1 } }}>
+                        {/* プレイヤー名称と総合ポイントを同じ行に配置 */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                            {player.name}
+                          </Typography>
+                          
+                          {/* 総合ポイントを同じ行の右側に表示（枠なし） */}
+                          {shouldShowCumulativePointsInPlayerPanel() && (
+                            <Typography 
+                              variant="h5" 
+                              sx={{ 
+                                fontWeight: 'bold',
+                                color: (() => {
+                                  const points = getPreviousRackTotalPointsAsNumber(player.id);
+                                  return points >= 0 ? AppColors.theme.primary : '#d32f2f';
+                                })()
+                              }}
+                            >
+                              {getPreviousRackTotalPoints(player.id)}
+                            </Typography>
+                          )}
+                        </Box>
                         
                         {/* 取得したボールのアイコン表示エリア */}
                         <Box sx={{ 
-                          minHeight: 56, // Further increased to prevent expansion when balls are added
+                          minHeight: 48, // Increased height to accommodate xs size balls
                           border: '1px dashed #ccc', 
                           borderRadius: 1, 
                           p: 1, 
-                          mb: 2,
                           position: 'relative' // For positioning the points display
                         }}>
                           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -240,9 +261,9 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                               <BallButton
                                 key={`${ballNumber}-${index}`}
                                 ballNumber={ballNumber}
-                                size="small"
+                                size="xs"
                                 isActive={true}
-                                disabled={false} // Change to active (not disabled)
+                                disabled={false}
                               />
                             ))}
                           </Box>
@@ -261,22 +282,6 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                             {getCurrentRackPoints(player.id)}
                           </Typography>
                         </Box>
-                        
-                        {/* 前ラック終了時の累計ポイント */}
-                        <Typography 
-                          variant="h5" 
-                          sx={{ 
-                            fontWeight: 'bold',
-                            color: (() => {
-                              if (!shouldShowCumulativePointsInPlayerPanel()) return 'transparent';
-                              const points = getPreviousRackTotalPointsAsNumber(player.id);
-                              return points >= 0 ? AppColors.theme.primary : '#d32f2f';
-                            })(),
-                            minHeight: '2rem' // Maintain consistent height even when empty
-                          }}
-                        >
-                          {shouldShowCumulativePointsInPlayerPanel() ? getPreviousRackTotalPoints(player.id) : ''}
-                        </Typography>
                       </CardContent>
                     </Card>
                   </Grid>

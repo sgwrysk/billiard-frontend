@@ -280,4 +280,56 @@ export class JapanEngine extends GameBase {
   handleUndo(game: Game): Game {
     return JapanUndoHandler.handleUndo(game);
   }
+  
+  // Handle game end - calculate final rack results without moving to next rack
+  handleGameEnd(game: Game): Game {
+    // Find the last rack completion shot
+    let lastRackCompleteIndex = -1;
+    for (let i = game.shotHistory.length - 1; i >= 0; i--) {
+      if (game.shotHistory[i].customData?.type === 'rack_complete') {
+        lastRackCompleteIndex = i;
+        break;
+      }
+    }
+    
+    // Check if there are ball clicks after the last rack completion
+    const currentRackShots = game.shotHistory.slice(lastRackCompleteIndex + 1);
+    const hasCurrentRackShots = currentRackShots.some(s => s.customData?.type === 'ball_click');
+    
+    if (!hasCurrentRackShots) {
+      return game; // No shots in current rack, return as is
+    }
+    
+    // Calculate current rack results
+    const currentRackResults = JapanScoreCalculator.calculateCurrentRackResults(game);
+    
+    // Add to rack history without advancing to next rack
+    const newRackHistory = [...(game.japanRackHistory || []), currentRackResults];
+    
+    // Create shot history entry for game completion
+    const gameCompleteShot = {
+      playerId: game.players[game.currentPlayerIndex].id,
+      ballNumber: 0, // No specific ball for game completion
+      isSunk: false,
+      isFoul: false,
+      timestamp: new Date(),
+      customData: {
+        type: 'game_complete',
+        finalRack: game.currentRack,
+        rackResults: currentRackResults,
+        finalMultiplier: game.japanCurrentMultiplier,
+        finalPlayerStates: game.players.map(player => ({
+          id: player.id,
+          ballsPocketed: [...(player.ballsPocketed || [])],
+          score: player.score,
+        })),
+      }
+    };
+    
+    return {
+      ...game,
+      japanRackHistory: newRackHistory,
+      shotHistory: [...game.shotHistory, gameCompleteShot],
+    };
+  }
 }

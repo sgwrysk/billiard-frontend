@@ -381,7 +381,16 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
   // Get final cumulative points for Japan games
   const getJapanFinalScore = (playerId: string) => {
-    return JapanScoreCalculator.getPreviousRackTotalPoints(game, playerId);
+    // If there's no rack history, return 0
+    if (!game.japanRackHistory || game.japanRackHistory.length === 0) {
+      return 0;
+    }
+    
+    // Get the latest rack result
+    const lastRackResult = game.japanRackHistory[game.japanRackHistory.length - 1];
+    const playerResult = lastRackResult?.playerResults.find(result => result.playerId === playerId);
+    
+    return playerResult?.totalPoints || 0;
   };
 
 

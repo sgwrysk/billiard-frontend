@@ -351,6 +351,7 @@ export const useGame = () => {
   return {
     // State
     currentGame,
+    setCurrentGame,
     
     // Core actions
     startGame,

@@ -175,6 +175,7 @@ const AppContent: React.FC = () => {
   const open = Boolean(anchorEl);
   const {
     currentGame,
+    setCurrentGame,
     startGame,
 
     pocketBall,
@@ -217,8 +218,20 @@ const AppContent: React.FC = () => {
 
   const handleEndGame = useCallback((winnerId?: string) => {
     if (currentGame) {
+      let finalGame = currentGame;
+      
+      // For Japan games, calculate current rack results before ending
+      if (currentGame.type === GameType.JAPAN) {
+        const engine = GameEngineFactory.createEngine(GameType.JAPAN);
+        if ('handleGameEnd' in engine) {
+          finalGame = (engine as any).handleGameEnd(currentGame);
+          // Update current game state with final calculations
+          setCurrentGame(finalGame);
+        }
+      }
+      
       const gameWithWinner = {
-        ...currentGame,
+        ...finalGame,
         winner: winnerId,
         endTime: new Date(),
       };
@@ -227,7 +240,7 @@ const AppContent: React.FC = () => {
       setCurrentScreen(AppScreen.VICTORY);
       resetScrollPosition();
     }
-  }, [currentGame, endGame]);
+  }, [currentGame, endGame, setCurrentGame]);
 
   // Monitor game completion and automatically transition to victory screen
   useEffect(() => {

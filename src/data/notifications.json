@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-13-02",
+      "date": "2025-09-13",
+      "category": "improvement",
+      "content": {
+        "ja": "ジャパンルール（5-9, 5-10）の画面表示を改善し、プレイヤーパネルをコンパクト化、スコア表の文字サイズを最適化して視認性を向上させました。",
+        "en": "Improved Japan Rule (5-9, 5-10) screen display with compact player panels and optimized score table font sizes for better visibility."
+      }
+    },
+    {
       "id": "2025-09-13-01",
       "date": "2025-09-13",
       "category": "improvement",

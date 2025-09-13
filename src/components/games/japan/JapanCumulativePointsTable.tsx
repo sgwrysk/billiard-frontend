@@ -153,10 +153,10 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                     return orderedPlayers.map((player, playerIndex) => (
                       <Box key={`player-name-${player.id}-table-${tableIndex}`} sx={{
                         width: `${playerColumnWidth}px`,
-                        padding: '8px',
+                        padding: '4px',
                         borderBottom: playerIndex === orderedPlayers.length - 1 ? 'none' : `1px solid ${AppColors.theme.primary}`,
                         fontWeight: 'bold',
-                        fontSize: '0.875rem',
+                        fontSize: '1rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -188,10 +188,10 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                         sx={{
                           minWidth: '60px',
                           flex: 1,
-                          padding: '8px',
+                          padding: '2px',
                           textAlign: 'center',
                           fontWeight: 'bold',
-                          fontSize: '0.875rem',
+                          fontSize: '1.2rem',
                           backgroundColor: startRack + i === currentRack ? `${AppColors.theme.primary}30` : AppColors.neutral.background,
                           color: startRack + i === currentRack ? AppColors.theme.primary : 'inherit',
                           height: '40px',
@@ -260,9 +260,9 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                                 {/* Left half: Earned points */}
                                 <Box sx={{
                                   flex: 1,
-                                  padding: '2px',
+                                  padding: '1px',
                                   textAlign: 'center',
-                                  fontSize: '0.8rem',
+                                  fontSize: '1rem',
                                   backgroundColor: rackData ? 'white' : 'transparent',
                                   fontWeight: 'bold',
                                   display: 'flex',
@@ -279,9 +279,9 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                                 {/* Right half: Delta points */}
                                 <Box sx={{
                                   flex: 1,
-                                  padding: '2px',
+                                  padding: '1px',
                                   textAlign: 'center',
-                                  fontSize: '0.8rem',
+                                  fontSize: '1rem',
                                   backgroundColor: rackData ? 'white' : 'transparent',
                                   fontWeight: 'bold',
                                   display: 'flex',
@@ -300,9 +300,9 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                               {/* Second row: Total points (full width) */}
                               <Box sx={{
                                 height: '33px', // Adjusted height for alignment (24px + 1px border + 33px = 58px)
-                                padding: '2px',
+                                padding: '1px',
                                 textAlign: 'center',
-                                fontSize: '1rem', // Larger font size for total points
+                                fontSize: '1.4rem', // Larger font size for total points
                                 backgroundColor: rackData ? 'white' : 'transparent',
                                 fontWeight: 'bold',
                                 display: 'flex',

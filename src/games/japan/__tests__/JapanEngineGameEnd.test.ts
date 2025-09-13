@@ -1,5 +1,4 @@
 import { JapanEngine } from '../JapanEngine';
-import { GameType } from '../../../types/index';
 import type { Game } from '../../../types/index';
 import type { JapanGameSettings } from '../../../types/japan';
 
@@ -123,6 +122,49 @@ describe('JapanEngine - Game End', () => {
       // Rack 1: earned 4 points (2*2), received 4*1=4 from Player1, gave 2*1=2 to Player1, delta = 4-2 = 2, total = 2  
       // Rack 2: earned 0 points (0*3), received 0*1=0 from Player1, gave 3*1=3 to Player1, delta = 0-3 = -3, total = 2-3 = -1
       expect(player2FinalScore).toBe(-1);
+    });
+
+    it('should revert game end calculations when restoring game', () => {
+      let game = createTestGame();
+      
+      // Add some shots and end the game
+      game = engine.handlePocketBall(game, 5); // Player 1: 1 point
+      game = engine.handleSwitchPlayer(game);
+      game = engine.handlePocketBall(game, 9); // Player 2: 1 point
+      game = engine.handleMultiplierChange(game, 2);
+      
+      // End the game (this should calculate and save rack results)
+      const endedGame = engine.handleGameEnd(game);
+      
+      // Verify that game end calculations were applied
+      expect(endedGame.japanRackHistory).toHaveLength(1);
+      expect(endedGame.shotHistory.some(shot => shot.customData?.type === 'game_complete')).toBe(true);
+      
+      // Now restore the game (this should revert the game end calculations)
+      const restoredGame = engine.handleGameRestore(endedGame);
+      
+      // Verify that game end calculations were reverted
+      expect(restoredGame.japanRackHistory).toHaveLength(0);
+      expect(restoredGame.shotHistory.some(shot => shot.customData?.type === 'game_complete')).toBe(false);
+      
+      // Verify that ball click shots are still there
+      const ballClickShots = restoredGame.shotHistory.filter(shot => shot.customData?.type === 'ball_click');
+      expect(ballClickShots).toHaveLength(2);
+    });
+
+    it('should not modify game if it was not ended', () => {
+      let game = createTestGame();
+      
+      // Add some shots but don't end the game
+      game = engine.handlePocketBall(game, 5); // Player 1: 1 point
+      game = engine.handleSwitchPlayer(game);
+      game = engine.handlePocketBall(game, 9); // Player 2: 1 point
+      
+      // Try to restore the game (should return unchanged since it wasn't ended)
+      const restoredGame = engine.handleGameRestore(game);
+      
+      // Should be the same reference since no changes were made
+      expect(restoredGame).toBe(game);
     });
   });
 });

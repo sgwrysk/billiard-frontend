@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-13-03",
+      "date": "2025-09-13",
+      "category": "bugfix",
+      "content": {
+        "ja": "ジャパンルールで「ゲーム終了」ボタンを押した際にポイントがスコア表に反映されない問題と、ゲーム結果画面から戻った際のポイント二重計算問題を修正しました。",
+        "en": "Fixed issues where game end button didn't save current rack points to score table and double calculation problem when returning from victory screen in Japan Rule."
+      }
+    },
+    {
       "id": "2025-09-13-02",
       "date": "2025-09-13",
       "category": "improvement",

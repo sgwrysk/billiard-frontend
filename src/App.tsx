@@ -222,9 +222,9 @@ const AppContent: React.FC = () => {
       
       // For Japan games, calculate current rack results before ending
       if (currentGame.type === GameType.JAPAN) {
-        const engine = GameEngineFactory.createEngine(GameType.JAPAN);
+        const engine = GameEngineFactory.getEngine(GameType.JAPAN);
         if ('handleGameEnd' in engine) {
-          finalGame = (engine as any).handleGameEnd(currentGame);
+          finalGame = (engine as { handleGameEnd: (game: Game) => Game }).handleGameEnd(currentGame);
           // Update current game state with final calculations
           setCurrentGame(finalGame);
         }
@@ -314,19 +314,25 @@ const AppContent: React.FC = () => {
 
   const handleReturnToGame = () => {
     if (finishedGame) {
-      // Manually undo the last score from the finished game first
       const engine = GameEngineFactory.getEngine(finishedGame.type);
       
-      let gameAfterUndo: Game;
-      if (engine.hasCustomLogic() && engine.handleCustomAction) {
-        gameAfterUndo = engine.handleCustomAction(finishedGame, 'UNDO_LAST_SHOT');
+      let gameAfterRestore: Game;
+      
+      // For Japan games, use specific restore logic to revert game end calculations
+      if (finishedGame.type === GameType.JAPAN && 'handleGameRestore' in engine) {
+        gameAfterRestore = (engine as { handleGameRestore: (game: Game) => Game }).handleGameRestore(finishedGame);
       } else {
-        gameAfterUndo = engine.handleUndo(finishedGame);
+        // For other games, use the standard undo logic
+        if (engine.hasCustomLogic() && engine.handleCustomAction) {
+          gameAfterRestore = engine.handleCustomAction(finishedGame, 'UNDO_LAST_SHOT');
+        } else {
+          gameAfterRestore = engine.handleUndo(finishedGame);
+        }
       }
       
-      // Now restore the undone game with status reset to IN_PROGRESS
+      // Now restore the game with status reset to IN_PROGRESS
       const restoredGame = {
-        ...gameAfterUndo,
+        ...gameAfterRestore,
         status: GameStatus.IN_PROGRESS,
         winner: undefined,
         endTime: undefined,

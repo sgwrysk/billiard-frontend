@@ -272,9 +272,11 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                                   borderRight: `1px solid ${AppColors.theme.primary}`,
                                   color: 'inherit' // Earned points are always positive, keep black
                                 }}>
-                                  {rackNumber === currentRack 
-                                    ? (getCurrentRackPoints(player.id) || '') // Show current rack points
-                                    : (playerRackData?.earnedPoints ?? '') // Show historical earned points
+                                  {rackData 
+                                    ? (playerRackData?.earnedPoints ?? '') // Show historical earned points if data exists
+                                    : rackNumber === currentRack 
+                                      ? (getCurrentRackPoints(player.id) || '') // Show current rack points only if no historical data
+                                      : '' // Empty for future racks
                                   }
                                 </Box>
                                 {/* Right half: Delta points */}
@@ -291,9 +293,9 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                                   color: playerRackData?.deltaPoints && playerRackData.deltaPoints > 0 ? '#1976d2' : 
                                          playerRackData?.deltaPoints && playerRackData.deltaPoints < 0 ? '#d32f2f' : 'inherit'
                                 }}>
-                                  {rackNumber === currentRack 
-                                    ? '' // Don't show delta for current rack (not yet calculated)
-                                    : (playerRackData?.deltaPoints ?? '') // Show historical delta points
+                                  {rackData 
+                                    ? (playerRackData?.deltaPoints ?? '') // Show historical delta points if data exists
+                                    : '' // Empty for current rack (not yet calculated) or future racks
                                   }
                                 </Box>
                               </Box>
@@ -310,15 +312,19 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 color: (() => {
-                                  const totalPoints = rackNumber === currentRack 
-                                    ? (shouldShowCumulativePoints() ? parseInt(getPreviousRackTotalPoints(player.id)) || 0 : 0)
-                                    : (playerRackData?.totalPoints ?? 0);
+                                  const totalPoints = rackData 
+                                    ? (playerRackData?.totalPoints ?? 0) // Use historical data if available
+                                    : (shouldShowCumulativePoints() && rackNumber === currentRack) 
+                                      ? parseInt(getPreviousRackTotalPoints(player.id)) || 0 
+                                      : 0;
                                   return totalPoints > 0 ? '#1976d2' : totalPoints < 0 ? '#d32f2f' : 'inherit';
                                 })()
                               }}>
-                                {rackNumber === currentRack 
-                                  ? (shouldShowCumulativePoints() ? getPreviousRackTotalPoints(player.id) : '') // 現在ラックでは条件に応じて表示
-                                  : (playerRackData?.totalPoints ?? '') // 過去ラックは履歴から表示
+                                {rackData 
+                                  ? (playerRackData?.totalPoints ?? '') // Show historical total points if data exists
+                                  : (shouldShowCumulativePoints() && rackNumber === currentRack) 
+                                    ? getPreviousRackTotalPoints(player.id) 
+                                    : '' // Empty for future racks or current rack without cumulative points
                                 }
                               </Box>
                             </Box>

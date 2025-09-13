@@ -332,4 +332,24 @@ export class JapanEngine extends GameBase {
       shotHistory: [...game.shotHistory, gameCompleteShot],
     };
   }
+  
+  // Handle game restoration - revert game end calculations
+  handleGameRestore(game: Game): Game {
+    // Check if game has been ended (has game_complete shot)
+    const gameCompleteIndex = game.shotHistory.findIndex(shot => shot.customData?.type === 'game_complete');
+    
+    if (gameCompleteIndex === -1) {
+      return game; // Game was not ended, no need to revert
+    }
+    
+    // Remove the game_complete shot and the last rack history entry
+    const updatedShotHistory = game.shotHistory.slice(0, gameCompleteIndex);
+    const updatedRackHistory = game.japanRackHistory ? game.japanRackHistory.slice(0, -1) : [];
+    
+    return {
+      ...game,
+      japanRackHistory: updatedRackHistory,
+      shotHistory: updatedShotHistory,
+    };
+  }
 }

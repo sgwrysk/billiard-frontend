@@ -38,7 +38,6 @@ import { getBallColor } from '../utils/ballUtils';
 import { UIColors, BowlardColors, AppStyles, AppColors } from '../constants/colors';
 import SetHistory from './SetHistory';
 import JapanCumulativePointsTable from './games/japan/JapanCumulativePointsTable';
-import { JapanScoreCalculator } from '../games/japan/JapanScoreCalculator';
 
 ChartJS.register(
   CategoryScale,

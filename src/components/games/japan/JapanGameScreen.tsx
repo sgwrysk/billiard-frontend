@@ -103,6 +103,12 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
     return basePoints * multiplier;
   };
   
+  // ゲーム終了状態かどうかを判定
+  const isGameEnded = () => {
+    // ショット履歴に game_complete が含まれている場合はゲーム終了状態
+    return game.shotHistory.some(shot => shot.customData?.type === 'game_complete');
+  };
+
   // プレイヤーパネル用：累計ポイントを表示すべきかどうかを判定
   const shouldShowCumulativePointsInPlayerPanel = () => {
     // 過去のラック履歴がある場合は累計ポイントを表示
@@ -121,7 +127,14 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
       return '0'; // ラック1では0を表示
     }
     
-    // 最新のラック履歴から該当プレイヤーのtotalPointsを取得
+    // ゲーム終了状態の場合は、最終ラック結果を返す
+    if (isGameEnded()) {
+      const lastRackResult = game.japanRackHistory[game.japanRackHistory.length - 1];
+      const playerResult = lastRackResult?.playerResults.find(pr => pr.playerId === playerId);
+      return (playerResult?.totalPoints || 0).toString();
+    }
+    
+    // 通常時：最新のラック履歴から該当プレイヤーのtotalPointsを取得
     const lastRackResult = game.japanRackHistory[game.japanRackHistory.length - 1];
     const playerResult = lastRackResult?.playerResults.find(pr => pr.playerId === playerId);
     return (playerResult?.totalPoints || 0).toString();
@@ -131,6 +144,13 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
   const getPreviousRackTotalPointsAsNumber = (playerId: string) => {
     if (!game.japanRackHistory || game.japanRackHistory.length === 0) {
       return 0;
+    }
+    
+    // ゲーム終了状態の場合は、最終ラック結果を返す
+    if (isGameEnded()) {
+      const lastRackResult = game.japanRackHistory[game.japanRackHistory.length - 1];
+      const playerResult = lastRackResult?.playerResults.find(pr => pr.playerId === playerId);
+      return playerResult?.totalPoints || 0;
     }
     
     const lastRackResult = game.japanRackHistory[game.japanRackHistory.length - 1];
@@ -268,19 +288,21 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                             ))}
                           </Box>
                           
-                          {/* このラックの獲得ポイントを右下に表示 */}
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              position: 'absolute', 
-                              bottom: 4, 
-                              right: 8, 
-                              fontWeight: 'bold',
-                              color: AppColors.theme.primary
-                            }}
-                          >
-                            {getCurrentRackPoints(player.id)}
-                          </Typography>
+                          {/* このラックの獲得ポイントを右下に表示（ゲーム終了時は非表示） */}
+                          {!isGameEnded() && (
+                            <Typography 
+                              variant="body2" 
+                              sx={{ 
+                                position: 'absolute', 
+                                bottom: 4, 
+                                right: 8, 
+                                fontWeight: 'bold',
+                                color: AppColors.theme.primary
+                              }}
+                            >
+                              {getCurrentRackPoints(player.id)}
+                            </Typography>
+                          )}
                         </Box>
                       </CardContent>
                     </Card>
@@ -288,8 +310,9 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                 ))}
               </Grid>
 
-              {/* ボールアイコン、操作ボタンを統合表示 */}
-              <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+              {/* ボールアイコン、操作ボタンを統合表示（ゲーム終了時は非表示） */}
+              {!isGameEnded() && (
+                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
                 {/* 左側: ハンディキャップボール */}
                 <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
                   {/* ハンディキャップボール */}
@@ -318,16 +341,18 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                   </Button>
                 </Box>
               </Box>
+              )}
             </CardContent>
           </Card>
-{/* 3. ポイント累計確認パネル */}
-<Box sx={{ mb: 3 }}>
-  <JapanCumulativePointsTable 
-    game={game} 
-    shouldShowCumulativePoints={shouldShowCumulativePointsInTable}
-    onEndGame={onEndGame}
-  />
-</Box>
+      
+      {/* 3. ポイント累計確認パネル */}
+      <Box sx={{ mb: 3 }}>
+        <JapanCumulativePointsTable 
+          game={game} 
+          shouldShowCumulativePoints={shouldShowCumulativePointsInTable}
+          onEndGame={onEndGame}
+        />
+      </Box>
 
       {/* Player Order Change Dialog */}
       <PlayerOrderChangeDialog

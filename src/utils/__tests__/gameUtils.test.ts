@@ -35,8 +35,8 @@ const createBaseGame = (type: GameType): Game => ({
 describe('gameUtils', () => {
   describe('isGameInProgress', () => {
     it('returns false for null or undefined game', () => {
-      expect(isGameInProgress(null as any)).toBe(false);
-      expect(isGameInProgress(undefined as any)).toBe(false);
+      expect(isGameInProgress(null as unknown as Game)).toBe(false);
+      expect(isGameInProgress(undefined as unknown as Game)).toBe(false);
     });
 
     describe('SET_MATCH game type', () => {
@@ -117,8 +117,8 @@ describe('gameUtils', () => {
 
       it('handles undefined ballsPocketed arrays', () => {
         const game = createBaseGame(GameType.ROTATION);
-        game.players[0].ballsPocketed = undefined as any;
-        game.players[1].ballsPocketed = undefined as any;
+        game.players[0].ballsPocketed = undefined as unknown as number[];
+        game.players[1].ballsPocketed = undefined as unknown as number[];
 
         expect(isGameInProgress(game)).toBe(false);
       });

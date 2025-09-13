@@ -26,6 +26,7 @@ export class BowlardEngine extends GameBase {
     }];
   }
   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handlePocketBall(game: Game, _ballNumber: number): Game {
     // Bowlard doesn't use ball pockets - _ballNumber parameter ignored
     // This method is required by the interface but not used in Bowlard

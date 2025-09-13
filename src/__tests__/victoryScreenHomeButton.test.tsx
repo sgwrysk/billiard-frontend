@@ -23,7 +23,7 @@ describe('Victory Screen Home Button - TDD', () => {
 
   it('should design the fixed home button visibility logic', () => {
     // FIXED behavior - home button shown in both GAME and VICTORY screens
-    const getFixedHomeButtonVisibility = (currentScreen: string, currentGame: any) => {
+    const getFixedHomeButtonVisibility = (currentScreen: string, currentGame: unknown) => {
       return (currentScreen === 'GAME' || currentScreen === 'VICTORY') && !!currentGame;
     };
 
@@ -78,7 +78,7 @@ describe('Victory Screen Home Button - TDD', () => {
 
   it('should test AppBar title updates for Victory Screen', () => {
     // Current getAppBarTitle function only handles GAME screen
-    const getCurrentAppBarTitle = (currentScreen: string, currentGame: any, _finishedGame: any, t: (key: string) => string) => {
+    const getCurrentAppBarTitle = (currentScreen: string, currentGame: unknown, _finishedGame: unknown, t: (key: string) => string) => {
       if (currentScreen === 'GAME' && currentGame) {
         return 'ゲームタイプ'; // Mock game type
       }
@@ -100,7 +100,7 @@ describe('Victory Screen Home Button - TDD', () => {
     expect(victoryTitle).toBe('Billiard Score');
 
     // IMPROVED: Victory screen could show specific title
-    const getImprovedAppBarTitle = (currentScreen: string, currentGame: any, finishedGame: any, t: (key: string) => string) => {
+    const getImprovedAppBarTitle = (currentScreen: string, currentGame: unknown, finishedGame: unknown, t: (key: string) => string) => {
       if (currentScreen === 'GAME' && currentGame) {
         return 'ゲームタイプ';
       }
@@ -136,7 +136,7 @@ describe('Victory Screen Home Button - TDD', () => {
 
   it('should verify the fixed implementation works correctly', () => {
     // Mock the FIXED home button visibility logic
-    const getFixedHomeButtonVisibility = (currentScreen: string, currentGame: any, finishedGame: any) => {
+    const getFixedHomeButtonVisibility = (currentScreen: string, currentGame: unknown, finishedGame: unknown) => {
       return (currentScreen === 'GAME' && !!currentGame) || (currentScreen === 'VICTORY' && !!finishedGame);
     };
 
@@ -167,7 +167,7 @@ describe('Victory Screen Home Button - TDD', () => {
     };
 
     // FIXED getAppBarTitle function
-    const getFixedAppBarTitle = (currentScreen: string, currentGame: any, finishedGame: any, t: (key: string) => string) => {
+    const getFixedAppBarTitle = (currentScreen: string, currentGame: unknown, finishedGame: unknown, t: (key: string) => string) => {
       if (currentScreen === 'GAME' && currentGame) {
         return 'セットマッチ'; // Mock game type
       }

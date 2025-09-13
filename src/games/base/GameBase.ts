@@ -120,6 +120,7 @@ export abstract class GameBase implements IGameEngine {
     return updatedGame;
   }
   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getBallScore(_ballNumber: number): number {
     // Default is 1 point, override as needed
     // _ballNumber parameter is available for subclasses to customize scoring

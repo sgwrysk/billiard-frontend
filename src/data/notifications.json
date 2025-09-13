@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-13-01",
+      "date": "2025-09-13",
+      "category": "improvement",
+      "content": {
+        "ja": "アプリの内部システムを大幅改善し、動作の安定性とパフォーマンスを向上させました。",
+        "en": "Significantly improved internal systems for better stability and performance."
+      }
+    },
+    {
       "id": "2025-09-01-01",
       "date": "2025-09-01",
       "category": "feature",

@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 describe('Dynamic Confirm Dialog - TDD', () => {
   it('should demonstrate current dialog has fixed message regardless of target screen', () => {
     // Current behavior - always shows "ホームに戻る"
-    const currentGetConfirmMessage = (_targetScreen: string) => {
+    const currentGetConfirmMessage = () => {
       return {
         title: 'ゲームを中断',
         message: 'ゲームが進行中です。ゲームを中断してホームに戻りますか？\n※進行中のデータは失われます。',
@@ -13,8 +13,8 @@ describe('Dynamic Confirm Dialog - TDD', () => {
     };
 
     // Test shows the bug - same message for different targets
-    const homeDialog = currentGetConfirmMessage('HOME');
-    const playerMgmtDialog = currentGetConfirmMessage('PLAYER_MANAGEMENT');
+    const homeDialog = currentGetConfirmMessage();
+    const playerMgmtDialog = currentGetConfirmMessage();
 
     // BUG: Both show "ホームに戻る" even for player management
     expect(homeDialog.confirmText).toBe('ホームに戻る');

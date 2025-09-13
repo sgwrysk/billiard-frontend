@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { storage } from '../utils/storageUtils';
 
@@ -130,6 +131,7 @@ const translations: Translations = {
     'notifications.category.feature': '機能追加',
     'notifications.category.bugfix': '不具合修正', 
     'notifications.category.upcoming': '今後の予定',
+    'notifications.category.improvement': '改善',
     'victory.points': '点',
     'victory.wins': '勝',
     'victory.gameEnd': 'ゲーム終了',
@@ -304,6 +306,7 @@ const translations: Translations = {
     'notifications.category.feature': 'Feature',
     'notifications.category.bugfix': 'Bug Fix',
     'notifications.category.upcoming': 'Upcoming',
+    'notifications.category.improvement': 'Improvement',
     'victory.points': 'pts',
     'victory.wins': 'wins',
     'victory.gameEnd': 'Game End',

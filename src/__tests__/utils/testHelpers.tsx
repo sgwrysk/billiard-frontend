@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // Common test utilities and helpers
 import React from 'react';
 import { vi } from 'vitest';

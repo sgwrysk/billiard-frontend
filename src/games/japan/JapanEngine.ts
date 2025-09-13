@@ -155,6 +155,7 @@ export class JapanEngine extends GameBase {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   checkVictoryCondition(_game: Game): { isGameOver: boolean; winnerId?: string } {
     // Japan game doesn't have a specific victory condition
     // It's typically played for a set time or until manual end

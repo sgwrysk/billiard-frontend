@@ -21,8 +21,8 @@ export interface PlayerInputFieldProps {
   variant?: 'outlined' | 'filled' | 'standard';
   size?: 'small' | 'medium';
   fullWidth?: boolean;
-  sx?: any;
-  inputProps?: any;
+  sx?: Record<string, unknown>;
+  inputProps?: Record<string, unknown>;
 }
 
 const PlayerInputField: React.FC<PlayerInputFieldProps> = ({
@@ -59,7 +59,8 @@ const PlayerInputField: React.FC<PlayerInputFieldProps> = ({
       } else if (!playerPosition && !isInitialized) {
         setIsInitialized(true);
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Failed to load player data:', error);
       showError(t('error.playerDataLoad') || 'Failed to load player data');
       setSuggestedPlayers([]);
       if (!isInitialized) {
@@ -68,7 +69,7 @@ const PlayerInputField: React.FC<PlayerInputFieldProps> = ({
     }
   }, [value, playerPosition, isInitialized, onChange, showError, t]);
 
-  const handleChange = (_event: any, newValue: string | Player | null) => {
+  const handleChange = (_event: unknown, newValue: string | Player | null) => {
     let playerName = '';
     
     if (typeof newValue === 'string') {

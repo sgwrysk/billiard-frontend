@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -35,7 +35,7 @@ const PlayerOrderChangeDialog: React.FC<PlayerOrderChangeDialogProps> = ({
   onEndGame,
 }) => {
   // Find the last player who scored in the current rack
-  const getLastScorerInCurrentRack = (): string => {
+  const getLastScorerInCurrentRack = useCallback((): string => {
     // Find the last rack complete shot to determine current rack boundary
     let lastRackCompleteIndex = -1;
     for (let i = game.shotHistory.length - 1; i >= 0; i--) {
@@ -58,7 +58,7 @@ const PlayerOrderChangeDialog: React.FC<PlayerOrderChangeDialogProps> = ({
     
     // Fallback to first player if no shots found
     return players[0]?.id || '';
-  };
+  }, [game.shotHistory, players]);
   
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>('');
   
@@ -67,7 +67,7 @@ const PlayerOrderChangeDialog: React.FC<PlayerOrderChangeDialogProps> = ({
     if (open) {
       setSelectedPlayerId(getLastScorerInCurrentRack());
     }
-  }, [open, game.shotHistory]);
+  }, [open, game.shotHistory, getLastScorerInCurrentRack]);
 
   const handleConfirm = () => {
     if (selectedPlayerId) {

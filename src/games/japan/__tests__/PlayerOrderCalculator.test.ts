@@ -33,15 +33,15 @@ describe('PlayerOrderCalculator', () => {
       const players = createTestPlayers(3);
       
       // Test case 1: A→B→C (select A) → A→C→B
-      let newOrder1 = PlayerOrderCalculator.calculateNewPlayerOrder(players, 'player-1');
+      const newOrder1 = PlayerOrderCalculator.calculateNewPlayerOrder(players, 'player-1');
       expect(newOrder1.map(p => p.id)).toEqual(['player-1', 'player-3', 'player-2']);
       
       // Test case 2: A→B→C (select B) → B→A→C  
-      let newOrder2 = PlayerOrderCalculator.calculateNewPlayerOrder(players, 'player-2');
+      const newOrder2 = PlayerOrderCalculator.calculateNewPlayerOrder(players, 'player-2');
       expect(newOrder2.map(p => p.id)).toEqual(['player-2', 'player-1', 'player-3']);
       
       // Test case 3: A→B→C (select C) → C→B→A
-      let newOrder3 = PlayerOrderCalculator.calculateNewPlayerOrder(players, 'player-3');
+      const newOrder3 = PlayerOrderCalculator.calculateNewPlayerOrder(players, 'player-3');
       expect(newOrder3.map(p => p.id)).toEqual(['player-3', 'player-2', 'player-1']);
     });
     

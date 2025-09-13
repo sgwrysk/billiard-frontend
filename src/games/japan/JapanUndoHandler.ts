@@ -1,4 +1,23 @@
-import type { Game } from '../../types/index';
+import type { Game, Shot } from '../../types/index';
+
+// Types for Japan undo operations
+interface RackCompleteActionData {
+  type: 'rack_complete';
+  previousRack: number;
+  previousMultiplier: number;
+  previousPlayerStates: Array<{
+    id: string;
+    ballsPocketed: number[];
+    score: number;
+  }>;
+}
+
+interface BallClickActionData {
+  type: 'ball_click';
+  points: number;
+}
+
+type JapanActionData = RackCompleteActionData | BallClickActionData | Record<string, unknown>;
 
 /**
  * Utility class for handling undo operations in Japan billiard games
@@ -15,14 +34,14 @@ export class JapanUndoHandler {
     }
     
     const lastShot = game.shotHistory[game.shotHistory.length - 1];
-    const lastAction = lastShot.customData;
+    const lastAction = lastShot.customData as JapanActionData;
     
     const updatedGame = { ...game };
     
     // Undo based on the last action type
     if (lastAction?.type === 'rack_complete') {
       // Undo rack completion - revert to previous rack state
-      return JapanUndoHandler.handleRackCompleteUndo(updatedGame, lastAction);
+      return JapanUndoHandler.handleRackCompleteUndo(updatedGame, lastAction as RackCompleteActionData);
     } else if (lastAction?.type === 'ball_click') {
       // Undo ball click - subtract the points earned
       return JapanUndoHandler.handleBallClickUndo(updatedGame, lastShot);
@@ -40,13 +59,9 @@ export class JapanUndoHandler {
    * @param lastAction Last action custom data
    * @returns Updated game state after undoing rack completion
    */
-  private static handleRackCompleteUndo(game: Game, lastAction: any): Game {
-    const previousRack = lastAction.previousRack as number;
-    const previousPlayerStates = lastAction.previousPlayerStates as Array<{
-      id: string;
-      ballsPocketed: number[];
-      score: number;
-    }>;
+  private static handleRackCompleteUndo(game: Game, lastAction: RackCompleteActionData): Game {
+    const previousRack = lastAction.previousRack;
+    const previousPlayerStates = lastAction.previousPlayerStates;
     
     // Restore rack number
     game.currentRack = previousRack;
@@ -57,10 +72,8 @@ export class JapanUndoHandler {
     }
     
     // Restore multiplier
-    const previousMultiplier = lastAction.previousMultiplier as number;
-    if (typeof previousMultiplier === 'number') {
-      game.japanCurrentMultiplier = previousMultiplier;
-    }
+    const previousMultiplier = lastAction.previousMultiplier;
+    game.japanCurrentMultiplier = previousMultiplier;
     
     // Restore player states (ballsPocketed arrays and scores)
     game.players = game.players.map(player => {
@@ -84,8 +97,9 @@ export class JapanUndoHandler {
    * @param lastShot Last shot that was taken
    * @returns Updated game state after undoing ball click
    */
-  private static handleBallClickUndo(game: Game, lastShot: any): Game {
-    const points = lastShot.customData.points as number;
+  private static handleBallClickUndo(game: Game, lastShot: Shot): Game {
+    const customData = lastShot.customData as unknown as BallClickActionData;
+    const points = customData.points;
     
     game.players = game.players.map(player => {
       if (player.id === lastShot.playerId) {
@@ -114,6 +128,7 @@ export class JapanUndoHandler {
    * @param ballNumber Ball number that was just undone (for verification)
    * @returns Updated array with the most recent ball removed
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private static removeBallFromPocketed(ballsPocketed: number[], _ballNumber: number): number[] {
     const balls = [...ballsPocketed];
     // Remove the last ball from the array (most recent pocket), regardless of ball number

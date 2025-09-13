@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Card,
@@ -65,22 +65,23 @@ const PlayerManagement: React.FC = () => {
   });
   const [showHidden, setShowHidden] = useState(false);
 
-  // Load players and default settings
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = () => {
+  const loadData = useCallback(() => {
     try {
       const allPlayers = getAllPlayers();
       setPlayers(allPlayers);
       
       const defaults = getDefaultPlayerSettings();
       setDefaultSettings(defaults);
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Failed to load player data:', error);
       showError(t('error.playerDataLoad') || 'Failed to load player data');
     }
-  };
+  }, [showError, t]);
+
+  // Load players and default settings
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleEditPlayer = (player: Player) => {
     setEditDialog({

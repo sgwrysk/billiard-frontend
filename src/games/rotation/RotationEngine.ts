@@ -86,6 +86,7 @@ export class RotationEngine extends GameBase {
     return true;
   }
   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleCustomAction(game: Game, action: string, _data?: unknown): Game {
     switch (action) {
       case 'RESET_RACK':

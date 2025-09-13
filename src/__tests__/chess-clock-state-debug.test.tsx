@@ -49,9 +49,17 @@ describe('Chess Clock State Debug', () => {
     const players = createTestPlayers();
     const mockOnTimeUp = vi.fn();
     const mockOnPlayerSelect = vi.fn();
-    const mockOnStateChange = vi.fn((state: any) => {
+    const mockOnStateChange = vi.fn((state: {
+      playerTimes: Array<{
+        remainingTime: number;
+        isWarning: boolean;
+        isTimeUp: boolean;
+      }>;
+      isRunning: boolean;
+      lastUpdateTime?: number;
+    }) => {
       console.log('🔍 Chess Clock State Change:', {
-        playerTimes: state.playerTimes.map((pt: any) => ({
+        playerTimes: state.playerTimes.map((pt) => ({
           remainingTime: pt.remainingTime,
           isWarning: pt.isWarning,
           isTimeUp: pt.isTimeUp

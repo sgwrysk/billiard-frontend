@@ -151,7 +151,6 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
             showError('Japan設定に問題があります。設定を確認してください。');
             return;
           }
-          console.log('Japan settings:', japanSettings);
           // TODO: Pass Japan settings to the game engine
         }
         

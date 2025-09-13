@@ -68,7 +68,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
         lastUpdateTimeRef.current = Date.now();
       }
     }
-  }, [chessClock.enabled, savedState, players]); // Depend on saved state and players
+  }, [chessClock.enabled, chessClock, savedState, players, playerTimes.length]); // Depend on saved state and players
 
   // Don't reset timer when current player changes - let it continue naturally
   useEffect(() => {
@@ -128,7 +128,7 @@ const ChessClock: React.FC<ChessClockProps> = ({
       };
       onStateChange(currentState);
     }
-  }, [playerTimes, isRunning]);
+  }, [playerTimes, isRunning, onStateChange]);
 
   const handleStartStop = () => {
     if (isRunning) {

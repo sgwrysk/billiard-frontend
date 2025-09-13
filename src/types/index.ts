@@ -106,7 +106,7 @@ export interface ScoreHistory {
 }
 
 // Notifications types
-export type NotificationCategory = 'feature' | 'bugfix' | 'upcoming';
+export type NotificationCategory = 'feature' | 'bugfix' | 'upcoming' | 'improvement';
 
 export interface Notification {
   id: string;

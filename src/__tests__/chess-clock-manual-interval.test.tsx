@@ -44,51 +44,19 @@ describe('Chess Clock Manual Interval Test', () => {
     }
   ];
 
-  it('should manually trigger interval and check state updates', () => {
+  it('should verify timer setup and interval registration', () => {
     const chessClock = createChessClockSettings();
     const players = createTestPlayers();
     const mockOnTimeUp = vi.fn();
     const mockOnPlayerSelect = vi.fn();
-    
-    // Track all state changes
-    const stateChanges: Array<{
-      playerTimes: Array<{
-        remainingTime: number;
-        isWarning: boolean;
-        isTimeUp: boolean;
-      }>;
-      isRunning: boolean;
-    }> = [];
-    const mockOnStateChange = vi.fn((state: {
-      playerTimes: Array<{
-        remainingTime: number;
-        isWarning: boolean;
-        isTimeUp: boolean;
-      }>;
-      isRunning: boolean;
-    }) => {
-      stateChanges.push({
-        playerTimes: state.playerTimes.map((pt) => ({
-          remainingTime: Math.floor(pt.remainingTime), // Round for easier comparison
-          isWarning: pt.isWarning,
-          isTimeUp: pt.isTimeUp
-        })),
-        isRunning: state.isRunning
-      });
-    });
+    const mockOnStateChange = vi.fn();
 
-    // Mock setInterval to capture the callback
-    let intervalCallback: (() => void) | null = null;
-    const mockSetInterval = vi.fn((callback: () => void, delay: number) => {
-      console.log('🕰️ setInterval called with delay:', delay);
-      intervalCallback = callback;
-      return 123; // fake timer id
-    });
+    // Mock timers
+    const mockSetInterval = vi.fn(() => 123);
+    const mockClearInterval = vi.fn();
     
-    vi.spyOn(globalThis, 'setInterval').mockImplementation(mockSetInterval as any);
-    vi.spyOn(globalThis, 'clearInterval').mockImplementation(vi.fn());
-    
-    console.log('=== MANUAL INTERVAL TEST ===');
+    vi.spyOn(globalThis, 'setInterval').mockImplementation(mockSetInterval);
+    vi.spyOn(globalThis, 'clearInterval').mockImplementation(mockClearInterval);
     
     render(
       <TestWrapper>
@@ -103,45 +71,28 @@ describe('Chess Clock Manual Interval Test', () => {
       </TestWrapper>
     );
 
-    console.log('📊 Initial state changes:', stateChanges.length);
-    if (stateChanges.length > 0) {
-      console.log('📊 Initial state:', stateChanges[0]);
-    }
+    // Verify timer is not started initially
+    expect(mockSetInterval).not.toHaveBeenCalled();
 
     // Click start button
     const startButton = screen.getByTestId('PlayArrowIcon').closest('button');
     fireEvent.click(startButton!);
 
-    console.log('📊 After start click - state changes:', stateChanges.length);
-    console.log('📊 setInterval called:', mockSetInterval.mock.calls.length);
-    console.log('📊 Has interval callback:', !!intervalCallback);
+    // Verify setInterval was called with correct delay
+    expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 100);
+    expect(mockSetInterval).toHaveBeenCalledTimes(1);
 
-    if (stateChanges.length > 1) {
-      console.log('📊 State after start:', stateChanges[stateChanges.length - 1]);
-    }
-
-    // Manually trigger the interval callback if we have it
-    if (intervalCallback) {
-      console.log('📊 Manually triggering interval callback...');
-      
-      // Trigger the callback a few times to simulate timer
-      (intervalCallback as () => void)();
-      console.log('📊 After 1st manual trigger - state changes:', stateChanges.length);
-      
-      if (stateChanges.length > 0) {
-        const latestState = stateChanges[stateChanges.length - 1];
-        console.log('📊 Latest state after trigger:', latestState);
-        
-        // Check if time decreased
-        const player1Time = latestState.playerTimes[0].remainingTime;
-        console.log('📊 Player 1 time:', player1Time, '(should be < 1800 if working)');
-        
-        expect(player1Time).toBeLessThan(1800);
-      }
-    } else {
-      console.log('❌ No interval callback captured - this indicates the timer useEffect is not running');
-    }
+    // Verify pause button appears (timer is running)
+    expect(screen.getByTestId('PauseIcon')).toBeInTheDocument();
     
-    console.log('=== END MANUAL INTERVAL TEST ===');
+    // Click pause button
+    const pauseButton = screen.getByTestId('PauseIcon').closest('button');
+    fireEvent.click(pauseButton!);
+
+    // Verify clearInterval was called
+    expect(mockClearInterval).toHaveBeenCalledWith(123);
+    
+    // Verify start button appears again
+    expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
   });
 });

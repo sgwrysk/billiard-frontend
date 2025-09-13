@@ -13,6 +13,7 @@ import {
   NewReleases as FeatureIcon,
   BugReport as BugFixIcon,
   Schedule as UpcomingIcon,
+  Upgrade as ImprovementIcon,
 } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Notification, NotificationCategory, NotificationData } from '../types/index';
@@ -30,6 +31,8 @@ const Notifications: React.FC = () => {
         return <BugFixIcon />;
       case 'upcoming':
         return <UpcomingIcon />;
+      case 'improvement':
+        return <ImprovementIcon />;
       default:
         return <NotificationsIcon />;
     }
@@ -44,6 +47,8 @@ const Notifications: React.FC = () => {
         return 'warning';
       case 'upcoming':
         return 'info';
+      case 'improvement':
+        return 'primary';
       default:
         return 'default';
     }

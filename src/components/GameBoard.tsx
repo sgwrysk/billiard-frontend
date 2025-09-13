@@ -83,9 +83,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
               onSwapPlayers={onSwapPlayers}
               canSwapPlayers={canSwapPlayers ? canSwapPlayers() : false}
               canUndoLastShot={canUndoLastShot || false}
-              onTimeUp={(playerIndex) => {
+              onTimeUp={() => {
                 // Handle time up - could trigger automatic player switch or just show warning
-                console.log(`Player ${playerIndex} time is up!`);
+                // Time up handling can be implemented here in the future
               }}
               onSwitchToPlayer={onSwitchToPlayer}
               onChessClockStateChange={onChessClockStateChange}
@@ -109,9 +109,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
             onSwapPlayers={onSwapPlayers}
             canSwapPlayers={canSwapPlayers ? canSwapPlayers() : false}
             canUndoLastShot={canUndoLastShot || false}
-            onTimeUp={(playerIndex) => {
+            onTimeUp={() => {
               // Handle time up - could trigger automatic player switch or just show warning
-              console.log(`Player ${playerIndex} time is up!`);
+              // Time up handling can be implemented here in the future
             }}
             onSwitchToPlayer={onSwitchToPlayer}
             onChessClockStateChange={onChessClockStateChange}

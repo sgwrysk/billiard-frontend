@@ -48,7 +48,7 @@ const createBallClickShot = (playerId: string, ballNumber: number, points: numbe
   }
 });
 
-const createRackCompleteShot = (previousRack: number, previousMultiplier: number, previousPlayerStates: any[]): Shot => ({
+const createRackCompleteShot = (previousRack: number, previousMultiplier: number, previousPlayerStates: Array<{id: string; ballsPocketed: number[]; score: number}>): Shot => ({
   playerId: 'player-1',
   ballNumber: 0,
   isSunk: false,

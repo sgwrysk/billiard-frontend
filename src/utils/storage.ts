@@ -8,7 +8,7 @@ export interface StorageVersion {
   timestamp: number;
 }
 
-export interface VersionedStorageData<T = any> {
+export interface VersionedStorageData<T = unknown> {
   version: string;
   timestamp: number;
   data: T;

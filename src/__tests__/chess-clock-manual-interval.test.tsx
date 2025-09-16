@@ -52,7 +52,7 @@ describe('Chess Clock Manual Interval Test', () => {
     const mockOnStateChange = vi.fn();
 
     // Mock timers
-    const mockSetInterval = vi.fn(() => 123);
+    const mockSetInterval = vi.fn(() => 123 as unknown as NodeJS.Timeout);
     const mockClearInterval = vi.fn();
     
     vi.spyOn(globalThis, 'setInterval').mockImplementation(mockSetInterval);

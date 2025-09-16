@@ -7,15 +7,18 @@ import type { Game } from '../../../../types/index';
 import { GameType, GameStatus } from '../../../../types/index';
 import type { JapanGameSettings } from '../../../../types/japan';
 import { LanguageProvider } from '../../../../contexts/LanguageContext';
+import { BallDesignProvider } from '../../../../contexts/BallDesignContext';
 
 const theme = createTheme();
 
 const renderWithTheme = (component: React.ReactElement) => {
   return render(
     <LanguageProvider>
-      <ThemeProvider theme={theme}>
-        {component}
-      </ThemeProvider>
+      <BallDesignProvider>
+        <ThemeProvider theme={theme}>
+          {component}
+        </ThemeProvider>
+      </BallDesignProvider>
     </LanguageProvider>
   );
 };

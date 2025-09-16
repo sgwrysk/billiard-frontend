@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 import { LanguageProvider } from '../../../../contexts/LanguageContext';
+import { BallDesignProvider } from '../../../../contexts/BallDesignContext';
 import JapanGameSettings from '../JapanGameSettings';
 import type { JapanGameSettings as JapanGameSettingsType } from '../../../../types/japan';
 
@@ -11,9 +12,11 @@ const theme = createTheme();
 const renderWithTheme = (component: React.ReactElement) => {
   return render(
     <LanguageProvider>
-      <ThemeProvider theme={theme}>
-        {component}
-      </ThemeProvider>
+      <BallDesignProvider>
+        <ThemeProvider theme={theme}>
+          {component}
+        </ThemeProvider>
+      </BallDesignProvider>
     </LanguageProvider>
   );
 };

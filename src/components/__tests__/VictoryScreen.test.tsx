@@ -3,6 +3,7 @@ import { render, screen, within, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import VictoryScreen from '../VictoryScreen';
 import { LanguageProvider } from '../../contexts/LanguageContext';
+import { BallDesignProvider } from '../../contexts/BallDesignContext';
 import { GameType, GameStatus } from '../../types/index';
 import type { Game } from '../../types/index';
 
@@ -11,10 +12,12 @@ vi.mock('react-chartjs-2', () => ({
   Line: () => <div data-testid="chart">Chart</div>,
 }));
 
-// Test wrapper with LanguageProvider
+// Test wrapper with LanguageProvider and BallDesignProvider
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <LanguageProvider>
-    {children}
+    <BallDesignProvider>
+      {children}
+    </BallDesignProvider>
   </LanguageProvider>
 );
 

@@ -4,17 +4,20 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { RotationBoard } from '../RotationBoard';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
+import { BallDesignProvider } from '../../../contexts/BallDesignContext';
 import { GameType, GameStatus } from '../../../types/index';
 import type { Game, ChessClockSettings } from '../../../types/index';
 
 const theme = createTheme();
 
-// Test wrapper with LanguageProvider and ThemeProvider
+// Test wrapper with LanguageProvider, BallDesignProvider, and ThemeProvider
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <LanguageProvider>
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
+    <BallDesignProvider>
+      <ThemeProvider theme={theme}>
+        {children}
+      </ThemeProvider>
+    </BallDesignProvider>
   </LanguageProvider>
 );
 

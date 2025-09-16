@@ -351,6 +351,7 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
           game={game} 
           shouldShowCumulativePoints={shouldShowCumulativePointsInTable}
           onEndGame={onEndGame}
+          defaultDisplayMode="pagination"
         />
       </Box>
 

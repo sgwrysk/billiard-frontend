@@ -115,9 +115,10 @@ describe('JapanCumulativePointsTable', () => {
   };
 
   it('should render the cumulative points table', () => {
-    renderWithProviders(<JapanCumulativePointsTable game={mockGame} />);
+    renderWithProviders(<JapanCumulativePointsTable game={mockGame} defaultDisplayMode="pagination" />);
     
-    expect(screen.getByText('ポイント累計')).toBeInTheDocument();
+    // Check that the table renders by looking for pagination controls
+    expect(screen.getByText('一覧表示')).toBeInTheDocument();
   });
 
   it('should display player names', () => {
@@ -179,7 +180,7 @@ describe('JapanCumulativePointsTable', () => {
     );
     
     // Component should render without errors even when hiding cumulative points
-    expect(screen.getByText('ポイント累計')).toBeInTheDocument();
+    expect(screen.getByText('プレイヤーA')).toBeInTheDocument();
   });
 
   it('should handle empty rack history gracefully', () => {
@@ -190,8 +191,8 @@ describe('JapanCumulativePointsTable', () => {
 
     renderWithProviders(<JapanCumulativePointsTable game={gameWithNoHistory} />);
     
-    expect(screen.getByText('ポイント累計')).toBeInTheDocument();
     expect(screen.getByText('プレイヤーA')).toBeInTheDocument();
     expect(screen.getByText('プレイヤーB')).toBeInTheDocument();
+    expect(screen.getByText('ページ切替')).toBeInTheDocument();
   });
 });

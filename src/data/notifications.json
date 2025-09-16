@@ -1,6 +1,24 @@
 {
   "notifications": [
     {
+      "id": "2025-09-16-02",
+      "date": "2025-09-16",
+      "category": "improvement",
+      "content": {
+        "ja": "ジャパンルール（5-9, 5-10）を正式版としてリリースしました。ベータ表記を削除し、安定した機能として提供開始します。",
+        "en": "Japan Rule (5-9, 5-10) is now officially released. Removed BETA designation and launched as a stable feature."
+      }
+    },
+    {
+      "id": "2025-09-16-01",
+      "date": "2025-09-16",
+      "category": "feature",
+      "content": {
+        "ja": "ジャパンルールの累計表にページネーション機能を追加しました。入力画面では期間別表示、結果画面では全期間表示がデフォルトとなり、表の左下で「ページ切替」と「一覧表示」を切り替えできます。",
+        "en": "Added pagination functionality to Japan Rule cumulative score table. Input screen defaults to period-by-period view, results screen defaults to full view, with toggle links at bottom-left for 'Page Navigation' and 'List View'."
+      }
+    },
+    {
       "id": "2025-09-13-03",
       "date": "2025-09-13",
       "category": "bugfix",

@@ -901,7 +901,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       {game.type === GameType.JAPAN && (
         <JapanCumulativePointsTable 
           game={game} 
-          shouldShowCumulativePoints={() => true} 
+          shouldShowCumulativePoints={() => true}
+          defaultDisplayMode="fullDisplay"
         />
       )}
 

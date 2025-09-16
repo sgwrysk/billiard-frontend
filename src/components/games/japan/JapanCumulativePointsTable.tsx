@@ -1,26 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
   CardContent,
   Button,
+  IconButton,
+  Link,
 } from '@mui/material';
+import {
+  ChevronLeft,
+  ChevronRight,
+  FiberManualRecord,
+} from '@mui/icons-material';
 import type { Game } from '../../../types/index';
 import { AppColors } from '../../../constants/colors';
+
+type DisplayMode = 'pagination' | 'fullDisplay';
 
 interface JapanCumulativePointsTableProps {
   game: Game;
   shouldShowCumulativePoints?: () => boolean;
   onEndGame?: () => void;
+  defaultDisplayMode?: DisplayMode;
 }
 
 const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
   game,
   shouldShowCumulativePoints = () => true, // Default: show cumulative points
   onEndGame,
+  defaultDisplayMode = 'fullDisplay',
 }) => {
   const japanSettings = game.japanSettings!;
   const currentRack = game.currentRack;
+
+  // Display mode and pagination state
+  const [displayMode, setDisplayMode] = useState<DisplayMode>(defaultDisplayMode);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+  // Calculate total number of pages and current page
+  const orderChangeInterval = japanSettings.orderChangeInterval;
+  const currentPeriod = Math.ceil(currentRack / orderChangeInterval);
+  const maxRack = currentPeriod * orderChangeInterval;
+  const totalPages = Math.ceil(maxRack / orderChangeInterval);
+  const currentRackPageIndex = currentPeriod - 1; // Convert to 0-based index
+
+  // Set initial page to current rack period when display mode changes to pagination
+  useEffect(() => {
+    if (displayMode === 'pagination') {
+      setCurrentPageIndex(currentRackPageIndex);
+    }
+  }, [displayMode, currentRackPageIndex]);
 
   // Get player order for specific rack period
   const getPlayerOrderForRackPeriod = (startRack: number, endRack: number): string[] => {
@@ -89,20 +118,18 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
       <CardContent>
         {/* ボーラード風スコア表 - 順替え単位で分割表示 */}
         {(() => {
-          const orderChangeInterval = japanSettings.orderChangeInterval;
-          // Calculate which order change period the current rack belongs to
-          const currentPeriod = Math.ceil(currentRack / orderChangeInterval);
-          // Show up to the end of the current period (e.g., if in rack 11, show up to rack 20)
-          const maxRack = currentPeriod * orderChangeInterval;
-          const tableCount = Math.ceil(maxRack / orderChangeInterval);
-          
           // Calculate fixed width for player name column based on longest name
           const longestPlayerName = game.players.reduce((longest, player) => 
             player.name.length > longest.length ? player.name : longest, '');
           // Fixed width calculation to prevent name cutoff: more generous padding
           const playerColumnWidth = Math.max(100, longestPlayerName.length * 12 + 32);
           
-          return Array.from({ length: tableCount }, (_, tableIndex) => {
+          // Determine which tables to display based on display mode
+          const tablesToShow = displayMode === 'pagination' 
+            ? [currentPageIndex] // Show only current page
+            : Array.from({ length: totalPages }, (_, i) => i); // Show all pages
+          
+          return tablesToShow.map((tableIndex) => {
             const startRack = tableIndex * orderChangeInterval + 1;
             const endRack = Math.min((tableIndex + 1) * orderChangeInterval, maxRack);
             const racksInThisTable = endRack - startRack + 1;
@@ -112,7 +139,7 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
             
             return (
               <Box key={`table-${tableIndex}`} sx={{ 
-                mb: tableIndex < tableCount - 1 ? 3 : 0,
+                mb: displayMode === 'fullDisplay' && tableIndex < tablesToShow.length - 1 ? 3 : 0,
                 border: `2px solid ${AppColors.theme.primary}`,
                 display: 'flex',
                 width: '100%',
@@ -339,14 +366,78 @@ const JapanCumulativePointsTable: React.FC<JapanCumulativePointsTableProps> = ({
           });
         })()}
         
-        {/* Game end button positioned at bottom right of table */}
-        {onEndGame && (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        {/* Bottom controls: Pagination on left, Game end button on right */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+          {/* Pagination controls on the left */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Previous page button */}
+            <IconButton
+              size="small"
+              disabled={displayMode === 'fullDisplay' || currentPageIndex === 0}
+              onClick={() => setCurrentPageIndex(Math.max(0, currentPageIndex - 1))}
+              sx={{ 
+                color: displayMode === 'fullDisplay' || currentPageIndex === 0 
+                  ? 'text.disabled' 
+                  : 'text.primary' 
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            
+            {/* Current page indicator / Return to current button */}
+            <IconButton
+              size="small"
+              disabled={displayMode === 'fullDisplay' || currentPageIndex === currentRackPageIndex}
+              onClick={() => setCurrentPageIndex(currentRackPageIndex)}
+              sx={{ 
+                color: displayMode === 'fullDisplay' || currentPageIndex === currentRackPageIndex
+                  ? 'text.disabled' 
+                  : 'text.primary' 
+              }}
+            >
+              <FiberManualRecord fontSize="small" />
+            </IconButton>
+            
+            {/* Next page button */}
+            <IconButton
+              size="small"
+              disabled={displayMode === 'fullDisplay' || currentPageIndex >= totalPages - 1}
+              onClick={() => setCurrentPageIndex(Math.min(totalPages - 1, currentPageIndex + 1))}
+              sx={{ 
+                color: displayMode === 'fullDisplay' || currentPageIndex >= totalPages - 1
+                  ? 'text.disabled' 
+                  : 'text.primary' 
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+            
+            {/* Display mode toggle link */}
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => setDisplayMode(displayMode === 'pagination' ? 'fullDisplay' : 'pagination')}
+              sx={{ 
+                ml: 1,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                color: 'primary.main',
+                '&:hover': {
+                  textDecoration: 'none',
+                },
+              }}
+            >
+              {displayMode === 'pagination' ? '一覧表示' : 'ページ切替'}
+            </Link>
+          </Box>
+          
+          {/* Game end button on the right */}
+          {onEndGame && (
             <Button variant="outlined" color="error" size="small" onClick={onEndGame}>
               ゲーム終了
             </Button>
-          </Box>
-        )}
+          )}
+        </Box>
       </CardContent>
     </Card>
   );

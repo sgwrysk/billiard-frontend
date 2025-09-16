@@ -77,6 +77,7 @@ export const BallDesignProvider: React.FC<BallDesignProviderProps> = ({ children
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBallDesign = (): BallDesignContextType => {
   const context = useContext(BallDesignContext);
   if (context === undefined) {

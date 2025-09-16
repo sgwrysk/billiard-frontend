@@ -51,7 +51,7 @@ const BallButton: React.FC<BallButtonProps> = ({
         
         // Override pseudo-elements for disabled state / 無効状態の疑似要素上書き
         '&::before': {
-          ...(ballStyle as any)['&::before'],
+          ...(ballStyle as Record<string, unknown>)['&::before'] as object,
           backgroundColor: disabled ? UIColors.background.mediumGray : UIColors.background.white,
           boxShadow: UIColors.shadow.inset,
         },
@@ -62,7 +62,7 @@ const BallButton: React.FC<BallButtonProps> = ({
         // Hover effects / ホバー効果
         '&:hover': !disabled ? {
           transform: 'scale(1.08)',
-          background: (ballStyle as any).background, // Preserve original ball color
+          background: (ballStyle as Record<string, unknown>).background as string, // Preserve original ball color
           '& span': {
             transform: 'scale(1.15)',
           }

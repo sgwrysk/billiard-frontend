@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -36,6 +36,7 @@ import type { Game, BowlingFrame } from '../types/index';
 import { GameType } from '../types/index';
 import { getBallColor } from '../utils/ballUtils';
 import { UIColors, BowlardColors, AppStyles, AppColors } from '../constants/colors';
+import { NumberInputStepper } from './common';
 import SetHistory from './SetHistory';
 import JapanCumulativePointsTable from './games/japan/JapanCumulativePointsTable';
 import JapanScoreChart from './games/japan/JapanScoreChart';
@@ -65,6 +66,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const winner = game.players.find(p => p.id === game.winner);
+  
+  // Multiplier state for Japan Rule final score calculation
+  const [multiplier, setMultiplier] = useState(1);
 
   
   const getGameTypeLabel = (type: GameType) => {
@@ -353,7 +357,8 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     const lastRackResult = game.japanRackHistory[game.japanRackHistory.length - 1];
     const playerResult = lastRackResult?.playerResults.find(result => result.playerId === playerId);
     
-    return playerResult?.totalPoints || 0;
+    const baseScore = playerResult?.totalPoints || 0;
+    return Math.round(baseScore * multiplier);
   };
 
 
@@ -809,9 +814,20 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
             {game.type !== GameType.BOWLARD && (
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                  <Typography variant="h6" gutterBottom>
-  最終スコア
-                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6">
+                      最終スコア
+                    </Typography>
+                    {game.type === GameType.JAPAN && (
+                      <NumberInputStepper
+                        value={multiplier}
+                        onChange={setMultiplier}
+                        min={1}
+                        max={999}
+                        step={1}
+                      />
+                    )}
+                  </Box>
                   <Stack spacing={2}>
                     {game.players.map(player => (
                         <Box 

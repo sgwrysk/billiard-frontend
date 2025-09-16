@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { Game, ChessClockState } from '../../types/index';
-import { UIColors, GameColors, AppStyles } from '../../constants/colors';
+import { UIColors, GameColors } from '../../constants/colors';
 import ChessClock from '../ChessClock';
 import SetHistory from '../SetHistory';
 
@@ -90,25 +90,38 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
             >
               <CardContent sx={{ 
                 textAlign: 'center', 
-                py: { xs: 0.25, md: 0.5 }, 
+                py: { xs: 0, md: 0.1 }, 
                 px: { xs: 0.25, md: 0.5 },
                 display: 'flex', 
                 flexDirection: 'column', 
                 justifyContent: 'center', 
                 alignItems: 'center', 
                 height: '100%',
-                minHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' }
+                minHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' },
+                pb: { xs: 0, md: 0 }
               }}>
                 <Typography 
                   variant="h6" 
                   sx={{ 
                     mt: { xs: 0.5, md: 0.8 },
                     mb: 0,
-                    fontSize: { xs: '1rem', md: '1.25rem', lg: '1.4rem' },
                     fontWeight: 700,
                   }}
                 >
-                  {player.name}
+                  <span style={{ 
+                    fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)' 
+                  }}>
+                    {player.name}
+                  </span>
+                  {player.targetSets && (
+                    <span style={{ 
+                      fontSize: 'clamp(1rem, 1.8vw, 1.4rem)',
+                      fontWeight: 500,
+                      marginLeft: '1rem'
+                    }}>
+                      {`(${player.targetSets})`}
+                    </span>
+                  )}
                 </Typography>
                 
                 {/* Break Icon - only show on the player who breaks */}
@@ -138,33 +151,37 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
                 <Typography 
                   sx={{ 
                     color: isPlayerInReach(player) ? GameColors.reach.text : 'primary.main',
-                    // Responsive font size that scales with both viewport and container
-                    // xs: 5rem, sm: 6.5rem, md: starts from 8rem and scales with viewport, capped at 20rem
+                    // Maximized font size utilizing all available space
                     fontSize: { 
-                      xs: '5rem', 
-                      sm: '6.5rem', 
-                      md: 'clamp(8rem, 12vw, 20rem)',
-                      lg: 'clamp(10rem, 14vw, 24rem)'
+                      xs: '8rem', 
+                      sm: '10rem', 
+                      md: 'clamp(14rem, 20vw, 32rem)',
+                      lg: 'clamp(16rem, 22vw, 36rem)'
                     },
                     fontWeight: 'bold',
-                    lineHeight: 1,
+                    lineHeight: 0.8,
                     textAlign: 'center',
-                    my: 0,
-                    // Additional spacing adjustments for larger text
-                    minHeight: { xs: '2.5rem', sm: '4rem', md: '5.5rem', lg: '6.5rem' },
+                    // Reduced negative margins to add some bottom spacing
+                    my: { xs: -1.2, sm: -1.8, md: -3 },
+                    mb: { xs: -0.8, sm: -1.2, md: -2.5 },
+                    mt: { xs: -0.5, sm: -1, md: -1.5 },
+                    // Expand to use maximum available vertical space
+                    minHeight: { xs: '4rem', sm: '5rem', md: '8rem', lg: '10rem' },
                   }}
                 >
-                  <span style={AppStyles.monoFont}>{player.setsWon || 0}</span>
+                  <span style={{
+                    // Enhanced font rendering for large sizes
+                    textRendering: 'optimizeLegibility',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale',
+                    // Back to Inter - cleaner for large score display
+                    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
+                    fontVariantNumeric: 'tabular-nums',
+                    fontWeight: '700'
+                  }}>
+                    {player.setsWon || 0}
+                  </span>
                 </Typography>
-                {player.targetSets && (
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ mt: { xs: 0.05, md: 0.1 }, fontSize: { xs: '0.85rem', md: '1rem' } }}
-                  >
-                    {t('game.targetSets')}: <span style={AppStyles.monoFont}>{player.targetSets}</span>
-                  </Typography>
-                )}
               </CardContent>
             </Card>
           </Grid>

@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-16-06",
+      "date": "2025-09-16",
+      "category": "improvement",
+      "content": {
+        "ja": "セットマッチのプレイヤーパネルデザインを改善しました。プレイヤー名と目標セット数の表示を最適化し、スコア数字を大きくして視認性を向上させました。フォントレンダリングも改善しています。",
+        "en": "Improved SetMatch player panel design. Optimized player name and target sets display, enlarged score numbers for better visibility, and enhanced font rendering."
+      }
+    },
+    {
       "id": "2025-09-16-05",
       "date": "2025-09-16",
       "category": "improvement",

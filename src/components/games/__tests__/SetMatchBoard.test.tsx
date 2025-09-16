@@ -94,10 +94,14 @@ describe('SetMatchBoard', () => {
     expect(screen.getAllByText('2').length).toBeGreaterThan(0); // Player 1's sets may appear in multiple places
     expect(screen.getAllByText('1').length).toBeGreaterThan(0); // Player 2's sets may appear in multiple places
 
-    // Check if target sets are displayed
-    expect(screen.getAllByText((_, element) => {
-      return element?.textContent === 'セット数: 3';
-    })).toHaveLength(2);
+    // Check if target sets are displayed in player names as "(3)" format
+    // Since the name and target sets are in separate spans, use a more flexible approach
+    expect(screen.getByText((_, element) => {
+      return element?.textContent === 'Player 1(3)';
+    })).toBeInTheDocument();
+    expect(screen.getByText((_, element) => {
+      return element?.textContent === 'Player 2(3)';
+    })).toBeInTheDocument();
   });
 
   it('should call onWinSet when player card is clicked', () => {
@@ -1258,11 +1262,13 @@ describe('SetMatchBoard', () => {
       // Chess clock should be present
       expect(screen.getByTestId('PlayArrowIcon')).toBeInTheDocument();
       
-      // Set match player cards should also be present
-      const setCountElements = screen.getAllByText((_, node) => {
-        return node?.textContent === 'セット数: 3';
-      });
-      expect(setCountElements.length).toBeGreaterThanOrEqual(2); // Both players show set count
+      // Set match player cards should also be present (target sets now in player names)
+      expect(screen.getByText((_, element) => {
+        return element?.textContent === 'Alice(3)';
+      })).toBeInTheDocument();
+      expect(screen.getByText((_, element) => {
+        return element?.textContent === 'Bob(3)';
+      })).toBeInTheDocument();
       
       // Both should be visible simultaneously
       const playerCards = screen.getAllByText(/Alice|Bob/);

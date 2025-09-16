@@ -33,6 +33,7 @@ const translations: Translations = {
     'menu.notifications': 'お知らせ',
     'menu.settings': '設定',
     'menu.playerManagement': 'プレイヤー管理',
+    'menu.qrShare': 'QRコード共有',
 
     // Game setup
     'setup.title': '新しいゲーム',
@@ -164,6 +165,9 @@ const translations: Translations = {
     'confirm.exitToNotifications.title': 'ゲームを中断',
     'confirm.exitToNotifications.message': 'ゲームが進行中です。ゲームを中断してお知らせを確認しますか？\n※進行中のデータは失われます。',
     'confirm.exitToNotifications.confirm': 'お知らせを見る',
+    'confirm.exitToQRShare.title': 'ゲームを中断',
+    'confirm.exitToQRShare.message': 'ゲームが進行中です。ゲームを中断してQRコード共有を確認しますか？\n※進行中のデータは失われます。',
+    'confirm.exitToQRShare.confirm': 'QRコード共有を見る',
 
     // Player management
     'playerManagement.title': 'プレイヤー管理',
@@ -195,6 +199,18 @@ const translations: Translations = {
 
     // Error messages
     'error.playerDataLoad': 'プレイヤーデータの読み込みに失敗しました',
+
+    // QR Share screen
+    'qrShare.title': 'QRコード共有',
+    'qrShare.description': 'このページのQRコードを生成して共有できます',
+    'qrShare.currentUrl': '現在のURL',
+    'qrShare.copyUrl': 'URLをコピー',
+    'qrShare.shareVia': 'SNSで共有',
+    'qrShare.shareTwitter': 'Xで共有',
+    'qrShare.shareFacebook': 'Facebookで共有',
+    'qrShare.shareLine': 'LINEで共有',
+    'qrShare.urlCopied': 'URLをコピーしました',
+    'qrShare.shareText': 'ビリヤードスコアアプリをチェック！',
   },
   en: {
     // Home screen
@@ -209,6 +225,7 @@ const translations: Translations = {
     'menu.notifications': 'Notifications',
     'menu.settings': 'Settings',
     'menu.playerManagement': 'Player Management',
+    'menu.qrShare': 'QR Code Share',
 
     // Game setup
     'setup.title': 'New Game',
@@ -339,6 +356,9 @@ const translations: Translations = {
     'confirm.exitToNotifications.title': 'Interrupt Game',
     'confirm.exitToNotifications.message': 'A game is in progress. Do you want to interrupt the game and check notifications?\n※Progress data will be lost.',
     'confirm.exitToNotifications.confirm': 'Check Notifications',
+    'confirm.exitToQRShare.title': 'Interrupt Game',
+    'confirm.exitToQRShare.message': 'A game is in progress. Do you want to interrupt the game and check QR share?\n※Progress data will be lost.',
+    'confirm.exitToQRShare.confirm': 'Check QR Share',
 
     // Player management
     'playerManagement.title': 'Player Management',
@@ -370,6 +390,18 @@ const translations: Translations = {
 
     // Error messages
     'error.playerDataLoad': 'Failed to load player data',
+
+    // QR Share screen
+    'qrShare.title': 'QR Code Share',
+    'qrShare.description': 'Generate and share QR code for this page',
+    'qrShare.currentUrl': 'Current URL',
+    'qrShare.copyUrl': 'Copy URL',
+    'qrShare.shareVia': 'Share via SNS',
+    'qrShare.shareTwitter': 'Share on X',
+    'qrShare.shareFacebook': 'Share on Facebook',
+    'qrShare.shareLine': 'Share on LINE',
+    'qrShare.urlCopied': 'URL copied to clipboard',
+    'qrShare.shareText': 'Check out this Billiard Score App!',
   },
 };
 

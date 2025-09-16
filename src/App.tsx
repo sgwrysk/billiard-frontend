@@ -15,7 +15,7 @@ import {
   ListItemIcon,
   ListItemText
 } from '@mui/material';
-import { Menu as MenuIcon, Home as HomeIcon, People as PeopleIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
+import { Menu as MenuIcon, Home as HomeIcon, People as PeopleIcon, Notifications as NotificationsIcon, QrCode2 as QrCodeIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
 import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
@@ -25,6 +25,7 @@ import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
 import PlayerManagement from './components/PlayerManagement';
 import Notifications from './components/Notifications';
+import QRShare from './components/QRShare';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
 import type { Game } from './types/index';
@@ -133,6 +134,7 @@ const AppScreen = {
   VICTORY: 'VICTORY',
   PLAYER_MANAGEMENT: 'PLAYER_MANAGEMENT',
   NOTIFICATIONS: 'NOTIFICATIONS',
+  QR_SHARE: 'QR_SHARE',
 } as const;
 
 // Menu configuration for extensible menu management
@@ -153,6 +155,12 @@ const MENU_ITEMS = [
     screen: AppScreen.PLAYER_MANAGEMENT, 
     icon: PeopleIcon, 
     labelKey: 'menu.playerManagement',
+    requiresGameExitConfirmation: true 
+  },
+  { 
+    screen: AppScreen.QR_SHARE, 
+    icon: QrCodeIcon, 
+    labelKey: 'menu.qrShare',
     requiresGameExitConfirmation: true 
   },
 ] as const;
@@ -396,6 +404,13 @@ const AppContent: React.FC = () => {
           title: t('confirm.exitToNotifications.title'),
           message: t('confirm.exitToNotifications.message'),
           confirmText: t('confirm.exitToNotifications.confirm'),
+          cancelText: t('confirm.exitGame.cancel'),
+        };
+      case AppScreen.QR_SHARE:
+        return {
+          title: t('confirm.exitToQRShare.title'),
+          message: t('confirm.exitToQRShare.message'),
+          confirmText: t('confirm.exitToQRShare.confirm'),
           cancelText: t('confirm.exitGame.cancel'),
         };
       default:
@@ -643,6 +658,10 @@ const AppContent: React.FC = () => {
         
         {currentScreen === AppScreen.NOTIFICATIONS && (
           <Notifications />
+        )}
+        
+        {currentScreen === AppScreen.QR_SHARE && (
+          <QRShare />
         )}
       </Container>
 

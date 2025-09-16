@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-16-04",
+      "date": "2025-09-16",
+      "category": "feature",
+      "content": {
+        "ja": "QRコード共有機能を追加しました。ハンバーガーメニューの「QRコード共有」から、現在のページのQRコードを生成してURLのコピーやX（旧Twitter）・Facebook・LINEでの共有が可能です。",
+        "en": "Added QR code sharing feature. Access 'QR Code Share' from hamburger menu to generate QR code for current page with URL copy and sharing via X (formerly Twitter), Facebook, and LINE."
+      }
+    },
+    {
       "id": "2025-09-16-03",
       "date": "2025-09-16",
       "category": "feature",

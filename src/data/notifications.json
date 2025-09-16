@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-16-03",
+      "date": "2025-09-16",
+      "category": "feature",
+      "content": {
+        "ja": "ジャパンルールの入力画面にスコア推移グラフを追加しました。累計表の下にラック別の得点推移を視覚的に確認できるグラフが表示されます。",
+        "en": "Added score progression graph to Japan Rule input screen. A visual graph showing rack-by-rack score progression is now displayed below the cumulative score table."
+      }
+    },
+    {
       "id": "2025-09-16-02",
       "date": "2025-09-16",
       "category": "improvement",

@@ -13,6 +13,7 @@ import { BallButton, NumberInputStepper } from '../../common';
 import { AppColors } from '../../../constants/colors';
 import PlayerOrderChangeDialog from './PlayerOrderChangeDialog';
 import JapanCumulativePointsTable from './JapanCumulativePointsTable';
+import JapanScoreChart from './JapanScoreChart';
 
 interface JapanGameScreenProps {
   game: Game;
@@ -354,6 +355,18 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
           defaultDisplayMode="pagination"
         />
       </Box>
+
+      {/* 4. スコア推移グラフパネル */}
+      {game.japanRackHistory && game.japanRackHistory.length > 0 && (
+        <Box sx={{ mb: 3 }}>
+          <JapanScoreChart 
+            game={game} 
+            height={250}
+            showTitle={false}
+            showCard={true}
+          />
+        </Box>
+      )}
 
       {/* Player Order Change Dialog */}
       <PlayerOrderChangeDialog

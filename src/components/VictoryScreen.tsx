@@ -38,6 +38,7 @@ import { getBallColor } from '../utils/ballUtils';
 import { UIColors, BowlardColors, AppStyles, AppColors } from '../constants/colors';
 import SetHistory from './SetHistory';
 import JapanCumulativePointsTable from './games/japan/JapanCumulativePointsTable';
+import JapanScoreChart from './games/japan/JapanScoreChart';
 
 ChartJS.register(
   CategoryScale,
@@ -165,9 +166,6 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       return generateRotationChartData();
     }
 
-    if (game.type === GameType.JAPAN) {
-      return generateJapanChartData();
-    }
 
     if (!game.scoreHistory || game.scoreHistory.length === 0) {
       return null;
@@ -331,40 +329,6 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     };
   };
 
-  // Generate chart data for Japan game - rack vs cumulative points
-  const generateJapanChartData = () => {
-    if (!game.japanRackHistory || game.japanRackHistory.length === 0) {
-      return null;
-    }
-
-    const playerColors = UIColors.chart.playerColors;
-    const racks = game.japanRackHistory.sort((a, b) => a.rackNumber - b.rackNumber);
-    
-    // Create labels (rack numbers)
-    const labels = racks.map(rack => `ラック${rack.rackNumber}`);
-    
-    // Create datasets for each player
-    const datasets = game.players.map((player, index) => {
-      const playerData = racks.map(rack => {
-        const playerResult = rack.playerResults.find(result => result.playerId === player.id);
-        return playerResult ? playerResult.totalPoints : 0;
-      });
-
-      return {
-        label: player.name,
-        data: playerData,
-        borderColor: playerColors[index % playerColors.length],
-        backgroundColor: playerColors[index % playerColors.length] + '20',
-        tension: 0.1,
-        fill: false,
-      };
-    });
-
-    return {
-      labels,
-      datasets,
-    };
-  };
 
   // Calculate actual sets won for a player from scoreHistory
   const calculateActualSetsWon = (playerId: string) => {
@@ -899,11 +863,13 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
       {/* ジャパンルール: ポイント累計表を表示 */}
       {game.type === GameType.JAPAN && (
-        <JapanCumulativePointsTable 
-          game={game} 
-          shouldShowCumulativePoints={() => true}
-          defaultDisplayMode="fullDisplay"
-        />
+        <Box sx={{ mb: 4 }}>
+          <JapanCumulativePointsTable 
+            game={game} 
+            shouldShowCumulativePoints={() => true}
+            defaultDisplayMode="fullDisplay"
+          />
+        </Box>
       )}
 
       {/* セットマッチ: 共通 SetHistory コンポーネントで統一表示 */}
@@ -911,8 +877,20 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         <SetHistory game={game} />
       )}
 
+      {/* ジャパンルール: スコア推移グラフ */}
+      {game.type === GameType.JAPAN && (
+        <Box sx={{ mb: 3 }}>
+          <JapanScoreChart 
+            game={game} 
+            height={300}
+            showTitle={false}
+            showCard={true}
+          />
+        </Box>
+      )}
+
       {/* その他のゲーム: スコア推移グラフ */}
-      {game.type !== GameType.SET_MATCH && generateChartData() && (
+      {game.type !== GameType.SET_MATCH && game.type !== GameType.JAPAN && generateChartData() && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>

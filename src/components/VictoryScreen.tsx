@@ -74,7 +74,27 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
-      {/* ゲーム詳細情報 - First for non-Japan games */}
+      {/* SET_MATCH Victory Content */}
+      {game.type === GameType.SET_MATCH && (
+        <SetMatchVictoryContent game={game} />
+      )}
+
+      {/* BOWLARD Victory Content */}
+      {game.type === GameType.BOWLARD && (
+        <BowlardVictoryContent game={game} />
+      )}
+
+      {/* ROTATION Victory Content */}
+      {game.type === GameType.ROTATION && (
+        <RotationVictoryContent game={game} />
+      )}
+
+      {/* JAPAN Victory Content */}
+      {game.type === GameType.JAPAN && (
+        <JapanVictoryContent game={game} />
+      )}
+
+      {/* ゲーム詳細情報 - After victory content for non-Japan games */}
       {game.type !== GameType.JAPAN && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
@@ -147,27 +167,6 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
           </CardContent>
         </Card>
       )}
-
-      {/* SET_MATCH Victory Content */}
-      {game.type === GameType.SET_MATCH && (
-        <SetMatchVictoryContent game={game} />
-      )}
-
-      {/* BOWLARD Victory Content */}
-      {game.type === GameType.BOWLARD && (
-        <BowlardVictoryContent game={game} />
-      )}
-
-      {/* ROTATION Victory Content */}
-      {game.type === GameType.ROTATION && (
-        <RotationVictoryContent game={game} />
-      )}
-
-      {/* JAPAN Victory Content */}
-      {game.type === GameType.JAPAN && (
-        <JapanVictoryContent game={game} />
-      )}
-
 
       {/* Action buttons */}
       <ActionButtons

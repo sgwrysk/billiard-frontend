@@ -4,12 +4,17 @@ import React from 'react';
 import { vi } from 'vitest';
 import { GameType, GameStatus, type Game, type Player, type ChessClockSettings } from '../../types/index';
 import { LanguageProvider } from '../../contexts/LanguageContext';
+import { BallDesignProvider } from '../../contexts/BallDesignContext';
 
 // Mock Chart.js for VictoryScreen tests - move this to individual test files
 
 // Test wrapper component
 export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <LanguageProvider>{children}</LanguageProvider>
+  <LanguageProvider>
+    <BallDesignProvider>
+      {children}
+    </BallDesignProvider>
+  </LanguageProvider>
 );
 
 // Mock functions factory

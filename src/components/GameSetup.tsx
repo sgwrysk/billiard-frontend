@@ -188,7 +188,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', p: 2 }}>
+    <Box sx={{ maxWidth: 680, mx: 'auto', p: 2 }}>
       <Card>
         <CardContent>
           {/* Game type selection */}

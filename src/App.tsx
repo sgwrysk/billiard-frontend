@@ -1,184 +1,48 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { 
   CssBaseline, 
   Container, 
-  AppBar, 
-  Toolbar, 
-  Typography, 
   Box, 
-  Select, 
-  MenuItem, 
-  FormControl,
-  IconButton,
-  Menu,
-  ListItemIcon,
-  ListItemText
 } from '@mui/material';
-import { Menu as MenuIcon, Home as HomeIcon, People as PeopleIcon, Notifications as NotificationsIcon, QrCode2 as QrCodeIcon } from '@mui/icons-material';
 
 import { useGame } from './hooks/useGame';
-import { LanguageProvider, useLanguage, type Language as LanguageType } from './contexts/LanguageContext';
-import { AppColors, UIColors } from './constants/colors';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { BallDesignProvider } from './contexts/BallDesignContext';
+import { theme } from './constants/theme';
+import { AppScreen, MENU_ITEMS, type AppScreenType } from './constants/navigation';
+import AppHeader from './components/navigation/AppHeader';
+import HamburgerMenu from './components/navigation/HamburgerMenu';
 import GameSetup from './components/GameSetup';
 import GameBoard from './components/GameBoard';
 import VictoryScreen from './components/VictoryScreen';
 import PlayerManagement from './components/PlayerManagement';
 import Notifications from './components/Notifications';
 import QRShare from './components/QRShare';
+import Settings from './components/Settings';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { GameType, GameStatus } from './types/index';
 import type { Game } from './types/index';
 import type { ChessClockSettings, ChessClockState } from './types/index';
 import { GameEngineFactory } from './games/GameEngineFactory';
 
-// Create Material-UI theme - Deep Blue + Outfit
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: AppColors.theme.primary,
-      light: AppColors.theme.primaryLight,
-      dark: AppColors.theme.primaryDark,
-    },
-    secondary: {
-      main: AppColors.theme.secondary, // Gold accent
-      light: AppColors.theme.secondaryLight,
-      dark: AppColors.theme.secondaryDark,
-    },
-    background: {
-      default: UIColors.background.default,
-      paper: UIColors.background.paper,
-    },
-  },
-  typography: {
-    fontFamily: '"Outfit", "Noto Sans JP", "Helvetica", "Arial", sans-serif',
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
-    fontWeightBold: 700,
-    h1: {
-      fontWeight: 800,
-    },
-    h2: {
-      fontWeight: 700,
-    },
-    h3: {
-      fontWeight: 600,
-    },
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 600,
-    },
-    h6: {
-      fontWeight: 500,
-    },
-    button: {
-      fontWeight: 600,
-      textTransform: 'none',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          padding: '10px 24px',
-          fontWeight: 600,
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.25)',
-          },
-        },
-        contained: {
-          background: `linear-gradient(135deg, ${AppColors.theme.primary} 0%, ${AppColors.theme.primaryLight} 100%)`,
-          '&:hover': {
-            background: `linear-gradient(135deg, ${AppColors.theme.primaryDark} 0%, ${AppColors.theme.primary} 100%)`,
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-          border: '1px solid rgba(25, 118, 210, 0.08)',
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          fontWeight: 500,
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          background: `linear-gradient(135deg, ${AppColors.theme.primary} 0%, ${AppColors.theme.primaryLight} 100%)`,
-          boxShadow: '0 2px 10px rgba(25, 118, 210, 0.3)',
-        },
-      },
-    },
-  },
-});
-
-const AppScreen = {
-  HOME: 'HOME',
-  SETUP: 'SETUP',
-  GAME: 'GAME',
-  VICTORY: 'VICTORY',
-  PLAYER_MANAGEMENT: 'PLAYER_MANAGEMENT',
-  NOTIFICATIONS: 'NOTIFICATIONS',
-  QR_SHARE: 'QR_SHARE',
-} as const;
-
-// Menu configuration for extensible menu management
-const MENU_ITEMS = [
-  { 
-    screen: AppScreen.HOME, 
-    icon: HomeIcon, 
-    labelKey: 'menu.scoreInput',
-    requiresGameExitConfirmation: true 
-  },
-  { 
-    screen: AppScreen.NOTIFICATIONS, 
-    icon: NotificationsIcon, 
-    labelKey: 'menu.notifications',
-    requiresGameExitConfirmation: true 
-  },
-  { 
-    screen: AppScreen.PLAYER_MANAGEMENT, 
-    icon: PeopleIcon, 
-    labelKey: 'menu.playerManagement',
-    requiresGameExitConfirmation: true 
-  },
-  { 
-    screen: AppScreen.QR_SHARE, 
-    icon: QrCodeIcon, 
-    labelKey: 'menu.qrShare',
-    requiresGameExitConfirmation: true 
-  },
-] as const;
 
 function App() {
   return (
     <LanguageProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AppContent />
-      </ThemeProvider>
+      <BallDesignProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AppContent />
+        </ThemeProvider>
+      </BallDesignProvider>
     </LanguageProvider>
   );
 }
 
 const AppContent: React.FC = () => {
-  const { t, language, setLanguage } = useLanguage();
-  const [currentScreen, setCurrentScreen] = useState<string>(AppScreen.HOME);
+  const { t } = useLanguage();
+  const [currentScreen, setCurrentScreen] = useState<AppScreenType>(AppScreen.HOME);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const {
@@ -209,7 +73,7 @@ const AppContent: React.FC = () => {
   
   const [finishedGame, setFinishedGame] = useState<Game | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<AppScreenType | null>(null);
   const [alternatingBreak, setAlternatingBreak] = useState<boolean>(false);
 
   // Helper function to reset scroll position to top
@@ -356,12 +220,9 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleLanguageChange = (newLanguage: LanguageType) => {
-    setLanguage(newLanguage);
-  };
 
   // Unified navigation handler with game state confirmation
-  const handleSafeNavigation = (targetScreen: string, skipConfirmation = false) => {
+  const handleSafeNavigation = (targetScreen: AppScreenType, skipConfirmation = false) => {
     // Check if confirmation is needed
     if (currentScreen === AppScreen.GAME && currentGame && !canSwapPlayers() && !skipConfirmation) {
       // Game is in progress, show confirmation dialog
@@ -374,7 +235,7 @@ const AppContent: React.FC = () => {
   };
 
   // Helper function to perform actual navigation
-  const navigateToScreen = (targetScreen: string) => {
+  const navigateToScreen = (targetScreen: AppScreenType) => {
     if (targetScreen === AppScreen.HOME) {
       resetGame();
     }
@@ -424,7 +285,7 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -432,9 +293,7 @@ const AppContent: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const handleMenuItemClick = (screen: string) => {
-    handleMenuClose();
-    
+  const handleMenuItemClick = (screen: AppScreenType) => {
     // Find menu item configuration
     const menuItem = MENU_ITEMS.find(item => item.screen === screen);
     
@@ -478,7 +337,7 @@ const AppContent: React.FC = () => {
     const targetScreen = pendingNavigation || AppScreen.HOME;
     setPendingNavigation(null);
     
-    navigateToScreen(targetScreen);
+    navigateToScreen(targetScreen as AppScreenType);
   };
 
   const handleCancelExit = () => {
@@ -486,127 +345,25 @@ const AppContent: React.FC = () => {
     setPendingNavigation(null);
   };
 
-  const getGameTypeLabel = (type: GameType) => {
-    switch (type) {
-      case GameType.SET_MATCH:
-        return t('setup.gameType.setmatch');
-      case GameType.ROTATION:
-        return t('setup.gameType.rotation');
-      case GameType.BOWLARD:
-        return t('setup.gameType.bowlard');
-      case GameType.JAPAN:
-        return t('setup.gameType.japan');
-      default:
-        return type;
-    }
-  };
-
-  const getAppBarTitle = () => {
-    if (currentScreen === AppScreen.GAME && currentGame) {
-      return getGameTypeLabel(currentGame.type);
-    }
-    if (currentScreen === AppScreen.VICTORY && finishedGame) {
-      return t('victory.gameResult');
-    }
-    return t('app.title');
-  };
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'grey.50' }}>
-      {/* App bar */}
-      <AppBar position="fixed" sx={{ zIndex: 1200 }}>
-        <Toolbar>
-          {/* Hamburger menu */}
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={handleMenuClick}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {getAppBarTitle()}
-          </Typography>
+      {/* App Header */}
+      <AppHeader 
+        onMenuOpen={handleMenuOpen}
+        currentScreen={currentScreen}
+        currentGame={currentGame}
+        finishedGame={finishedGame}
+        onHomeButtonClick={handleHomeButtonClick}
+      />
 
-          {/* Home button - show in game and victory screens */}
-          {((currentScreen === AppScreen.GAME && currentGame) || (currentScreen === AppScreen.VICTORY && finishedGame)) && (
-            <IconButton
-              onClick={handleHomeButtonClick}
-              title={currentScreen === AppScreen.VICTORY ? t('victory.backToHome') : t('game.backToHome')}
-              size="large"
-              sx={{ 
-                mr: 2,
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                }
-              }}
-            >
-              <HomeIcon />
-            </IconButton>
-          )}
-          
-          {/* Language selector */}
-          <FormControl size="small" sx={{ mr: 2, minWidth: { xs: 60, sm: 120 } }}>
-            <Select
-              value={language}
-              onChange={(e) => handleLanguageChange(e.target.value as LanguageType)}
-              sx={{ 
-                color: 'white',
-                '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.23)' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.5)' },
-                '.MuiSvgIcon-root': { color: 'white' }
-              }}
-            >
-              <MenuItem value="ja">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🇯🇵 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>{t('language.japanese')}</Box>
-                </Box>
-              </MenuItem>
-              <MenuItem value="en">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🇺🇸 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>{t('language.english')}</Box>
-                </Box>
-              </MenuItem>
-            </Select>
-          </FormControl>
-        </Toolbar>
-      </AppBar>
-
-      {/* Hamburger menu dropdown */}
-      <Menu
+      {/* Hamburger Menu */}
+      <HamburgerMenu
         anchorEl={anchorEl}
         open={open}
         onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        {MENU_ITEMS.map((menuItem) => {
-          const IconComponent = menuItem.icon;
-          return (
-            <MenuItem 
-              key={menuItem.screen} 
-              onClick={() => handleMenuItemClick(menuItem.screen)}
-            >
-              <ListItemIcon>
-                <IconComponent fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary={t(menuItem.labelKey)} />
-            </MenuItem>
-          );
-        })}
-      </Menu>
+        onMenuItemClick={handleMenuItemClick}
+      />
 
       {/* Main content */}
       <Container maxWidth="lg" sx={{ py: 3, mt: 8, minHeight: 'calc(100vh - 64px)' }}>
@@ -662,6 +419,10 @@ const AppContent: React.FC = () => {
         
         {currentScreen === AppScreen.QR_SHARE && (
           <QRShare />
+        )}
+        
+        {currentScreen === AppScreen.SETTINGS && (
+          <Settings />
         )}
       </Container>
 

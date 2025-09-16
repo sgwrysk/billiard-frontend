@@ -100,56 +100,6 @@ export const BowlardColors = {
   },
 } as const;
 
-/**
- * Billiard ball color settings
- * Used for Rotation and other games
- */
-export const BallColors = {
-  // Color definitions for solid balls (1-8) and striped balls (9-15)
-  // Defined as same-color pairs: 1&9, 2&10, etc.
-  colors: {
-    1: '#FFD700',  // Yellow (solid 1 = striped 9)
-    2: '#6495ED',  // Blue (solid 2 = striped 10)
-    3: '#FF6B6B',  // Red (solid 3 = striped 11)
-    4: '#9370DB',  // Purple (solid 4 = striped 12)
-    5: '#FF8C00',  // Orange (solid 5 = striped 13)
-    6: '#32CD32',  // Green (solid 6 = striped 14)
-    7: '#CD853F',  // Maroon (solid 7 = striped 15)
-    8: '#000000',  // Black (special black 8 ball)
-    9: '#FFD700',  // Yellow stripe (same as 1)
-    10: '#6495ED', // Blue stripe (same as 2)
-    11: '#FF6B6B', // Red stripe (same as 3)
-    12: '#9370DB', // Purple stripe (same as 4)
-    13: '#FF8C00', // Orange stripe (same as 5)
-    14: '#32CD32', // Green stripe (same as 6)
-    15: '#CD853F', // Maroon stripe (same as 7)
-  },
-  
-  // Ball text color (number color)
-  text: {
-    // Black text for bright colored balls
-    light: '#000000',
-    // White text for dark colored balls
-    dark: '#FFFFFF',
-  },
-  
-  // Ball border and shadow color
-  border: '#333333',
-  
-  // Pocketed ball color
-  pocketed: {
-    background: 'linear-gradient(145deg, #e6e6e6, #cccccc)',
-    shadow: 'inset 2px 2px 4px rgba(0,0,0,0.2)',
-  },
-  
-  // Normal ball shadow effect
-  shadow: {
-    normal: '0 4px 12px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.3)',
-  },
-  
-  // Default color (for undefined ball numbers)
-  default: '#CCCCCC',
-} as const;
 
 /**
  * Common color settings for UI elements

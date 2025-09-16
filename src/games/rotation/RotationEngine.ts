@@ -1,7 +1,6 @@
 import { GameBase } from '../base/GameBase';
 import type { Game, Player } from '../../types/index';
 import { GameType } from '../../types/index';
-import { getBallScore } from '../../utils/ballUtils';
 
 export class RotationEngine extends GameBase {
   getGameType(): GameType {
@@ -20,7 +19,8 @@ export class RotationEngine extends GameBase {
       return game;
     }
     
-    const score = getBallScore(ballNumber, this.getGameType());
+    // In rotation, each ball's point value equals its number
+    const score = ballNumber;
     
     // Update player state
     const updatedPlayers = game.players.map(player => {
@@ -290,6 +290,7 @@ export class RotationEngine extends GameBase {
   }
   
   protected getBallScore(ballNumber: number): number {
-    return getBallScore(ballNumber, this.getGameType());
+    // In rotation, each ball's point value equals its number
+    return ballNumber;
   }
 }

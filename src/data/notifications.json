@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-09-16-07",
+      "date": "2025-09-16",
+      "category": "feature",
+      "content": {
+        "ja": "ボールデザイン選択機能を追加しました。設定画面からデフォルト・Aramithトーナメント・Aramithブラックの3種類のボールデザインを選択できるようになりました。",
+        "en": "Added ball design selection feature. You can now choose from 3 ball designs (Default, Aramith Tournament, Aramith Black) in the Settings screen."
+      }
+    },
+    {
       "id": "2025-09-16-06",
       "date": "2025-09-16",
       "category": "improvement",

@@ -1,7 +1,6 @@
 import { GameBase } from '../base/GameBase';
 import type { Game, Player } from '../../types/index';
 import { GameType, GameStatus } from '../../types/index';
-import { getBallScore } from '../../utils/ballUtils';
 
 export class SetMatchEngine extends GameBase {
   getGameType(): GameType {
@@ -9,7 +8,8 @@ export class SetMatchEngine extends GameBase {
   }
   
   getBallNumbers(): number[] {
-    return Array.from({ length: 9 }, (_, i) => i + 1);
+    // Set Match doesn't use individual ball selection
+    return [];
   }
   
   initializePlayers(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Player[] {
@@ -43,37 +43,10 @@ export class SetMatchEngine extends GameBase {
     };
   }
   
-  handlePocketBall(game: Game, ballNumber: number): Game {
-    const activePlayer = game.players[game.currentPlayerIndex];
-    
-    // Check if ball is already pocketed
-    if (this.isBallPocketed(game, ballNumber)) {
-      return game;
-    }
-    
-    const score = getBallScore(ballNumber, this.getGameType());
-    
-    // Update player state
-    const updatedPlayers = game.players.map(player => {
-      if (player.id === activePlayer.id) {
-        return {
-          ...player,
-          ballsPocketed: [...player.ballsPocketed, ballNumber],
-          score: player.score + score,
-        };
-      }
-      return player;
-    });
-    
-    // Add shot history
-    const updatedGame = this.addShotToHistory(
-      { ...game, players: updatedPlayers },
-      activePlayer.id,
-      ballNumber,
-      true
-    );
-    
-    return updatedGame;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handlePocketBall(game: Game, _ballNumber: number): Game {
+    // Set Match doesn't use individual ball pocketing - handled by WIN_SET custom action
+    return game;
   }
   
   handleSwitchPlayer(game: Game): Game {
@@ -180,15 +153,6 @@ export class SetMatchEngine extends GameBase {
     };
   }
   
-  private isBallPocketed(game: Game, ballNumber: number): boolean {
-    return game.players.some(player => 
-      player.ballsPocketed.includes(ballNumber)
-    );
-  }
-  
-  protected getBallScore(ballNumber: number): number {
-    return getBallScore(ballNumber, this.getGameType());
-  }
   
   private handleUndoLastShot(game: Game): Game {
     // In Set Match, undo the last set victory

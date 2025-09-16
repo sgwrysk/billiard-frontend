@@ -116,7 +116,8 @@ GameColors.victory.text                 // 勝利時のテキスト色
 
 ### 1. インポート
 ```typescript
-import { AppColors, BowlardColors, BallColors, UIColors, GameColors } from '../constants/colors';
+import { AppColors, BowlardColors, UIColors, GameColors } from '../constants/colors';
+import { BallColors } from '../utils/ballUtils';
 ```
 
 ### 2. コンポーネントでの使用例

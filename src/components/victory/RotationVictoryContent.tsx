@@ -5,7 +5,6 @@ import {
   CardContent,
   Typography,
   Avatar,
-  Chip,
   Divider,
 } from '@mui/material';
 import { EmojiEvents } from '@mui/icons-material';
@@ -21,8 +20,9 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { getBallColor } from '../../utils/ballUtils';
-import { UIColors, AppStyles, AppColors } from '../../constants/colors';
+import { BallRenderer } from '../../utils/BallRenderer';
+import { useBallDesign } from '../../contexts/BallDesignContext';
+import { UIColors, AppStyles } from '../../constants/colors';
 import { getBaseChartOptions } from '../../utils/victoryScreenUtils';
 import type { GameVictoryContentProps } from './common';
 
@@ -38,6 +38,7 @@ ChartJS.register(
 
 const RotationVictoryContent: React.FC<GameVictoryContentProps> = ({ game }) => {
   const { t } = useLanguage();
+  const { currentDesign } = useBallDesign();
   const winner = game.players.find(p => p.id === game.winner);
 
   // Generate complete pocketed balls data from scoreHistory for ROTATION games, organized by rack
@@ -268,61 +269,18 @@ const RotationVictoryContent: React.FC<GameVictoryContentProps> = ({ game }) => 
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, ml: 1 }}>
                     {playerData.ballsPocketed.length > 0 ? (
                       playerData.ballsPocketed.map(ball => (
-                        <Chip
+                        <Box
                           key={ball}
-                          label={ball}
-                          sx={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: '50%',
-                            fontWeight: 'bold',
-                            fontSize: '0.9rem',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            border: 'none',
-                            
-                            // Base background for all balls
-                            background: ball > 8 
-                              ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ball)} 20%, ${getBallColor(ball)} 80%, white 80%, white 100%)`
-                              : `radial-gradient(circle at 30% 30%, ${getBallColor(ball)}dd, ${getBallColor(ball)} 70%)`,
-                            
-                            boxShadow: `0 3px 8px ${AppColors.effects.shadow.dark}, inset -1px -1px 2px ${AppColors.effects.shadow.light}, inset 1px 1px 2px rgba(255,255,255,0.3)`,
-                            
-                            // White circle background for number
-                            '&::before': {
-                              content: '""',
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              transform: 'translate(-50%, -50%)',
-                              width: '20px',
-                              height: '20px',
-                              backgroundColor: 'white',
-                              borderRadius: '50%',
-                              boxShadow: UIColors.shadow.inset,
-                              zIndex: 1,
-                            },
-                            
-                            '& .MuiChip-label': {
-                              padding: 0,
-                              fontSize: '0.9rem',
-                              fontWeight: 'bold',
-                              position: 'relative',
-                              zIndex: 2,
-                              color: UIColors.text.black,
-                            },
-                            
-                            // Prevent hover color changes - keep original background
-                            '&:hover': {
-                              background: ball > 8 
-                                ? `linear-gradient(to bottom, white 0%, white 20%, ${getBallColor(ball)} 20%, ${getBallColor(ball)} 80%, white 80%, white 100%) !important`
-                                : `radial-gradient(circle at 30% 30%, ${getBallColor(ball)}dd, ${getBallColor(ball)} 70%) !important`,
-                              '& .MuiChip-label': {
-                                color: `${UIColors.text.black} !important`,
-                              }
-                            },
-                          }}
-                        />
+                          sx={BallRenderer.getStyle(ball, currentDesign.id, 'medium')}
+                        >
+                          <span style={{ 
+                            position: 'relative', 
+                            zIndex: 3,
+                            ...AppStyles.monoFont
+                          }}>
+                            {ball}
+                          </span>
+                        </Box>
                       ))
                     ) : (
                       <Typography variant="body2" color="text.secondary">

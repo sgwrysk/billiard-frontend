@@ -271,7 +271,7 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                         
                         {/* 取得したボールのアイコン表示エリア */}
                         <Box sx={{ 
-                          minHeight: 48, // Increased height to accommodate xs size balls
+                          minHeight: 48, // Increased height to accommodate scoreDisplay size balls
                           border: '1px dashed #ccc', 
                           borderRadius: 1, 
                           p: 1, 
@@ -282,7 +282,7 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
                               <BallButton
                                 key={`${ballNumber}-${index}`}
                                 ballNumber={ballNumber}
-                                size="xs"
+                                size="scoreDisplay"
                                 isActive={true}
                                 disabled={false}
                               />

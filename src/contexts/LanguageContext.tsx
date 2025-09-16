@@ -211,6 +211,16 @@ const translations: Translations = {
     'qrShare.shareLine': 'LINEで共有',
     'qrShare.urlCopied': 'URLをコピーしました',
     'qrShare.shareText': 'ビリヤードスコアアプリをチェック！',
+
+    // Settings screen
+    'settings.ballDesign': 'ボールデザイン設定',
+    'settings.ballDesignDescription': 'ゲーム内で使用するボールのデザインを選択できます。',
+    'settings.selected': '選択中',
+    
+    // Ball design names
+    'ballDesign.default': 'デフォルト (オリジナル)',
+    'ballDesign.aramith-tournament-tv': 'トーナメントTVプロカップ デュラミス (Aramith)',
+    'ballDesign.aramith-tournament-tv-black': 'トーナメントTV BLACK デュラミス (Aramith)',
   },
   en: {
     // Home screen
@@ -402,6 +412,16 @@ const translations: Translations = {
     'qrShare.shareLine': 'Share on LINE',
     'qrShare.urlCopied': 'URL copied to clipboard',
     'qrShare.shareText': 'Check out this Billiard Score App!',
+
+    // Settings screen
+    'settings.ballDesign': 'Ball Design Settings',
+    'settings.ballDesignDescription': 'Select the ball design to use in games.',
+    'settings.selected': 'Selected',
+    
+    // Ball design names
+    'ballDesign.default': 'Default (Original)',
+    'ballDesign.aramith-tournament-tv': 'Tournament TV Pro-Cup Duramith (Aramith)',
+    'ballDesign.aramith-tournament-tv-black': 'Tournament TV BLACK Duramith (Aramith)',
   },
 };
 

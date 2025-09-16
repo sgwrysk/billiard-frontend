@@ -61,14 +61,14 @@ const JapanGameSettingsComponent: React.FC<JapanGameSettingsProps> = ({
           <Typography variant="subtitle1" gutterBottom>
             ハンディキャップボール
           </Typography>
-          <Grid container spacing={1} sx={{ maxWidth: 600 }}>
+          <Grid container spacing={1} sx={{ maxWidth: 800 }}>
             {Array.from({ length: 10 }, (_, i) => i + 1).map((ballNumber) => (
               <Grid item key={ballNumber}>
                 <BallButton
                   ballNumber={ballNumber}
                   isActive={settings.handicapBalls.includes(ballNumber)}
                   onClick={handleHandicapBallToggle}
-                  size="small"
+                  size="medium"
                 />
               </Grid>
             ))}

@@ -199,7 +199,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
               label={t('setup.gameType')}
               onChange={(e) => handleGameTypeChange(e.target.value as GameType)}
             >
-              <MenuItem value={GameType.SET_MATCH}>{t('setup.gameType.setmatch')}</MenuItem>
+              <MenuItem value={GameType.SET_MATCH}>{t('setup.gameType.setMatch')}</MenuItem>
               <MenuItem value={GameType.ROTATION}>{t('setup.gameType.rotation')}</MenuItem>
               <MenuItem value={GameType.BOWLARD}>{t('setup.gameType.bowlard')}</MenuItem>
               <MenuItem value={GameType.JAPAN}>{t('setup.gameType.japan')}</MenuItem>

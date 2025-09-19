@@ -161,7 +161,7 @@ describe('Victory Screen Home Button - TDD', () => {
       const translations: Record<string, string> = {
         'app.title': 'Billiard Score',
         'victory.gameResult': 'ゲーム結果',
-        'setup.gameType.setmatch': 'セットマッチ',
+        'setup.gameType.setMatch': 'セットマッチ',
       };
       return translations[key] || key;
     };

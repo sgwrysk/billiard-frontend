@@ -5,7 +5,7 @@ import type { Game } from '../types/index';
 export const getGameTypeLabel = (type: GameType, t: (key: string) => string) => {
   switch (type) {
     case GameType.SET_MATCH:
-      return t('setup.gameType.setmatch');
+      return t('setup.gameType.setMatch');
     case GameType.ROTATION:
       return t('setup.gameType.rotation');
     case GameType.BOWLARD:

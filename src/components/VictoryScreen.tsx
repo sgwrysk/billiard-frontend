@@ -40,7 +40,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
   const getGameTypeLabel = (type: GameType) => {
     switch (type) {
       case GameType.SET_MATCH:
-        return t('setup.gameType.setmatch');
+        return t('setup.gameType.setMatch');
       case GameType.ROTATION:
         return t('setup.gameType.rotation');
       case GameType.BOWLARD:

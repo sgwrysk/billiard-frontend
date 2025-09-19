@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LanguageProvider } from '../contexts/LanguageContext';
+import { BallDesignProvider } from '../contexts/BallDesignContext';
 import { SetMatchBoard } from '../components/games/SetMatchBoard';
 import { RotationBoard } from '../components/games/RotationBoard';
 import { GameType, GameStatus } from '../types/index';
@@ -8,7 +9,9 @@ import type { Game } from '../types/index';
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <LanguageProvider>
-    {children}
+    <BallDesignProvider>
+      {children}
+    </BallDesignProvider>
   </LanguageProvider>
 );
 

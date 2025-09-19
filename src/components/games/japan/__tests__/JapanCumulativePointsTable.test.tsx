@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 import { LanguageProvider } from '../../../../contexts/LanguageContext';
+import { BallDesignProvider } from '../../../../contexts/BallDesignContext';
 import JapanCumulativePointsTable from '../JapanCumulativePointsTable';
 import type { Game } from '../../../../types/index';
 import { GameType, GameStatus } from '../../../../types/index';
@@ -13,9 +14,11 @@ const theme = createTheme();
 const renderWithProviders = (component: React.ReactElement) => {
   return render(
     <LanguageProvider>
-      <ThemeProvider theme={theme}>
-        {component}
-      </ThemeProvider>
+      <BallDesignProvider>
+        <ThemeProvider theme={theme}>
+          {component}
+        </ThemeProvider>
+      </BallDesignProvider>
     </LanguageProvider>
   );
 };

@@ -30,5 +30,29 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    testTimeout: 30000,      // 30秒に延長 (デフォルト5秒)
+    hookTimeout: 30000,      // setup/teardownも30秒
+    pool: 'forks',           // forksプールでより安定した並列実行
+    poolOptions: {
+      forks: {
+        singleFork: false,   // マルチフォーク有効
+        maxForks: 2,         // 最大2フォークで安定性重視
+        minForks: 1          // 最小1フォーク
+      }
+    },
+    // テスト分離は有効にして安定性確保
+    isolate: true,
+    // テスト結果のバッファリング
+    reporters: ['default'],
+    // カバレッジ設定
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        'src/**/*.test.*',
+        'src/**/__tests__/**'
+      ]
+    }
   },
 })

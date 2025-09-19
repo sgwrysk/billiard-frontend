@@ -3,11 +3,16 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import GameBoard from '../GameBoard';
 import { LanguageProvider } from '../../contexts/LanguageContext';
+import { BallDesignProvider } from '../../contexts/BallDesignContext';
 import type { Game } from '../../types/index';
 import { GameType, GameStatus } from '../../types/index';
 
 const MockLanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <LanguageProvider>{children}</LanguageProvider>
+  <LanguageProvider>
+    <BallDesignProvider>
+      {children}
+    </BallDesignProvider>
+  </LanguageProvider>
 );
 
 const createMockGame = (type: GameType): Game => ({

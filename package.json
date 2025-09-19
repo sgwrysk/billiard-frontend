@@ -11,7 +11,12 @@
     "start": "vite preview --port 3000 --host 0.0.0.0",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "test:fast": "vitest run --reporter=basic --maxConcurrency=4",
+    "test:components": "vitest run src/components/",
+    "test:games": "vitest run src/games/",
+    "test:utils": "vitest run src/utils/",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

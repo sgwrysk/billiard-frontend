@@ -68,20 +68,16 @@ const ChessClock: React.FC<ChessClockProps> = ({
         lastUpdateTimeRef.current = Date.now();
       }
     }
-  }, [chessClock.enabled, chessClock, savedState, players, playerTimes.length]); // Depend on saved state and players
+  }, [chessClock.enabled, chessClock.timeLimit, chessClock.individualTime, chessClock.player1TimeLimit, chessClock.player2TimeLimit, savedState, players.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Don't reset timer when current player changes - let it continue naturally
+  // Timer logic - optimized for battery life and prevent infinite loops
   useEffect(() => {
-    // Note: We don't reset lastUpdateTime here to preserve the continuous timer
-  }, [currentPlayerIndex]);
-
-  // No scroll monitoring needed for fixed header
-
-  // Timer logic
-  useEffect(() => {
-    if (!isRunning || !chessClock.enabled) {
+    if (!isRunning || !chessClock.enabled || playerTimes.length === 0) {
       return;
     }
+
+    // Initialize lastUpdateTime when starting timer
+    lastUpdateTimeRef.current = Date.now();
 
     const interval = setInterval(() => {
       const now = Date.now();
@@ -96,7 +92,6 @@ const ChessClock: React.FC<ChessClockProps> = ({
             const isWarning = newRemainingTime <= chessClock.warningTime * 60;
             const isTimeUp = newRemainingTime <= 0;
 
-
             // Call onTimeUp when time runs out
             if (isTimeUp && !playerTime.isTimeUp && onTimeUp) {
               onTimeUp(index);
@@ -110,13 +105,13 @@ const ChessClock: React.FC<ChessClockProps> = ({
           }
           return playerTime;
         });
-        
+
         return newTimes;
       });
-    }, 100); // Update every 100ms for smooth countdown
+    }, 500); // Update every 500ms for battery optimization
 
     return () => clearInterval(interval);
-  }, [isRunning, currentPlayerIndex, chessClock, onTimeUp]);
+  }, [isRunning, currentPlayerIndex, chessClock.enabled, chessClock.warningTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save chess clock state when it changes
   useEffect(() => {

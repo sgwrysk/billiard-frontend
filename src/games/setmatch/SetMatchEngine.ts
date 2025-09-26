@@ -8,8 +8,8 @@ export class SetMatchEngine extends GameBase {
   }
   
   getBallNumbers(): number[] {
-    // Set Match doesn't use individual ball selection
-    return [];
+    // Set Match uses standard 9-ball setup for individual ball tracking
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9];
   }
   
   initializePlayers(playerSetups: {name: string, targetScore?: number, targetSets?: number}[]): Player[] {
@@ -43,10 +43,32 @@ export class SetMatchEngine extends GameBase {
     };
   }
   
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handlePocketBall(game: Game, _ballNumber: number): Game {
-    // Set Match doesn't use individual ball pocketing - handled by WIN_SET custom action
-    return game;
+  handlePocketBall(game: Game, ballNumber: number): Game {
+    const currentPlayerIndex = game.currentPlayerIndex;
+    const updatedPlayers = game.players.map((player, index) => {
+      if (index === currentPlayerIndex) {
+        return {
+          ...player,
+          ballsPocketed: [...player.ballsPocketed, ballNumber],
+          score: player.score + (ballNumber === 9 ? 10 : 1), // 9-ball is worth 10 points, others are 1 point
+        };
+      }
+      return player;
+    });
+
+    const shotHistory = [...game.shotHistory, {
+      playerId: game.players[currentPlayerIndex].id,
+      ballNumber,
+      timestamp: new Date(),
+      isSunk: true,
+      isFoul: false,
+    }];
+
+    return {
+      ...game,
+      players: updatedPlayers,
+      shotHistory,
+    };
   }
   
   handleSwitchPlayer(game: Game): Game {

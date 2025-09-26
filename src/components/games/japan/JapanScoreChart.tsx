@@ -1,29 +1,9 @@
 import React from 'react';
-import { Box, Card, CardContent, Typography } from '@mui/material';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Card, CardContent, Typography } from '@mui/material';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import type { Game } from '../../../types/index';
 import { UIColors } from '../../../constants/colors';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import SimpleChart from '../../common/SimpleChart';
 
 interface JapanScoreChartProps {
   game: Game;
@@ -34,11 +14,11 @@ interface JapanScoreChartProps {
 
 const JapanScoreChart: React.FC<JapanScoreChartProps> = ({
   game,
-  height = 300,
+  height = 400, // Increased from 300 to 400 for better display
   showTitle = true,
   showCard = true
 }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   // Generate chart data for Japan game - rack vs cumulative points
   const generateJapanChartData = () => {
@@ -76,32 +56,6 @@ const JapanScoreChart: React.FC<JapanScoreChartProps> = ({
     };
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: false,
-        },
-      },
-      x: {
-        title: {
-          display: true,
-          text: language === 'en' ? 'Rack' : 'ラック',
-        },
-      },
-    },
-  };
 
   const chartData = generateJapanChartData();
 
@@ -110,9 +64,11 @@ const JapanScoreChart: React.FC<JapanScoreChartProps> = ({
   }
 
   const chartElement = (
-    <Box sx={{ height }}>
-      <Line data={chartData} options={chartOptions} />
-    </Box>
+    <SimpleChart
+      data={chartData}
+      height={height}
+      showTitle={false}
+    />
   );
 
   if (!showCard) {
@@ -121,9 +77,9 @@ const JapanScoreChart: React.FC<JapanScoreChartProps> = ({
 
   return (
     <Card>
-      <CardContent>
+      <CardContent sx={{ p: 0.5, '&:last-child': { pb: 0.5 } }}>
         {showTitle && (
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>
             {t('victory.scoreProgression')}
           </Typography>
         )}

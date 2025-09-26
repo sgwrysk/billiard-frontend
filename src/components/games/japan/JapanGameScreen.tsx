@@ -359,9 +359,9 @@ const JapanGameScreen: React.FC<JapanGameScreenProps> = ({
       {/* 4. スコア推移グラフパネル */}
       {game.japanRackHistory && game.japanRackHistory.length > 0 && (
         <Box sx={{ mb: 3 }}>
-          <JapanScoreChart 
-            game={game} 
-            height={250}
+          <JapanScoreChart
+            game={game}
+            height={350} // Increased from 250 for better visibility
             showTitle={false}
             showCard={true}
           />

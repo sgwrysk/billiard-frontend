@@ -116,7 +116,7 @@ const AppContent: React.FC = () => {
 
   // Monitor game completion and automatically transition to victory screen
   useEffect(() => {
-    if (currentGame && currentGame.status === GameStatus.COMPLETED) {
+    if (currentGame?.status === GameStatus.COMPLETED) {
       // Find the winner
       let winnerId: string | undefined;
       for (const player of currentGame.players) {
@@ -132,10 +132,10 @@ const AppContent: React.FC = () => {
           }
         }
       }
-      
+
       handleEndGame(winnerId);
     }
-  }, [currentGame, handleEndGame]);
+  }, [currentGame?.status, currentGame?.players, currentGame?.type, handleEndGame]);
 
   const handleResetGame = () => {
     resetGame();

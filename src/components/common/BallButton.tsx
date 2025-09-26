@@ -13,7 +13,7 @@ interface BallButtonProps {
   size?: 'scoreDisplay' | 'medium';
 }
 
-const BallButton: React.FC<BallButtonProps> = ({
+const BallButton: React.FC<BallButtonProps> = React.memo(({
   ballNumber,
   isActive = false,
   onClick,
@@ -85,6 +85,6 @@ const BallButton: React.FC<BallButtonProps> = ({
       </span>
     </Button>
   );
-};
+});
 
 export default BallButton;

@@ -69,7 +69,7 @@ export class BallRenderer {
   static getStyle(ballNumber: number, designId: string, sizeKey: BallSizeKey): object {
     // Validate ball number / ボール番号を検証
     if (ballNumber < 1 || ballNumber > 15) {
-      console.warn(`Invalid ball number: ${ballNumber}. Using ball 1.`);
+      // Invalid ball number, using ball 1 as fallback
       ballNumber = 1;
     }
 

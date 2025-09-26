@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from 'react';
 import { storage } from '../utils/storageUtils';
 
 export type Language = 'ja' | 'en';
@@ -19,6 +19,7 @@ interface Translations {
   en: Translation;
 }
 
+// Memoized translations object to prevent re-creation
 const translations: Translations = {
   ja: {
     // Home screen
@@ -447,24 +448,26 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     storage.setString('billiard-language', language);
   }, [language]);
 
-  const t = (key: string, params?: Record<string, string>): string => {
+  // Memoize translation function to prevent re-creation
+  const t = useMemo(() => (key: string, params?: Record<string, string>): string => {
     let text = translations[language][key] || key;
-    
+
     // Replace parameters in translation text
     if (params) {
       Object.entries(params).forEach(([param, value]) => {
         text = text.replace(`{${param}}`, value);
       });
     }
-    
-    return text;
-  };
 
-  const value = {
+    return text;
+  }, [language]);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     language,
     setLanguage,
     t,
-  };
+  }), [language, t]);
 
   return (
     <LanguageContext.Provider value={value}>

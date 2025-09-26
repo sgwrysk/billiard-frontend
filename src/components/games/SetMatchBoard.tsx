@@ -26,7 +26,7 @@ interface SetMatchBoardProps {
   onChessClockStateChange?: (state: ChessClockState) => void;
 }
 
-export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
+export const SetMatchBoard: React.FC<SetMatchBoardProps> = React.memo(({
   game,
   onWinSet,
   onUndoLastShot,
@@ -242,4 +242,4 @@ export const SetMatchBoard: React.FC<SetMatchBoardProps> = ({
       {/* Action Buttons row removed; undo moved to top controls */}
     </Box>
   );
-};
+});

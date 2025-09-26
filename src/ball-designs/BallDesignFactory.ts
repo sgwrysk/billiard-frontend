@@ -63,7 +63,7 @@ export class BallDesignFactory {
     const strategy = this.strategies.get(designId);
     
     if (!strategy) {
-      console.warn(`Unknown ball design ID: ${designId}. Falling back to default design.`);
+      // Unknown ball design ID, falling back to default design
       return this.strategies.get('default')!;
     }
     

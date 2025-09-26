@@ -78,8 +78,8 @@ describe('Chess Clock Manual Interval Test', () => {
     const startButton = screen.getByTestId('PlayArrowIcon').closest('button');
     fireEvent.click(startButton!);
 
-    // Verify setInterval was called with correct delay
-    expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 100);
+    // Verify setInterval was called with correct delay (optimized for battery)
+    expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 500);
     expect(mockSetInterval).toHaveBeenCalledTimes(1);
 
     // Verify pause button appears (timer is running)

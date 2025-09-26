@@ -31,7 +31,7 @@ interface RotationBoardProps {
   onChessClockStateChange?: (state: ChessClockState) => void;
 }
 
-export const RotationBoard: React.FC<RotationBoardProps> = ({
+export const RotationBoard: React.FC<RotationBoardProps> = React.memo(({
   game,
   onPocketBall,
   onSwitchPlayer,
@@ -292,4 +292,4 @@ export const RotationBoard: React.FC<RotationBoardProps> = ({
       {/* Action Buttons row removed; actions moved to top controls */}
     </Box>
   );
-};
+});

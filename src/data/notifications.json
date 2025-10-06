@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "2025-10-06-01",
+      "date": "2025-10-06",
+      "category": "bugfix",
+      "content": {
+        "ja": "チェスクロックのプレイヤー別設定時のレスポンシブ表示を修正しました。狭い画面でもレイアウトが崩れないようになりました。",
+        "en": "Fixed responsive layout for chess clock individual player settings. Layout now displays properly on narrow screens."
+      }
+    },
+    {
       "id": "2025-09-26-01",
       "date": "2025-09-26",
       "category": "improvement",

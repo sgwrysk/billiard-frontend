@@ -316,10 +316,10 @@ describe('ChessClockSetup', () => {
       const mockOnChange = vi.fn();
       const individualTimeSettings = { ...defaultChessClockSettings, individualTime: true };
       renderChessClockSetup(individualTimeSettings, mockOnChange);
-      
+
       const presetButton = screen.getByText('40');
       fireEvent.click(presetButton);
-      
+
       expect(mockOnChange).toHaveBeenCalledWith({
         ...individualTimeSettings,
         timeLimit: 40,
@@ -330,22 +330,42 @@ describe('ChessClockSetup', () => {
 
     it('should maintain individual time settings when toggling individual time off and on', () => {
       const mockOnChange = vi.fn();
-      const individualTimeSettings = { 
-        ...defaultChessClockSettings, 
+      const individualTimeSettings = {
+        ...defaultChessClockSettings,
         individualTime: true,
         player1TimeLimit: 25,
         player2TimeLimit: 35
       };
       renderChessClockSetup(individualTimeSettings, mockOnChange);
-      
+
       // Toggle individual time off
       const individualToggle = screen.getByRole('checkbox', { name: /プレイヤー別に設定/ });
       fireEvent.click(individualToggle);
-      
+
       expect(mockOnChange).toHaveBeenCalledWith({
         ...individualTimeSettings,
         individualTime: false,
       });
+    });
+  });
+
+  describe('Responsive Layout', () => {
+    it('should render individual time inputs with proper responsive layout', () => {
+      const individualTimeSettings = { ...defaultChessClockSettings, individualTime: true };
+      renderChessClockSetup(individualTimeSettings);
+
+      // Check that player names are displayed
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+
+      // Check that number inputs are rendered
+      const timeInputs = screen.getAllByDisplayValue('30');
+      expect(timeInputs).toHaveLength(2);
+
+      // Verify that Grid components are used for responsive layout
+      const aliceText = screen.getByText('Alice');
+      const gridItem = aliceText.closest('.MuiGrid-item');
+      expect(gridItem).toBeInTheDocument();
     });
   });
 });

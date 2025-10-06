@@ -126,8 +126,8 @@ const ChessClockSetup: React.FC<ChessClockSetupProps> = ({
             <Grid container spacing={2}>
               {players.map((player, index) => (
                 <Grid item xs={6} key={index}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ minWidth: 60 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {player.name || `${t('setup.playerName')} ${index + 1}`}
                     </Typography>
                     <NumberInputStepper
